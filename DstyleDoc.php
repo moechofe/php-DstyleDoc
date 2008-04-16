@@ -1258,11 +1258,11 @@ class DstyleDoc_Token_Method extends DstyleDoc_Token_Doc_Commentable implements 
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token $current, $file, $line )
+  static public function hie( DstyleDoc_Token $current, $line )
   {
     if( $current instanceof DstyleDoc_Token_Modifier )
     {
-      $method = new self( $current->class, $file, $line );
+      $method = new self( $current->class, $line );
       $method->doc_comment = $current->doc_comment;
       $method->abstract = $current->abstract;
       $method->static = $current->static;
@@ -1272,7 +1272,7 @@ class DstyleDoc_Token_Method extends DstyleDoc_Token_Doc_Commentable implements 
       $method->private = $current->private;
     }
     else
-      $method = new self( $current, $file, $line );
+      $method = new self( $current, $line );
     return $method;
   }
 
@@ -1296,9 +1296,9 @@ class DstyleDoc_Token_Method extends DstyleDoc_Token_Doc_Commentable implements 
   // }}}
   // {{{ __construct()
 
-  protected function __construct( DstyleDoc_Token_Class $class, $file, $line )
+  protected function __construct( DstyleDoc_Token_Class $class, $line )
   {
-    parent::__construct( $class, $file, $line );
+    parent::__construct( $class, $line );
     $this->class = $class;
   }
 

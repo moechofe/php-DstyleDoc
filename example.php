@@ -53,10 +53,12 @@ function test( source $i, $a = 'b', $int = 0 )
 
   a( $a );
 
-  a->b();
+  $a->b();
 
   trigger_error('test',E_ERROR_USER);
 }
+
+define( 'C_DEFAULT', 'heu' );
 
 /**
  * Test classe.
@@ -65,12 +67,12 @@ function test( source $i, $a = 'b', $int = 0 )
  *
  * Version: 1.6a
  */
-class Test extends customTest implements A, B, C
+class Test extends customTest implements A, B
 {
   /**
    * Static Final Public FUnction A
    */
-  static final public function a( string $var = C_DEFAULT )
+  static final public function a( $var = C_DEFAULT )
   {
   }
 }
@@ -89,6 +91,22 @@ abstract class customTest
 interface A
 {
 }
+interface B
+{
+}
+
+require_once( 'xdebug.front.end.php' );
+
+require_once( 'DstyleDoc.php' );
+require_once( 'converter.toString.php' );
+
+d(
+
+DstyleDoc::hie()
+  ->source( 'example.php' )
+  ->convert_with( new DstyleDoc_Converter_toString() )
+
+)->fontend;
 
 /**
 // recupère la doc des elements parent pour les classe ou les fonction etendu
