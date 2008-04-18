@@ -141,9 +141,9 @@ HTML;
     return DstyleDoc_Token_String::hie( $current, $source );
   }
 
-  protected function t_unknown( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_unknown( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Unknown::hie( $converter, $current, $source );
+    return DstyleDoc_Token_Unknown::hie( $converter, $current, $source, $line );
   }
 
   protected function t_close_tag( DstyleDoc_Converter $converter, $current )
@@ -154,14 +154,14 @@ HTML;
       return DstyleDoc_Token_Null::hie();
   }
 
-  protected function t_extends( DstyleDoc_Converter $converter, $current )
+  protected function t_extends( DstyleDoc_Converter $converter, $current, $file, $line )
   {
-    return DstyleDoc_Token_Extends::hie( $current );
+    return DstyleDoc_Token_Extends::hie( $current, $line );
   }
 
-  protected function t_implements( DstyleDoc_Converter $converter, $current )
+  protected function t_implements( DstyleDoc_Converter $converter, $current, $file, $line )
   {
-    return DstyleDoc_Token_Implements::hie( $current );
+    return DstyleDoc_Token_Implements::hie( $current, $line );
   }
 
   protected function t_interface( DstyleDoc_Converter $converter, $current, $source, $file, $line )
@@ -184,9 +184,9 @@ HTML;
       return DstyleDoc_Token_Function::hie( $current, $line );
   }
 
-  protected function t_variable( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_variable( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Variable::hie( $current, $source, null );
+    return DstyleDoc_Token_Variable::hie( $current, $source, null, $line );
   }
 
   protected function t_constant_encapsed_string( DstyleDoc_Converter $converter, $current, $source )
@@ -199,9 +199,9 @@ HTML;
     return DstyleDoc_Token_Lnumber::hie( $current, $source );
   }
 
-  protected function t_throw( DstyleDoc_Converter $converter, $current )
+  protected function t_throw( DstyleDoc_Converter $converter, $current, $file, $line )
   {
-    return DstyleDoc_Token_Throw::hie( $current );
+    return DstyleDoc_Token_Throw::hie( $current, $line );
   }
 
   protected function t_new( DstyleDoc_Converter $converter, $current )
@@ -220,34 +220,34 @@ HTML;
       return DstyleDoc_Token_Null::hie();
   }
 
-  protected function t_abstract( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_abstract( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Modifier::hie( $current, $source );
+    return DstyleDoc_Token_Modifier::hie( $current, $source, $line );
   }
 
-  protected function t_static( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_static( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Modifier::hie( $current, $source );
+    return DstyleDoc_Token_Modifier::hie( $current, $source, $line );
   }
 
-  protected function t_final( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_final( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Modifier::hie( $current, $source );
+    return DstyleDoc_Token_Modifier::hie( $current, $source, $line );
   }
 
-  protected function t_public( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_public( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Modifier::hie( $current, $source );
+    return DstyleDoc_Token_Modifier::hie( $current, $source, $line );
   }
 
-  protected function t_protected( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_protected( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Modifier::hie( $current, $source );
+    return DstyleDoc_Token_Modifier::hie( $current, $source, $line );
   }
 
-  protected function t_private( DstyleDoc_Converter $converter, $current, $source )
+  protected function t_private( DstyleDoc_Converter $converter, $current, $source, $file, $line )
   {
-    return DstyleDoc_Token_Modifier::hie( $current, $source );
+    return DstyleDoc_Token_Modifier::hie( $current, $source, $line );
   }
 
   protected function t_require_once( DstyleDoc_Converter $converter, $current )
@@ -313,20 +313,20 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token
 {
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Converter $converter, DstyleDoc_Token $current, $source )
+  static public function hie( DstyleDoc_Converter $converter, DstyleDoc_Token $current, $source, $line )
   {
     switch( $source )
     {
     case ',':
       if( $current instanceof DstyleDoc_Token_Variable )
-        return DstyleDoc_Token_Function_Tuple::hie( $current->function );
+        return DstyleDoc_Token_Function_Tuple::hie( $current->function, $line );
       break;
 
     case '(':
       if( $current instanceof DstyleDoc_Token_Function and ! $current->is_tupled )
-        return DstyleDoc_Token_Function_Tuple::hie( $current );
+        return DstyleDoc_Token_Function_Tuple::hie( $current, $line );
       elseif( $current instanceof DstyleDoc_Token_Method and ! $current->is_tupled )
-        return DstyleDoc_Token_Method_Tuple::hie( $current );
+        return DstyleDoc_Token_Method_Tuple::hie( $current, $line );
       elseif( $current instanceof DstyleDoc_Token_Function or $current instanceof DstyleDoc_Token_Method )
         return $current;
       break;
@@ -348,6 +348,7 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token
       break;
 
     case '}':
+      var_dump( $current );
       if( $current instanceof DstyleDoc_Token_Function )
         return $current->to( $converter );
       elseif( $current instanceof DstyleDoc_Token_Class )
@@ -406,36 +407,6 @@ class DstyleDoc_Token_Doc_Comment extends DstyleDoc_Class_Ref
   protected function get_source()
   {
     return $this->_source;
-  }
-
-  // }}}
-  // {{{ $file
-
-  protected $_file = 0;
-
-  protected function set_file( DstyleDoc_Token_File $file )
-  {
-    $this->_file = $file;
-  }
-
-  protected function get_file()
-  {
-    return $this->_file;
-  }
-
-  // }}}
-  // {{{ $line
-
-  protected $_line = 0;
-
-  protected function set_line( $line )
-  {
-    $this->_line = (integer)$line;
-  }
-
-  protected function get_line( $line )
-  {
-    return $this->_line;
   }
 
   // }}}
@@ -517,7 +488,10 @@ abstract class DstyleDoc_Token_Fileable extends DstyleDoc_Token
 
   protected function __construct( $file, $line )
   {
-    $this->file = $file;
+    if( $file instanceof DstyleDoc_Token_Fileable )
+      $this->file = $file->file;
+    elseif( is_string($file) )
+      $this->file = $file;
     $this->line = $line;
   }
 
@@ -548,10 +522,11 @@ abstract class DstyleDoc_Token_Doc_Commentable extends DstyleDoc_Token_Fileable
 
   protected function __construct( DstyleDoc_Token $doc_comment, $line )
   {
-    if( $doc_comment instanceof DstyleDoc_Token_Doc_Comment and $doc_comment->file instanceof DstyleDoc_Token_File )
+    parent::__construct( $doc_comment, $line );
+/*    if( $doc_comment instanceof DstyleDoc_Token_Doc_Comment and $doc_comment->file instanceof DstyleDoc_Token_File )
       parent::__construct( $doc_comment->file, $line );
     else
-      parent::__construct( null, $line );
+      parent::__construct( null, $line );*/
 
     if( $doc_comment instanceof DstyleDoc_Token_Doc_Comment )
       $this->doc_comment = $doc_comment;
@@ -729,7 +704,7 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token_Doc_Commentable implements D
     $converter->class = $this->name;
     $class = $converter->class;
 
-    $class->file = $this->file;
+    $class->file = $this->file->file;
     $class->line = $this->line;
     $class->documentation = (string)$this->doc_comment;
 
@@ -746,7 +721,7 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token_Doc_Commentable implements D
       $function = $class->method;
       $converter->method = $function;
 
-      $function->file = $method->file;
+      $function->file = $method->file->file;
       $function->line = $method->line;
       $function->class = $class;
       $function->documentation = (string)$method->doc_comment;
@@ -799,7 +774,7 @@ class DstyleDoc_Token_Function_Tuple extends DstyleDoc_Function_Ref implements D
 
   public function set_value( $string )
   {
-    $this->var = DstyleDoc_Token_Variable::hie( $this, null, $string );
+    $this->var = DstyleDoc_Token_Variable::hie( $this, null, $string, $this->line );
   }
 
   // }}}
@@ -813,9 +788,9 @@ class DstyleDoc_Token_Function_Tuple extends DstyleDoc_Function_Ref implements D
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token $current )
+  static public function hie( DstyleDoc_Token $current, $line )
   {
-    return new self( $current );
+    return new self( $current, $line );
   }
 
   // }}}
@@ -859,9 +834,9 @@ class DstyleDoc_Token_Method_Tuple extends DstyleDoc_Method_Ref implements Dstyl
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token $current )
+  static public function hie( DstyleDoc_Token $current, $line )
   {
-    return new self( $current );
+    return new self( $current, $line );
   }
 
   // }}}
@@ -1414,9 +1389,9 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Function_Ref implements DstyleD
   // }}}
   // {{{ __construct()
 
-  protected function __construct( DstyleDoc_Token $varable, $source, $type )
+  protected function __construct( DstyleDoc_Token $varable, $source, $type, $line )
   {
-    parent::__construct( $varable );
+    parent::__construct( $varable, $line );
     $this->var = $source;
     $this->type = $type;
   }
@@ -1424,11 +1399,11 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Function_Ref implements DstyleD
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token $current, $source, $type )
+  static public function hie( DstyleDoc_Token $current, $source, $type, $line )
   {
     if( $current instanceof DstyleDoc_Token_Method_Tuple or $current instanceof DstyleDoc_Token_Function_Tuple )
     {
-      $current->function->variable = new self( $current->function, $source, $type );
+      $current->function->variable = new self( $current->function, $source, $type, $line );
       return $current->function->variable;
     }
     elseif( $current instanceof DstyleDoc_Token_Method or $current instanceof DstyleDoc_Token_Function )
@@ -1457,27 +1432,31 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Function_Ref implements DstyleD
 /**
  * Classe abstraite des tokens faisant reference à un token de type classe.
  */
-abstract class DstyleDoc_Class_Ref extends DstyleDoc_Token
+abstract class DstyleDoc_Class_Ref extends DstyleDoc_Token_Fileable
 {
   // {{{ $class
 
   protected $_class = null;
 
-  protected function set_class( $class )
+  protected function set_class( DstyleDoc_Token_Class $class )
   {
     $this->_class = $class;
   }
 
   protected function get_class()
   {
-    return $this->_class;
+    if( $this->_class instanceof DstyleDoc_Token_Class )
+      return $this->_class;
+    else
+      return DstyleDoc_Token_Null::hie();
   }
 
   // }}}
   // {{{ __construct()
 
-  protected function __construct( DstyleDoc_Token_Class $class )
+  protected function __construct( DstyleDoc_Token_Class $class, $line )
   {
+    parent::__construct( $class, $line );
     $this->class = $class;
   }
 
@@ -1487,7 +1466,7 @@ abstract class DstyleDoc_Class_Ref extends DstyleDoc_Token
 /**
  * Classe des tokens faisant reference à un token de type function.
  */
-abstract class DstyleDoc_Function_Ref extends DstyleDoc_Token
+abstract class DstyleDoc_Function_Ref extends DstyleDoc_Token_Fileable
 {
   // {{{ $function
 
@@ -1507,8 +1486,9 @@ abstract class DstyleDoc_Function_Ref extends DstyleDoc_Token
   // }}}
   // {{{ __construct()
 
-  protected function __construct( DstyleDoc_Token $function )
+  protected function __construct( DstyleDoc_Token $function, $line )
   {
+    parent::__construct( $function, $line );
     $this->function = $function;
   }
 
@@ -1634,12 +1614,12 @@ class DstyleDoc_Token_Modifier extends DstyleDoc_Class_Ref
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token $current, $source )
+  static public function hie( DstyleDoc_Token $current, $source, $line )
   {
     if( $current instanceof DstyleDoc_Token_Modifier )
       $modifier = $current;
     else
-      $modifier = new self;
+      $modifier = new self( $current, $line );
 
     if( $current instanceof DstyleDoc_Token_Doc_Comment )
       $modifier->doc_comment = $current;
@@ -1683,8 +1663,9 @@ class DstyleDoc_Token_Modifier extends DstyleDoc_Class_Ref
   // }}}
   // {{{ __construct()
 
-  protected function __construct()
+  protected function __construct( DstyleDoc_Token $current, $line )
   {
+    parent::__construct( $current->class, $line );
   }
 
   // }}}
@@ -1755,9 +1736,9 @@ class DstyleDoc_Token_Extends extends DstyleDoc_Class_Ref implements DstyleDoc_T
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token_Class $current )
+  static public function hie( DstyleDoc_Token_Class $current, $line )
   {
-    return new self( $current );
+    return new self( $current, $line );
   }
 
   // }}}
@@ -1786,9 +1767,9 @@ class DstyleDoc_Token_Implements extends DstyleDoc_Class_Ref implements DstyleDo
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token_Class $current )
+  static public function hie( DstyleDoc_Token_Class $current, $line )
   {
-    return new self( $current );
+    return new self( $current, $line );
   }
 
   // }}}
@@ -1817,9 +1798,9 @@ class DstyleDoc_Token_Throw extends DstyleDoc_Function_Ref implements DstyleDoc_
   // }}}
   // {{{ hie()
 
-  static public function hie( DstyleDoc_Token_Function $current )
+  static public function hie( DstyleDoc_Token_Function $current, $line )
   {
-    return new self( $current );
+    return new self( $current, $line );
   }
 
   // }}}
@@ -1882,2121 +1863,6 @@ class DstyleDoc_Token_Interface extends DstyleDoc_Token_Doc_Commentable implemen
     $interface->documentation = (string)$this->doc_comment;
 
     return DstyleDoc_Token_Null::hie();
-  }
-
-  // }}}
-}
-
-abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
-{
-  // {{{ $converter
-
-  protected $_converter = null;
-
-  protected function set_converter( DstyleDoc_Converter $converter )
-  {
-    $this->_converter = $converter;
-  }
-
-  protected function get_converter()
-  {
-    return $this->_converter;
-  }
-
-  // }}}
-  // {{{ $descriptions
-
-  protected $_descriptions = array();
-
-  protected function get_descriptions()
-  {
-    return $this->_descriptions;
-  }
-
-  protected function set_descriptions( $descriptions )
-  {
-    $this->_descriptions = (array)$descriptions;
-  }
-
-  protected function set_description( $description )
-  {
-    $this->_descriptions[] = $description;
-  }
-
-  protected function get_description()
-  {
-    return $this->converter->convert_description( $this->_descriptions );
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( DstyleDoc_Converter $converter )
-  {
-    $this->converter = $converter;
-  }
-
-  // }}}
-}
-
-/**
- * Classe abstraite d'un Element.
- */
-abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
-{
-  // {{{ $version
-
-  protected $_version = '';
-
-  protected function set_version( $version ) 
-  {
-    $this->_version = $version;
-  }
-
-  protected function get_version()
-  {
-    return $this->_version;
-  }
-
-  // }}}
-  // {{{ $documentation
-
-  protected $_documentation = '';
-
-  protected function set_documentation( $documentation )
-  {
-    $this->_documentation = $documentation;
-  }
-
-  protected function get_documentation()
-  {
-    return $this->_documentation;
-  }
-
-  // }}}
-  // {{{ $analysed
-
-  protected $_analysed = false;
-
-  protected function set_analysed( $analysed )
-  {
-    $this->_analysed = (boolean)$analysed;
-  }
-
-  protected function get_analysed()
-  {
-    return $this->_analysed;
-  }
-
-  // }}}
-  // {{{ $packages
-
-  protected $_packages = array();
-
-  protected function set_packages( $packages )
-  {
-    $this->_packages = $packages;
-  }
-
-  protected function get_packages()
-  {
-    return $this->_packages;
-  }
-
-  // }}}
-  // {{{ $historys
-
-  protected $_historys = array();
-
-  protected function set_historys( $versions )
-  {
-    $this->_historys = (array)$versions;
-  }
-
-  protected function get_historys()
-  {
-    return $this->_historys;
-  }
-
-  protected function set_history( $version ) 
-  {
-    $this->_historys[] = new DstyleDoc_Element_History_Version( $this->converter, $version );
-  }
-
-  protected function get_history()
-  {
-    if( count($this->_historys) )
-    {
-      list($version) = array_reverse($this->_historys);
-      return $version;
-    }
-    else
-      return new DstyleDoc_Element_History_Version( $this->converter, null );
-  }
-
-  // }}}
-  // {{{ __toString()
-
-  abstract public function __toString();
-
-  // }}}
-  // {{{ analyse()
-
-  public function analyse()
-  {
-    $analysers = array();
-    foreach( get_declared_classes() as $class )
-      if( is_subclass_of( $class, 'DstyleDoc_Analyser' ) )
-        $analysers[] = $class;
-
-    $current = null;
-    foreach( explode("\n",strtr($this->documentation,array("\r\n"=>"\n","\r"=>"\n"))) as $source )
-    {
-      echo '<hr /><h1>',htmlentities($source),'</h1>';
-      var_dump( $current );
-      $result = array();
-      $source = DstyleDoc_Analyser::remove_stars($source);
-      foreach( $analysers as $analyser )
-      {
-          if( call_user_func( array($analyser,'analyse'), $current, $source, &$instance, &$priority ) )
-            $result[$priority] = $instance;
-      }
-      if( $result )
-      {
-        ksort($result);
-        $current = current($result);
-
-        echo '<hr />';
-        var_dump( $result );
-
-        if( $current instanceof DstyleDoc_Analyser )
-          $current = $current->apply( $this );
-      }
-    }
-
-    foreach( $analysers as $analyser )
-      call_user_func( array($analyser,'finalize'), $this );
-
-    $this->analysed = true;
-  }
-
-  // }}}
-}
-
-/**
- * Classe abstratite d'un Element Contenant un titre.
- */
-abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
-{
-  // {{{ $descriptions
-
-  protected function get_description()
-  {
-    if( ! $this->analysed ) $this->analyse();
-    $copy = $this->_descriptions;
-    if( count($copy) )
-      array_shift($copy);
-    return $this->converter->convert_description( $copy );
-  }
-
-  // }}}
-  // {{{ $title
-
-  protected function get_title()
-  {
-    if( ! $this->analysed ) $this->analyse();
-    if( count($this->_descriptions) )
-      list($result) = $this->_descriptions;
-    else
-      $result = '';
-    return $this->converter->convert_title( $result );
-  }
-
-  // }}}
-}
-
-/**
- * Classe abstraite d'un Element possèdant un lien dans un fichier.
- */
-abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
-{
-  // {{{ $file
-
-  protected $_file = '';
-
-  protected function set_file( $file )
-  {
-    if( is_string($file) and ($found = $this->converter->file_exists($file)) )
-      $this->_file = $found;
-    elseif( $file instanceof DstyleDoc_Element_File )
-      $this->_file = $file;
-    else
-      $this->_file = new DstyleDoc_Element_File( $this->converter, $file );
-  }
-
-  protected function get_file()
-  {
-    return $this->_file;
-  }
-
-  // }}}
-  // {{{ $line
-
-  protected $_line = 0;
-
-  protected function set_line( $line )
-  {
-    $this->_line = abs((integer)$line);
-  }
-
-  protected function get_line()
-  {
-    return $this->_line;
-  }
-
-  // }}}
-}
-
-/**
- * Classe abstraite d'un Element possèdant un lien dans un fichier et un nom.
- */
-abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
-{
-  // {{{ $name
-
-  protected $_name = '';
-
-  protected function set_name( $name )
-  {
-    $this->_name = (string)$name;
-  }
-
-  protected function get_name()
-  {
-    return $this->_name;
-  }
-
-  // }}}
-  // {{{ __toString()
-
-  public function __toString()
-  {
-    return $this->name;
-  }
-
-  // }}}
-  // {{{ __construct() 
-
-  public function __construct( DstyleDoc_Converter $converter, $name )
-  {
-    parent::__construct( $converter );
-    if( $name )
-      $this->name = $name;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type fichier.
- */
-class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
-{
-  // {{{ $file
-
-  protected $_file = '';
-
-  protected function set_file( $file )
-  {
-    $this->_file = (string)$file;
-  }
-
-  protected function get_file()
-  {
-    return $this->_file;
-  }
-
-  // }}}
-  // {{{ $classes
-
-  protected $_classes = array();
-
-  protected function set_class( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_classes) )
-    {
-      reset($this->_classes);
-      while( true)
-      {
-        $class = current($this->_classes);
-        if( $found = ($class->name == $name or $class === $name) or false === next($this->_classes) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Class )
-        $this->_classes[] = $name;
-      else
-        $this->_classes[] = new DstyleDoc_Element_Class( $this, $name );
-      end($this->_classes);
-    }
-  }
-
-  protected function get_class()
-  {
-    if( ! count($this->_classes) )
-    {
-      $this->_classes[] = new DstyleDoc_Element_Class( $this, null );
-      return end($this->_classes);
-    }
-    else
-      return current($this->_classes);
-  }
- 
-  protected function get_classes()
-  {
-    return $this->_classes;
-  }
-
-  // }}}
-  // {{{ $interfaces
-
-  protected $_interfaces = array();
-
-  protected function set_interface( $name )
-  {
-   $found = false;
-    if( ! empty($name) and count($this->_interfaces) )
-    {
-      reset($this->_interfaces);
-      while( true)
-      {
-        $interface = current($this->_interfaces);
-        if( $found = ($interface->name == $name) or false === next($this->_interfaces) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      $this->_interfaces[] = new DstyleDoc_Element_Interface( $this, $name );
-      end($this->_interfaces);
-    }
-  }
-
-  protected function get_interface()
-  {
-    if( ! count($this->_interfaces) )
-    {
-      $this->_interfaces[] = new DstyleDoc_Element_Interface( $this, null );
-      return end($this->_interfaces);
-    }
-    else
-      return current($this->_interfaces);
-  }
-
-  protected function get_interfaces()
-  {
-    return $this->_interfaces;
-  }
-
-  // }}}
-  // {{{ $functions
-
-  protected $_functions = array();
-
-  protected function set_function( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_functions) )
-    {
-      reset($this->_functions);
-      while( true)
-      {
-        $function = current($this->_functions);
-        if( $found = ($function->name == $name or $function === $name) or false === next($this->_functions) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Function )
-        $this->_functions[] = $name;
-      else
-        $this->_functions[] = new DstyleDoc_Element_Function( $this, $name );
-      end($this->_functions);
-    }
-  }
-  
-  protected function get_function()
-  {
-    if( ! count($this->_functions) )
-    {
-      $this->_functions[] = new DstyleDoc_Element_Function( $this, null );
-      return end($this->_functions);
-    }
-    else
-      return current($this->_functions);
-  }
-
-  protected function get_functions()
-  {
-    return $this->_functions;
-  }
-
-  // }}}
-  // {{{ __toString()
-
-  public function __toString()
-  {
-    return $this->converter->convert_file( $this->file );
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( DstyleDoc_Converter $converter, $file )
-  {
-    parent::__construct( $converter );
-    $this->file = $file;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type classe.
- */
-class DstyleDoc_Element_Class extends DstyleDoc_Element_Filed_Named
-{
-  // {{{ $abstract
-
-  protected $_abstract = false;
-
-  protected function set_abstract( $abstract )
-  {
-    $this->_abstract = $abstract;
-  }
-
-  protected function get_abstract()
-  {
-    return $this->_abstract;
-  }
-
-  // }}}
-  // {{{ $final
-
-  protected $_final = false;
-
-  protected function set_final( $final )
-  {
-    $this->_final = $final;
-  }
-
-  protected function get_final()
-  {
-    return $this->_final;
-  }
-
-  // }}}
-  // {{{ $parent
-
-  protected $_parent = null;
-
-  protected function set_parent( $parent )
-  {
-    $this->_parent = (string)$parent;
-  }
-
-  protected function get_parent()
-  {
-    return $this->_parent;
-  }
-
-  // }}}
-  // {{{ $implements
-
-  protected $_implements = array();
-
-  protected function set_implement( $implement )
-  {
-    $this->_implements[] = (string)$implement;
-  }
-
-  protected function get_implements()
-  {
-    return $this->_implements;
-  }
-
-  // }}}
-  // {{{ $methods
-
-  protected $_methods = array();
-
-  protected function set_method( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_methods) )
-    {
-      reset($this->_methods);
-      while( true)
-      {
-        $method = current($this->_methods);
-        if( $found = ($method->name == $name or $method === $name) or false === next($this->_methods) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Method )
-        $this->_methods[] = $name;
-      else
-        $this->_methods[] = new DstyleDoc_Element_Method( $this->converter, $name );
-      end($this->_methods);
-    }
-  }
-
-  protected function get_method()
-  {
-    if( ! count($this->_methods) )
-    {
-      $this->_methods[] = new DstyleDoc_Element_Method( $this->converter, null );
-      return end($this->_methods);
-    }
-    else
-      return current($this->_methods);
-  }
-
-
-  protected function get_methods()
-  {
-    return $this->_methods;
-  }
-
-  // }}}
-  // {{{ $childs
-
-  protected function get_childs()
-  {
-    return $this->_childs;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de version de l'historique.
- */
-class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
-{
-  // {{{ $version
-
-  protected $_version = '';
-
-  protected function set_version( $version ) 
-  {
-    $this->_version = $version;
-  }
-
-  protected function get_version()
-  {
-    return $this->_version;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( DstyleDoc_Converter $converter, $version )
-  {
-    parent::__construct( $converter );
-    $this->version = $version;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type interface.
- */
-class DstyleDoc_Element_Interface extends DstyleDoc_Element_Filed_Named
-{
-}
-
-/**
- * Classe d'un element de type fonction.
- */
-class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
-{
-  // {{{ $params
-
-  protected $_params = array();
-
-  protected function set_params( $params )
-  {
-    $this->_params = (array)$params;
-  }
-
-  protected function get_params()
-  {
-    return $this->_params;
-  }
-
-  /**
-   * Séléction un paramètre existant ou en crée un nouveau.
-   * Le paramètre ainsi séléctionné peut être récupérer avec get_param().
-   * Params:
-   *  $param = Le nom de la variable existante ou qui sera créer.
-   */
-  protected function set_param( $param ) 
-  {
-    $found = false;
-    if( ! empty($param) and count($this->_params) )
-    {
-      reset($this->_params);
-      while( true)
-      {
-        $value = current($this->_params);
-        if( $value->var == $param )
-        {
-          $found = true;
-          break;
-        }
-        elseif( false === next($this->_params) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      $this->_params[] = new DstyleDoc_Element_Param( $this->converter, $param );
-      end($this->_params);
-    }
-  }
-
-  protected function get_param()
-  {
-    if( ! count($this->_params) )
-    {
-      $this->_params[] = new DstyleDoc_Element_Param( $this->converter, null );
-      return end($this->_params);
-    }
-    else
-      return current($this->_params);
-  }
-
-  // }}}
-  // {{{ $returns
-
-  protected $_returns = null;
-
-  protected function get_return()
-  {
-    if( ! $this->_returns )
-      $this->_returns = new DstyleDoc_Element_Return( $this->converter );
-
-    return $this->_returns;
-  }
-
-  // }}}
-  // {{{ $exceptions
-
-  protected $_exceptions = array();
-
-  protected function set_exception( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_exceptions) )
-    {
-      reset($this->_exceptions);
-      while( true)
-      {
-        $exception = current($this->_exceptions);
-        if( $found = ($exception->name == $name) or false === next($this->_exceptions) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      $this->_exceptions[] = new DstyleDoc_Element_Exception( $this->converter, $name );
-      end($this->_exceptions);
-    }
-  }
-
-  protected function get_exception()
-  {
-    if( ! count($this->_exceptions) )
-    {
-      $this->_exceptions[] = new DstyleDoc_Element_Exception( $this->converter, null );
-      return end($this->_exceptions);
-    }
-    else
-      return current($this->_exceptions);
-  }
-
-  protected function get_exceptions()
-  {
-    return $this->_exceptions;
-  }
-
-  // }}}
-  // {{{ $syntax
-
-  protected $_syntax = array();
-
-  protected function set_syntax( $syntax )
-  {
-    $this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $syntax );
-  }
-
-  protected function get_syntax()
-  {
-    if( count($this->_syntax) )
-      return end($this->_syntax);
-    else
-      return new DstyleDoc_Element_Syntax( $this->converter, null );
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type fonction.
- */
-class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
-{
-  // {{{ $class
-
-  protected $_class = null;
-
-  protected function set_class( DstyleDoc_Element_Class $class )
-  {
-    $this->_class = $class;
-  }
-
-  protected function get_class()
-  {
-    return $this->_class;
-  }
-
-  // }}}
-  // {{{ $abstract
-
-  protected $_abstract = false;
-
-  protected function set_abstract( $abstract )
-  {
-    $this->_abstract = $abstract;
-  }
-
-  protected function get_abstract()
-  {
-    return $this->_abstract;
-  }
-
-  // }}}
-  // {{{ $static
-
-  protected $_static = false;
-
-  protected function set_static( $static )
-  {
-    $this->_static = $static;
-  }
-
-  protected function get_static()
-  {
-    return $this->_static;
-  }
-
-  // }}}
-  // {{{ $public
-
-  protected $_public = false;
-
-  protected function set_public( $public )
-  {
-    $this->_public = $public;
-  }
-
-  protected function get_public()
-  {
-    return $this->_public;
-  }
-
-  // }}}
-  // {{{ $protected
-
-  protected $_protected = false;
-
-  protected function set_protected( $protected )
-  {
-    $this->_protected = $protected;
-  }
-
-  protected function get_protected()
-  {
-    return $this->_protected;
-  }
-
-  // }}}
-  // {{{ $private
-
-  protected $_private = false;
-
-  protected function set_private( $private )
-  {
-    $this->_private = $private;
-  }
-
-  protected function get_private()
-  {
-    return $this->_private;
-  }
-
-  // }}}
-  // {{{ $final
-
-  protected $_final = false;
-
-  protected function set_final( $final )
-  {
-    $this->_final = $final;
-  }
-
-  protected function get_final()
-  {
-    return $this->_final;
-  }
-
-  // }}}
-}
-
-/**
- * Class d'un element de type syntaxe.
- */
-class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
-{
-  // {{{ $syntax
-
-  protected $_syntax = array();
-
-  protected function set_syntax( $syntax ) 
-  {
-    $this->_syntax = (array)$syntax;
-  }
-
-  protected function get_syntax()
-  {
-    return $this->_syntax;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( DstyleDoc_Converter $converter, $syntax )
-  {
-    parent::__construct( $converter );
-    $this->syntax = $syntax;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type paramètre.
- */
-class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
-{
-  // {{{ $name
-
-  protected $_name = '';
-
-  protected function set_name( $name ) 
-  {
-    $this->_name = (string)$name;
-  }
-
-  protected function get_name()
-  {
-    return $this->_name;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( DstyleDoc_Converter $converter, $exception )
-  {
-    parent::__construct( $converter );
-    $this->name = $exception;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type paramètre.
- */
-class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
-{
-  // {{{ $types
-
-  protected $_types = '';
-
-  protected function set_types( $types ) 
-  {
-    $this->_types = (array)$types;
-  }
-
-  protected function get_types()
-  {
-    return $this->_types;
-  }
-
-  protected function set_type( $type ) 
-  {
-    if( ! empty($type) )
-    {
-      $this->_types[] = (string)$type;
-      $this->_types = array_unique($this->_types);
-    }
-  }
-
-  // }}}
-  // {{{ $var
-
-  protected $_var = '';
-
-  protected function set_var( $var ) 
-  {
-    $this->_var = (string)$var;
-  }
-
-  protected function get_var()
-  {
-    return $this->_var;
-  }
-
-  // }}}
-  // {{{ $default
-
-  protected $_default = '';
-
-  protected function set_default( $default ) 
-  {
-    $this->_default = (string)$default;
-  }
-
-  protected function get_default()
-  {
-    return $this->_default;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( DstyleDoc_Converter $converter, $var )
-  {
-    parent::__construct( $converter );
-    if( $var )
-      $this->var = $var;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'un element de type paramètre.
- */
-class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
-{
-  // {{{ $types
-
-  protected $_types = '';
-
-  protected function set_types( $types ) 
-  {
-    $this->_types = (array)$types;
-  }
-
-  protected function get_types()
-  {
-    return $this->_types;
-  }
-
-  protected function set_type( $type ) 
-  {
-    if( ! empty($type) )
-    {
-      $this->_types[] = (string)$type;
-      $this->_types = array_unique($this->_types);
-    }
-  }
-
-  // }}}
-}
-
-/**
- * Interface de la base des analysers
- */
-interface DstyleDoc_Analyseable
-{
-  // {{{ analyse()
-
-  static function analyse( $current, $source, &$instance, &$priority );
-
-  // }}}
-  // {{{ apply()
-
-  function apply( DstyleDoc_Element $element );
-
-  // }}}
-}
-
-interface DstyleDoc_Analyser_Descriptable
-{
-  // {{{ descriptable()
-
-  function descriptable( DstyleDoc_Element $element, $description );
-
-  // }}}
-}
-
-/**
- * Classe abstraite de la base des analysers.
- */
-abstract class DstyleDoc_Analyser extends DstyleDoc_Properties implements DstyleDoc_Analyseable
-{
-  // {{{ remove_stars()
-
-  static public function remove_stars( $source )
-  {
-    // ^\s*(?:\/*\**|\**)\s*(.*?)\s*(?:\**\/|\**)$
-    if( preg_match( '/^\\s*(?:\\/*\\**|\\**)\\s*(.*?)\\s*(?:\\**\\/|\\**)$/', $source, $matches ) )
-      return $matches[1];
-    else
-      return $source;
-  }
-
-  // }}}
-  // {{{ finalize()
-
-  static public function finalize( DstyleDoc_Element $element )
-  {
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse de la description.
- */
-class DstyleDoc_Analyser_Description extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 100;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    if( $source and $current instanceof DstyleDoc_Analyser_Descriptable )
-    {
-      $instance = new self( $source );
-      $priority = self::priority;
-      $instance->descriptable = $current;
-      return true;
-    }
-    elseif( $source )
-    {
-      $instance = new self( $source );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute une nouvelle ligne de description à l'élément.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    if( $this->descriptable )
-    {
-      $this->descriptable->descriptable( $element, $this->description );
-      return $this->descriptable;
-    }
-    else
-    {
-      $element->description = $this->description;
-      return $this;
-    }
-  }
-
-  // }}}
-  // {{{ $description
-
-  protected $_description = '';
-
-  protected function set_description( $description )
-  {
-    $this->_description = (string)$description;
-  }
-
-  protected function get_description()
-  {
-    return $this->_description;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  protected function __construct( $description )
-  {
-    $this->description = $description;
-  }
-
-  // }}}
-  // {{{ $descriptable
-
-  protected $_descriptable = null;
-
-  protected function set_descriptable( DstyleDoc_Analyser_Descriptable $descriptable )
-  {
-    $this->_descriptable = $descriptable;
-  }
-
-  protected function get_descriptable()
-  {
-    return $this->_descriptable;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'un séparateur de paragraphe la description
- */
-class DstyleDoc_Analyser_Description_Paragraphe extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 1000;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    if( $current instanceof DstyleDoc_Analyser_Description and $source === '' )
-    {
-      $instance = new self();
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    if( count($element->descriptions) > 1 )
-    {
-      list($last) = array_reverse($element->descriptions);
-      if( $last !== '' )
-        $element->description = '';
-    }
-    return $this;
-  }
-
-  // }}}
-  // {{{ finalize()
-
-  static public function finalize( DstyleDoc_Element $element )
-  {
-    if( count($element->descriptions) > 1 )
-    {
-      list($last) = array_reverse($element->descriptions);
-      if( $last === '' )
-      {
-        $new = $element->descriptions;
-        array_pop($new);
-        $element->descriptions = $new;
-      }
-    }
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise de version.
- */
-class DstyleDoc_Analyser_Version extends DstyleDoc_Analyser
-{
-  // {{{ $version
-
-  protected $_version = '';
-
-  protected function set_version( $version ) 
-  {
-    $this->_version = $version;
-  }
-
-  protected function get_version()
-  {
-    return $this->_version;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^version:\s*(.+)$
-    if( preg_match( '/^version:\\s*(.+)$/i', $source, $matches ) )
-    {
-      $instance = new self( $matches[1] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  protected function __construct( $version )
-  {
-    $this->version = $version;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    $element->version = $this->version;
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise d'historique.
- */
-class DstyleDoc_Analyser_History extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^history:(?:\s*(?:v|version:?\s*)?(\d.*?)\s*[:=]?(?:\s+(.*)))?$
-    if( preg_match( '/^history:(?:\\s*(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?(?:\\s+(.*)))?$/i', $source, $matches ) )
-    {
-      $instance = new self();
-      $priority = self::priority;
-      if( ! empty($matches[1]) )
-      {
-        $instance = new DstyleDoc_Analyser_Element_History_List( $matches[1], $matches[2] );
-        $property = DstyleDoc_Analyser_Element_History_List::priority;
-      }
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'un élément de liste d'historique.
- */
-class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
-{
-  // {{{ $version
-
-  protected $_version = '';
-
-  protected function set_version( $version ) 
-  {
-    $this->_version = $version;
-  }
-
-  protected function get_version()
-  {
-    return $this->_version;
-  }
-
-  // }}}
-  // {{{ $description
-
-  protected $_description = '';
-
-  protected function set_description( $description )
-  {
-    $this->_description = (string)$description;
-  }
-
-  protected function get_description()
-  {
-    return $this->_description;
-  }
-
-  // }}}
-  // {{{ descriptable()
-
-  public function descriptable( DstyleDoc_Element $element, $description )
-  {
-    $element->history->description = $description;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 20;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^(?:[-+*]\s*)?(?:v|version:?\s*)?(\d.*?)\s*[:=]?(?:\s+(.*))$
-    if( ($current instanceof DstyleDoc_Analyser_History or $current instanceof DstyleDoc_Analyser_Element_History_List)
-      and preg_match( '/^(?:[-+*]\\s*)?(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?(?:\\s+(.*))$/i', $source, $matches ) )
-    {
-      $instance = new self( $matches[1], $matches[2] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    $element->history = $this->version;
-    $element->history->description = $this->description;
-    return $this;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( $version, $description )
-  {
-    $this->version = $version;
-    $this->description = $description;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise de paramètre.
- */
-class DstyleDoc_Analyser_Param extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^params?:\s*(?:\s(?:([^\s+]+)\s+)?(?:(\$.+?|\.{3})(?:\s*[:=]?\s+)?)(.*))?$
-    if( preg_match( '/^params?:\\s*(?:\\s(?:([^\\s+]+)\\s+)?(?:(\\$.+?|\\.{3})(?:\\s*[:=]?\\s+)?)(.*))?$/i', $source, $matches ) )
-    {
-      $instance = new self();
-      $priority = self::priority;
-      if( isset($matches[3]) )
-      {
-        $instance = new DstyleDoc_Analyser_Element_Param_List( $matches[1], $matches[2], $matches[3] );
-        $property = DstyleDoc_Analyser_Element_Param_List::priority;
-      }
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'un élément de liste de paramètre.
- */
-class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
-{
-  // {{{ $types
-
-  protected $_types = '';
-
-  protected function set_types( $types ) 
-  {
-    $this->_types = (array)$types;
-  }
-
-  protected function get_types()
-  {
-    return $this->_types;
-  }
-
-  // }}}
-  // {{{ $var
-
-  protected $_var = '';
-
-  protected function set_var( $var ) 
-  {
-    $this->_var = $var;
-  }
-
-  protected function get_var()
-  {
-    return $this->_var;
-  }
-
-  // }}}
-  // {{{ $description
-
-  protected $_description = '';
-
-  protected function set_description( $description )
-  {
-    $this->_description = (string)$description;
-  }
-
-  protected function get_description()
-  {
-    return $this->_description;
-  }
-
-  // }}}
-  // {{{ descriptable()
-
-  public function descriptable( DstyleDoc_Element $element, $description )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-      $element->param->description = $description;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 15;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^\s*(?:[-+*]\s+)?(?:([^\s]+)\s+)?(?:(\$.+?|\.{3})(?:\s*[:=]?\s+)?)(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-      and preg_match( '/^\\s*(?:[-+*]\\s+)?(?:([^\\s]+)\\s+)?(?:(\\$.+?|\\.{3})(?:\\s*[:=]?\\s+)?)(.*)$/i', $source, $matches ) )
-    {
-      $instance = new self( $matches[1], $matches[2], $matches[3] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-    {
-      $element->param = $this->var;
-
-      if( $this->var )
-        $element->param->var = $this->var;
-
-      foreach( $this->types as $type )
-        $element->param->type = $type;
-
-      $element->param->description = $this->description;
-    }
-    return $this;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( $types, $var, $description )
-  {
-    $this->types = preg_split('/[,|]/', $types);
-    $this->var = $var;
-    $this->description = $description;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise de retour.
- */
-class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^returns?:\s*(?:\s(?:([^\s+]+)\s+)?(.*))?$
-    if( preg_match( '/^returns?:\\s*(?:\\s(?:([^\\s+]+)\\s+)?(.*))?$/i', $source, $matches ) )
-    {
-      $instance = new self();
-      $priority = self::priority;
-      if( isset($matches[2]) )
-      {
-        $instance = new DstyleDoc_Analyser_Element_Return_List( $matches[1], $matches[2] );
-        $property = DstyleDoc_Analyser_Element_Return_List::priority;
-      }
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'un élément de liste de retour.
- */
-class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
-{
-  // {{{ $types
-
-  protected $_types = '';
-
-  protected function set_types( $types ) 
-  {
-    $this->_types = (array)$types;
-  }
-
-  protected function get_types()
-  {
-    return $this->_types;
-  }
-
-  // }}}
-  // {{{ $description
-
-  protected $_description = '';
-
-  protected function set_description( $description )
-  {
-    $this->_description = (string)$description;
-  }
-
-  protected function get_description()
-  {
-    return $this->_description;
-  }
-
-  // }}}
-  // {{{ descriptable()
-
-  public function descriptable( DstyleDoc_Element $element, $description )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-      $element->return->description = $description;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 15;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^\s*(?:-\s+)?(?:(?:([^\s+]+)\s+)?(.*))?$
-    if( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^\\s*(?:-\\s+)?(?:(?:([^\\s+]+)\\s+)?(.*))?$/i', $source, $matches ) )
-    {
-      if( ! trim($matches[2]) )
-        return false;
-      $instance = new self( $matches[1], $matches[2] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-    {
-      foreach( $this->types as $type )
-        $element->return->type = $type;
-
-      $element->return->description = $this->description;
-    }
-    return $this;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( $types, $description )
-  {
-    $this->types = preg_split('/[,|]/', $types);
-    $this->description = $description;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise de version.
- */
-class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
-{
-  // {{{ $packages
-
-  protected $_packages = '';
-
-  protected function set_packages( $packages ) 
-  {
-    $this->_packages = (array)$packages;
-  }
-
-  protected function get_packages()
-  {
-    return $this->_packages;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^package:\s*(.+)$
-    if( preg_match( '/^package:\\s*(.+)$/i', $source, $matches ) )
-    {
-      $instance = new self( $matches[1] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  protected function __construct( $package )
-  {
-    $this->packages = preg_split( '/[.,;:> ]+/', $package );
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    $element->packages = $this->packages;
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise d'exception.
- */
-class DstyleDoc_Analyser_Throw extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^throws?:\s*(?:\s(?:([\pL\pN]+)\s*)(?:[:=]\s+)?(.*))?$
-    if( preg_match( '/^throws?:\\s*(?:\\s(?:([\\pL\\pN]+)\\s*)(?:[:=]\\s+)?(.*))?$/i', $source, $matches ) )
-    {
-      $instance = new self();
-      $priority = self::priority;
-      if( isset($matches[2]) )
-      {
-        $instance = new DstyleDoc_Analyser_Element_Throw_List( $matches[1], $matches[2] );
-        $property = DstyleDoc_Analyser_Element_Throw_List::priority;
-      }
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'un élément de liste d'exception.
- */
-class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
-{
-  // {{{ $exception
-
-  protected $_exception = '';
-
-  protected function set_exception( $exception ) 
-  {
-    $this->_exception = (string)$exception;
-  }
-
-  protected function get_exception()
-  {
-    return $this->_exception;
-  }
-
-  // }}}
-  // {{{ $description
-
-  protected $_description = '';
-
-  protected function set_description( $description )
-  {
-    $this->_description = (string)$description;
-  }
-
-  protected function get_description()
-  {
-    return $this->_description;
-  }
-
-  // }}}
-  // {{{ descriptable()
-
-  public function descriptable( DstyleDoc_Element $element, $description )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-      $element->exception->description = $description;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 15;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // \s*(?:[-+*]\s+)?(?:([\pL\pN]+)\s*)(?:[:=]\s+)?(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Throw or $current instanceof DstyleDoc_Analyser_Element_Throw_List)
-      and preg_match( '/\\s*(?:[-+*]\\s+)?(?:([\\pL\\pN]+)\\s*)(?:[:=]\\s+)?(.*)$/i', $source, $matches ) )
-    {
-      if( ! trim($matches[1]) )
-        return false;
-      $instance = new self( $matches[1], $matches[2] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute une exception à l'élément.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-    {
-      $element->exception = $this->exception;
-      $element->exception->description = $this->description;
-    }
-    return $this;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( $exception, $description )
-  {
-    $this->exception = $exception;
-    $this->description = $description;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'une balise de syntaxe.
- */
-class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
-{
-  // {{{ priority
-
-  const priority = 10;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // ^syntax:\s*$
-    if( preg_match( '/^syntax:\\s*$/i', $source, $matches ) )
-    {
-      $instance = new self();
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    return $this;
-  }
-
-  // }}}
-}
-
-/**
- * Classe d'analyse d'un élément de liste de syntaxe.
- */
-class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
-{
-  // {{{ $syntax
-
-  protected $_syntax = '';
-
-  protected function set_syntax( $syntax ) 
-  {
-    $optional = false;
-    foreach( explode(',', $syntax) as $var )
-    {
-      // \s*(\[?)\s*(\$[\pLpN]+|\.{3})\s*\]?
-      if( preg_match('/\\s*(\\[?)\\s*(\\$[\\pLpN]+|\\.{3})\\s*\\]?/i', $var, $matches) )
-      {
-        if( ! empty($matches[1]) )
-          $optional = true;
-        $this->_syntax[] = array(
-          'var' => $matches[2],
-          'optional' => $optional );
-      }
-    }
-  }
-
-  protected function get_syntax()
-  {
-    return $this->_syntax;
-  }
-
-  // }}}
-  // {{{ $description
-
-  protected $_description = '';
-
-  protected function set_description( $description )
-  {
-    $this->_description = (string)$description;
-  }
-
-  protected function get_description()
-  {
-    return $this->_description;
-  }
-
-  // }}}
-  // {{{ descriptable()
-
-  public function descriptable( DstyleDoc_Element $element, $description )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-      $element->syntax->description = $description;
-  }
-
-  // }}}
-  // {{{ priority
-
-  const priority = 15;
-
-  // }}}
-  // {{{ analyse()
-
-  static public function analyse( $current, $source, &$instance, &$priority )
-  {
-    // (?:[-+*]\s*)?((?:\s*,?\s*\[?\s*(?:\$[\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/(?:[-+*]\\s*)?((?:\\s*,?\\s*\\[?\\s*(?:\\$[\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
-    {
-      if( ! trim($matches[1]) )
-        return false;
-      $instance = new self( $matches[1], $matches[2] );
-      $priority = self::priority;
-      return true;
-    }
-    else
-      return false;
-  }
-
-  // }}}
-  // {{{ apply()
-
-  /**
-   * Ajoute une exception à l'élément.
-   */
-  public function apply( DstyleDoc_Element $element )
-  {
-    if( $element instanceof DstyleDoc_Element_Function )
-    {
-      $element->syntax = $this->syntax;
-      $element->syntax->description = $this->description;
-    }
-    return $this;
-  }
-
-  // }}}
-  // {{{ __construct()
-
-  public function __construct( $syntax, $description )
-  {
-    $this->syntax = $syntax;
-    $this->description = $description;
   }
 
   // }}}
