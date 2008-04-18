@@ -869,9 +869,50 @@ class DstyleDoc_Token_Method_Tuple extends DstyleDoc_Method_Ref implements Dstyl
 
 /**
  * Classe de token d'inclusion de dépendance.
- * /
+ */
 class DstyleDoc_Token_Dependency extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
 {
+  // {{{ $dependences
+
+  protected $_dependences = array();
+
+  protected function set_dependence( $dependence )
+  {
+    $this->_dependences[] = $dependence;
+  }
+
+  protected function get_dependences()
+  {
+    return $this->_dependences;
+  }
+
+  // }}}
+  // {{{ set_value()
+
+  public function set_value( $string )
+  {
+    $this->dependence = DstyleDoc_Token_Variable::hie( $this, null, $string );
+  }
+
+  // }}}
+  // {{{ get_value()
+
+  public function get_value()
+  {
+    return $this->var;
+  }
+
+  // }}}
+  // {{{ hie()
+
+  static public function hie( DstyleDoc_Token $current )
+  {
+    var_dump( $current );
+    exit;
+    return new self( $current );
+  }
+
+  // }}}
 }
 
 /**
@@ -1029,7 +1070,7 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token_Doc_Commentable implement
     foreach( $this->exceptions as $exception )
       $function->exception = $exception;
 
-    return DstyleDoc_Token_Null::hie();
+    return $this->file;
   }
 
   // }}}
@@ -1664,7 +1705,7 @@ class DstyleDoc_Token_String extends DstyleDoc_Token
       return $current->value;
     }
     else
-      return DstyleDoc_Token_Null::hie();
+      return $current;
   }
 
   // }}}
