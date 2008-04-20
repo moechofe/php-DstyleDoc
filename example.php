@@ -71,7 +71,7 @@ interface tamsuft_template_interface
    * @param tamsuft $tamsuft L'instance de {@link tamsuft} en cours.
    * @param tamsuft L'instance de {@link tamsuft} en cours.
    */
-  static function hie( $template, $tamsuft );
+  static function hie( PDO $template, $tamsuft = "string" );
 
   // }}}
 }
