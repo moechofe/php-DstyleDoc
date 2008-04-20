@@ -35,6 +35,11 @@ interface DstyleDoc_Token_Valueable
   function get_value();
 }
 
+interface DstyleDoc_Token_Elementable
+{
+  function to( DstyleDoc_Converter $converter );
+}
+
 /**
  * Classe de token utilsable.
  */
@@ -100,8 +105,9 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 
   protected function set_documentation( $documentation )
   {
-    if( $documentation instanceof DstyleDoc_Token_Doc_Comment
-      or $documentation instanceof DstyleDoc_Token_Doc_Comment )
+    if( $documentation instanceof DstyleDoc_Token_Doc_Comment )
+      $this->_documentation = $documentation->documentation;
+    elseif( $documentation instanceof DstyleDoc_Token )
       $this->_documentation = $documentation->documentation;
     else
       $this->_documentation = (string)$documentation;
@@ -140,21 +146,126 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 
   protected function set_modifier( $modifier )
   {
-    if( $modifier instanceof DstyleDoc_Token_Modifier )
+    if( $modifier instanceof DstyleDoc_Token_Custom )
       $this->modifiers = $modifier->modifiers;
-    elseif( is_string($modifier) and isset($this->_modifiers[$modifier] ) )
+    elseif( is_string($modifier) and isset($this->_modifiers[$modifier]) )
       $this->_modifiers[$modifier] = true;
   }
 
   protected function set_modifiers( $modifiers )
   {
-    foreach( (array)$modifiers as $modifier )
-      $this->modifier = $modifier;
+    foreach( (array)$modifiers as $modifier => $true )
+      if( $true and isset($this->_modifiers[$modifier]) )
+        $this->_modifiers[$modifier] = true;
   }
 
   protected function get_modifiers()
   {
     return $this->_modifiers;
+  }
+
+  // }}}
+  // {{{ $function
+
+  protected $_function = null;
+
+  protected function set_function( DstyleDoc_Token_Custom $function )
+  {
+    if( $function instanceof DstyleDoc_Token_Function )
+      $this->_function = $function;
+    else
+      $this->_function = $function->function;
+  }
+
+  protected function get_function()
+  {
+    if( $this->_function instanceof DstyleDoc_Token_Function )
+      return $this->_function;
+    else
+      return new DstyleDoc_Token_Fake;
+  }
+
+  // }}}
+  // {{{ $_methods
+
+  protected $_methods = array();
+
+  protected function set_method( DstyleDoc_Token_Custom $method )
+  {
+    if( $method instanceof DstyleDoc_Token_Function )
+      $this->_methods[] = $method;
+  }
+
+  protected function get_methods()
+  {
+    return $this->_methods;
+  }
+
+  // }}}
+  // {{{ $vars
+
+  protected $_vars = array();
+
+  protected function set_var( DstyleDoc_Token_Custom $var )
+  {
+    if( $var instanceof DstyleDoc_Token_Variable )
+      $this->_vars[] = $var;
+  }
+
+  protected function get_vars()
+  {
+    return $this->_vars;
+  }
+
+  // }}}
+  // {{{ $types
+
+  protected $_types = array();
+
+  protected function set_type( $type )
+  {
+    $this->_types[] = (string)$type;
+  }
+
+  protected function get_types()
+  {
+    return $this->_types;
+  }
+
+  // }}}
+  // {{{ $default
+
+  protected $_default = '';
+
+  protected function set_default( $default )
+  {
+    $this->_default = $default;
+  }
+
+  protected function get_default()
+  {
+    return $this->_default;
+  }
+
+  // }}}
+  // {{{ $object
+
+  protected $_object = null;
+
+  protected function set_object( DstyleDoc_Token_Custom $object )
+  {
+    if( $object instanceof DstyleDoc_Token_Interface )
+      $this->_object = $object;
+    elseif( ! $object->object instanceof DstyleDoc_Token_Fake )
+      $this->_object = $object->object;
+  }
+
+  protected function get_object()
+  {
+    if( $this->_object instanceof DstyleDoc_Token_Custom )
+      return $this->_object;
+    else
+      return new DstyleDoc_Token_Fake;
   }
 
   // }}}
@@ -175,6 +286,34 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     case '(' :
       if( $current instanceof DstyleDoc_Token_Function )
         return DstyleDoc_Token_Tuple::hie( $converter, $current, $source, $file, $line );
+      break;
+
+    case ',' :
+      if( $current instanceof DstyleDoc_Token_Variable )
+        return DstyleDoc_Token_Tuple::hie( $converter, $current, $source, $file, $line );
+      break;
+
+    case '=' :
+      if( $current instanceof DstyleDoc_Token_Variable )
+        return $current;
+      break;
+
+    case ')' :
+      if( $current instanceof DstyleDoc_Token_Variable or $current instanceof DstyleDoc_Token_Tuple )
+        return $current->function;
+      break;
+
+    case ';' :
+      if( $current instanceof DstyleDoc_Token_Function and ! $current->object instanceof DstyleDoc_Token_Fake )
+        return $current->object;
+      break;
+
+    case '}' :
+      if( $current instanceof DstyleDoc_Token_Interface )
+      {
+        $current->to( $converter );
+        return $current->open_tag;
+      }
       break;
     }
   }
@@ -206,9 +345,10 @@ class DstyleDoc_Token_Doc_Comment extends DstyleDoc_Token
     $return->open_tag = $current;
     $return->line = $line;
     $return->documentation = $source;
+    $return->object = $current;
 
-    if( $current instanceof DstyleDoc_Token_Doc_Comment )
-      $current->open_tag->documentation = $current->documentation;
+    if( $current instanceof self )
+      $current->open_tag->documentation = $current;
 
     return $return;
   }
@@ -217,14 +357,15 @@ class DstyleDoc_Token_Doc_Comment extends DstyleDoc_Token
 // }}}
 // {{{ Interface
 
-class DstyleDoc_Token_Interface extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+class DstyleDoc_Token_Interface extends DstyleDoc_Token implements DstyleDoc_Token_Valueable, DstyleDoc_Token_Elementable
 {
   static public function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
     $return = new self;
     $return->open_tag = $current;
+    $return->file = $file;
     $return->line = $line;
-    $return->documentation = $current->documentation;
+    $return->documentation = $current;
 
     return $return;
   }
@@ -237,6 +378,40 @@ class DstyleDoc_Token_Interface extends DstyleDoc_Token implements DstyleDoc_Tok
   {
     return $this;
   }
+
+  public function to( DstyleDoc_Converter $converter )
+  {
+    $converter->interface = $this->name;
+    $interface = $converter->interface;
+
+    $interface->file = $this->file;
+    $interface->line = $this->line;
+    $interface->documentation = $this->documentation;
+
+    foreach( $this->methods as $method )
+    {
+      $interface->method = $method->name;
+      $function = $interface->method;
+
+      $function->class = $interface;
+      $function->file = $method->file;
+      $function->line = $method->line;
+      $function->documentation = $method->documentation;
+      $function->public = true;
+      $function->static = $method->modifiers['static'];
+
+      foreach( $method->vars as $var )
+      {
+        $function->param = $var->name;
+        $param = $function->param;
+
+        foreach( $var->types as $type )
+          $param->type = $type;
+
+        $param->default = $var->default;
+      }
+    }
+  }
 }
 
 // }}}
@@ -248,7 +423,12 @@ class DstyleDoc_Token_String extends DstyleDoc_Token_Light
   {
     $return = $current;
 
-    if( $current instanceof DstyleDoc_Token_Valueable )
+    if( $current instanceof DstyleDoc_Token_Tuple )
+    {
+      $return = DstyleDoc_Token_Variable::hie( $converter, $current, $source, $file, $line );
+      $return->type = $source;
+    }
+    elseif( $current instanceof DstyleDoc_Token_Valueable )
     {
       $current->value = $source;
 
@@ -292,9 +472,9 @@ class DstyleDoc_Token_Modifier extends DstyleDoc_Token
     $return = new self;
     $return->open_tag = $current;
     $return->modifier = $source;
+    $return->object = $current;
 
-    if( $current instanceof DstyleDoc_Token_Doc_Comment )
-      $return->documentation = $current->documentation;
+    $return->documentation = $current;
 
     return $return;
   }
@@ -310,8 +490,13 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
     $return = new self;
     $return->open_tag = $current;
     $return->modifier = $current;
+    $return->file = $file;
     $return->line = $line;
-    $return->documentation = $current->documentation;
+    $return->documentation = $current;
+    $return->object = $current;
+
+    if( ! $return->object instanceof DstyleDoc_Token_Fake )
+      $return->object->method = $return;
 
     return $return;      
   }
@@ -327,23 +512,10 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
 }
 
 // }}}
-// {{{ DstyleDoc_Token_Tuple
+// {{{ Tuple
 
-class DstyleDoc_Token_Tuple extends DstyleDoc_Token_Light
+class DstyleDoc_Token_Tuple extends DstyleDoc_Token
 {
-  protected $_function = null;
-  protected function set_function( DstyleDoc_Token_Function $function )
-  {
-    $this->_function = $function;
-  }
-  protected function get_function()
-  {
-    if( $this->_function instanceof DstyleDoc_Token_Function )
-      return $this->_function;
-    else
-      return new DstyleDoc_Token_Fake;
-  }
-
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
     $return = new self;
@@ -354,7 +526,125 @@ class DstyleDoc_Token_Tuple extends DstyleDoc_Token_Light
 }
 
 // }}}
-// {{{ DstyleDoc_Token_Variable
+// {{{ Variable
+
+class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    if( $current instanceof self )
+      $return = $current;
+    else
+    {
+      $return = new self;
+      $return->function = $current;
+      $return->function->var = $return;
+    }
+    
+    $return->name = $source;
+
+    return $return;
+  }
+
+  public function set_value( $value )
+  {
+    $this->default = $value;
+  }
+
+  public function get_value()
+  {
+    return $this;
+  }
+}
+
+// }}}
+// {{{ Constant Encapsed String
+
+class DstyleDoc_Token_Constant_Encapsed_String extends DstyleDoc_Token_Light
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    $return = $current;
+
+    if( $current instanceof DstyleDoc_Token_Valueable )
+    {
+      $current->value = $source;
+
+      if( $current->value instanceof DstyleDoc_Token_Custom )
+        $return = $current->value;
+    }
+
+    return $return;
+  }
+}
+
+// }}}
+// {{{ Lnumber
+
+class DstyleDoc_Token_Lnumber extends DstyleDoc_Token_Light
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    $return = $current;
+
+    if( $current instanceof DstyleDoc_Token_Valueable )
+    {
+      $current->value = $source;
+
+      if( $current->value instanceof DstyleDoc_Token_Custom )
+        $return = $current->value;
+    }
+
+    return $return;
+  }
+}
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
+
+
+// }}}
+// {{{
 
 
 // }}}
