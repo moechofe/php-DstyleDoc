@@ -77,6 +77,7 @@ class DstyleDoc extends DstyleDoc_Properties
 
   protected function analyse_file( DstyleDoc_Converter $converter, $file )
   {
+    d( $converter )->d8->p6;
     $line = 1;
     $current = new DstyleDoc_Token_Fake;
     $doc = '';
@@ -104,13 +105,15 @@ class DstyleDoc extends DstyleDoc_Properties
 <div style='clear:both'></div>
 HTML;
 
+      $save = $current;
       // processing token
       $current = call_user_func( array('DstyleDoc_Token_'.$call,'hie'), $converter, $current, $source, $file, $line );
 
       if( ! $current instanceof DstyleDoc_Token_Custom )
+      {
+        d( $save );
         throw new UnexpectedValueException;
-      
-      //var_dump( $current );
+      }
     }
   }
 
