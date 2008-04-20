@@ -78,7 +78,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected function set_documentation( $documentation )
   {
-    $this->_documentation = $documentation;
+    $this->_documentation = (string)$documentation;
   }
 
   protected function get_documentation()
@@ -235,7 +235,7 @@ abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 {
   // {{{ $file
 
-  protected $_file = '';
+  protected $_file = null;
 
   protected function set_file( $file )
   {
@@ -482,9 +482,62 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 }
 
 /**
+ * Classe d'un element qui contient des fonctions
+ */
+class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_Filed_Named
+{
+  // {{{ $methods
+
+  protected $_methods = array();
+
+  protected function set_method( $name )
+  {
+    $found = false;
+    if( ! empty($name) and count($this->_methods) )
+    {
+      reset($this->_methods);
+      while( true)
+      {
+        $method = current($this->_methods);
+        if( $found = ($method->name == $name or $method === $name) or false === next($this->_methods) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $name instanceof DstyleDoc_Element_Method )
+        $this->_methods[] = $name;
+      else
+        $this->_methods[] = new DstyleDoc_Element_Method( $this->converter, $name );
+      end($this->_methods);
+    }
+  }
+
+  protected function get_method()
+  {
+    if( ! count($this->_methods) )
+    {
+      $this->_methods[] = new DstyleDoc_Element_Method( $this->converter, null );
+      return end($this->_methods);
+    }
+    else
+      return current($this->_methods);
+  }
+
+
+  protected function get_methods()
+  {
+    return $this->_methods;
+  }
+
+  // }}}
+}
+
+/**
  * Classe d'un element de type classe.
  */
-class DstyleDoc_Element_Class extends DstyleDoc_Element_Filed_Named
+class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 {
   // {{{ $abstract
 
@@ -546,52 +599,6 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Filed_Named
   }
 
   // }}}
-  // {{{ $methods
-
-  protected $_methods = array();
-
-  protected function set_method( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_methods) )
-    {
-      reset($this->_methods);
-      while( true)
-      {
-        $method = current($this->_methods);
-        if( $found = ($method->name == $name or $method === $name) or false === next($this->_methods) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Method )
-        $this->_methods[] = $name;
-      else
-        $this->_methods[] = new DstyleDoc_Element_Method( $this->converter, $name );
-      end($this->_methods);
-    }
-  }
-
-  protected function get_method()
-  {
-    if( ! count($this->_methods) )
-    {
-      $this->_methods[] = new DstyleDoc_Element_Method( $this->converter, null );
-      return end($this->_methods);
-    }
-    else
-      return current($this->_methods);
-  }
-
-
-  protected function get_methods()
-  {
-    return $this->_methods;
-  }
-
-  // }}}
   // {{{ $childs
 
   protected function get_childs()
@@ -636,7 +643,7 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
 /**
  * Classe d'un element de type interface.
  */
-class DstyleDoc_Element_Interface extends DstyleDoc_Element_Filed_Named
+class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 {
 }
 
@@ -787,9 +794,10 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected $_class = null;
 
-  protected function set_class( DstyleDoc_Element_Class $class )
+  protected function set_class( DstyleDoc_Element $class )
   {
-    $this->_class = $class;
+    if( $class instanceof DstyleDoc_Element_Interface or $class instanceof DstyleDoc_Element_Class )
+      $this->_class = $class;
   }
 
   protected function get_class()
