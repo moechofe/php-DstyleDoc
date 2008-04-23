@@ -202,7 +202,7 @@ class tamsuft_template
    */
   final static public function get_hie()
   {
-    return self::$_hie;
+    return self::$_hie;;;
   }
   
   // }}}
@@ -249,7 +249,7 @@ class tamsuft_template
   {
     try
     {
-      $class_name = self::get_hie();
+      $class_name = self::get_hie();;;
       return new $class_name( $template, $tamsuft );
     }
     catch( error_arguments $e )
@@ -272,6 +272,7 @@ class tamsuft_template
    */
   protected function __construct( $template, $tamsuft )
   {
+    {
     if( ( ! $template instanceof template and ! is_string($template) ) or ! $tamsuft instanceof tamsuft )
       throw new error_arguments('s/(template)(tamsuft)');
 
@@ -285,6 +286,7 @@ class tamsuft_template
     parent::__construct( $source, $tamsuft );
 
     $tamsuft->template = $this;
+    }
   }
   
   // }}}

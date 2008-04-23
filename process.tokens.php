@@ -15,6 +15,17 @@ abstract class DstyleDoc_Token_Custom extends DstyleDoc_Properties
 /**
  * Classe de token de base.
  */
+abstract class DstyleDoc_Token_None extends DstyleDoc_Token_Custom
+{
+  final static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return $current;
+  }
+}
+
+/**
+ * Classe de token de base.
+ */
 abstract class DstyleDoc_Token_Light extends DstyleDoc_Token_Custom implements DstyleDoc_Token_Work
 {
   final protected function __construct()
@@ -169,15 +180,15 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 
   protected $_function = null;
 
-  protected function set_function( DstyleDoc_Token_Custom $function )
+  protected function set__function( DstyleDoc_Token_Custom $function )
   {
     if( $function instanceof DstyleDoc_Token_Function )
       $this->_function = $function;
-    else
+    elseif( $function->function instanceof DstyleDoc_Token_Function )
       $this->_function = $function->function;
   }
 
-  protected function get_function()
+  protected function get__function()
   {
     if( $this->_function instanceof DstyleDoc_Token_Function )
       return $this->_function;
@@ -186,7 +197,7 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
   }
 
   // }}}
-  // {{{ $_methods
+  // {{{ $methods
 
   protected $_methods = array();
 
@@ -254,9 +265,15 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 
   protected function set_object( DstyleDoc_Token_Custom $object )
   {
-    if( $object instanceof DstyleDoc_Token_Interface )
+    if( $object instanceof DstyleDoc_Token_Interface
+      or $object instanceof DstyleDoc_Token_Function
+      or $object instanceof DstyleDoc_Token_Class
+      or $object instanceof DstyleDoc_Token_Context )
       $this->_object = $object;
-    elseif( ! $object->object instanceof DstyleDoc_Token_Fake )
+
+    elseif( $object->object instanceof DstyleDoc_Token_Interface
+      or $object->object instanceof DstyleDoc_Token_Function
+      or $object->object instanceof DstyleDoc_Token_Class )
       $this->_object = $object->object;
   }
 
@@ -266,6 +283,21 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
       return $this->_object;
     else
       return new DstyleDoc_Token_Fake;
+  }
+
+  // }}}
+  // {{{ $exceptions
+
+  protected $_exceptions = array();
+
+  protected function set_exception( $exception )
+  {
+    $this->_exceptions[] = (string)$exception;
+  }
+
+  protected function get_exceptions()
+  {
+    return $this->_exceptions;
   }
 
   // }}}
@@ -280,12 +312,17 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     switch( $source )
     {
     case '{' :
-      return $current;
+      if( $current instanceof DstyleDoc_Token_Tuple )
+        return DstyleDoc_Token_Context::hie( $converter, $current, $source, $file, $line );
+      else
+        return $current;
       break;
 
     case '(' :
       if( $current instanceof DstyleDoc_Token_Function )
         return DstyleDoc_Token_Tuple::hie( $converter, $current, $source, $file, $line );
+      if( $current instanceof DstyleDoc_Token_Context )
+        return $current;
       break;
 
     case ',' :
@@ -296,16 +333,24 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     case '=' :
       if( $current instanceof DstyleDoc_Token_Variable )
         return $current;
+      else
+        return $current;
       break;
 
     case ')' :
-      if( $current instanceof DstyleDoc_Token_Variable or $current instanceof DstyleDoc_Token_Tuple )
-        return $current->function;
+      if( $current instanceof DstyleDoc_Token_Tuple )
+        return $current;
+      elseif( $current instanceof DstyleDoc_Token_Variable )
+        return DstyleDoc_Token_Tuple::hie( $converter, $current->object, $source, $file, $line );
+      else
+        return $current;
       break;
 
     case ';' :
-      if( $current instanceof DstyleDoc_Token_Function and ! $current->object instanceof DstyleDoc_Token_Fake )
-        return $current->object;
+      if( $current instanceof DstyleDoc_Token_Tuple )
+        return $current->object->object;
+      elseif( $current instanceof DstyleDoc_Token_Function )
+        return $current;
       break;
 
     case '}' :
@@ -314,6 +359,17 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
         $current->to( $converter );
         return $current->open_tag;
       }
+      elseif( $current instanceof DstyleDoc_Token_Function and ! $current->object instanceof DstyleDoc_Token_Fake )
+      {
+        $current->to( $converter );
+        return $current->open_tag;
+      }
+//      elseif( $current instanceof DstyleDoc_Token_Function )
+  //      return $current->object;
+      break;
+
+    case '!' :
+      return $current;
       break;
     }
   }
@@ -443,12 +499,8 @@ class DstyleDoc_Token_String extends DstyleDoc_Token_Light
 // }}}
 // {{{ Comment
 
-class DstyleDoc_Token_Comment extends DstyleDoc_Token_Custom
+class DstyleDoc_Token_Comment extends DstyleDoc_Token_None
 {
-  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
-  {
-    return $current;
-  }
 }
 
 // }}}
@@ -519,7 +571,7 @@ class DstyleDoc_Token_Tuple extends DstyleDoc_Token
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
     $return = new self;
-    $return->function = $current;
+    $return->object = $current;
 
     return $return;
   }
@@ -534,12 +586,14 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
   {
     if( $current instanceof self )
       $return = $current;
-    else
+    elseif( $current instanceof DstyleDoc_Token_Tuple )
     {
       $return = new self;
-      $return->function = $current;
-      $return->function->var = $return;
+      $return->object = $current;
+      $return->object->var = $return;
     }
+    else
+      return $current;
     
     $return->name = $source;
 
@@ -600,32 +654,170 @@ class DstyleDoc_Token_Lnumber extends DstyleDoc_Token_Light
 }
 
 // }}}
-// {{{
+// {{{ Class
 
+class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    $return = new self;
+    $return->open_tag = $current;
+    $return->modifier = $current;
+    $return->file = $file;
+    $return->line = $line;
+    $return->documentation = $current;
+
+    return $return;
+  }
+
+  public function set_value( $value )
+  {
+    $this->name = $value;
+  }
+  public function get_value()
+  {
+    return $this;
+  }
+}
 
 // }}}
-// {{{
+// {{{ Context
 
+class DstyleDoc_Token_Context extends DstyleDoc_Token
+{
+  protected $_level = 1;
+  protected function get_up()
+  {
+    $this->_level += 1;
+    return $this;
+  }
+  protected function get_down()
+  {
+    $this->_level -= 1;
+    return $this;
+  }
+  protected function get_level()
+  {
+    return $this->_level;
+  }
+
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    if( $current instanceof self )
+      return $current->up;
+
+    $return = new self;
+    $return->open_tag = $current;
+    $return->object = $current;
+
+    return $return;
+  }
+}
 
 // }}}
-// {{{
+// {{{ Protected
 
-
-// }}}
-// {{{
-
-
-// }}}
-// {{{
-
-
-// }}}
-// {{{
-
+class DstyleDoc_Token_Protected extends DstyleDoc_Token_Custom
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return DstyleDoc_Token_Modifier::hie( $converter, $current, $source, $file, $line );
+  }
+}
 
 // }}}
-// {{{
+// {{{ Public
 
+class DstyleDoc_Token_Public extends DstyleDoc_Token_Custom
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return DstyleDoc_Token_Modifier::hie( $converter, $current, $source, $file, $line );
+  }
+}
+
+// }}}
+// {{{ Private
+
+class DstyleDoc_Token_Private extends DstyleDoc_Token_Custom
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return DstyleDoc_Token_Modifier::hie( $converter, $current, $source, $file, $line );
+  }
+}
+
+// }}}
+// {{{ Final
+
+class DstyleDoc_Token_Final extends DstyleDoc_Token_Custom
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return DstyleDoc_Token_Modifier::hie( $converter, $current, $source, $file, $line );
+  }
+}
+
+// }}}
+// {{{ Abstract
+
+class DstyleDoc_Token_Abstract extends DstyleDoc_Token_Custom
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return DstyleDoc_Token_Modifier::hie( $converter, $current, $source, $file, $line );
+  }
+}
+// }}}
+// {{{ If
+
+class DstyleDoc_Token_If extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ InstanceOf
+
+class DstyleDoc_Token_InstanceOf extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Throw
+
+class DstyleDoc_Token_Throw extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    $return = new self;
+    $return->object = $current;
+
+    return $return;
+  }
+
+  public function set_value( $value )
+  {
+    $this->object->exception = $value;
+  }
+  public function get_value()
+  {
+    return $this->object;
+  }
+}
+
+// }}}
+// {{{ New
+
+class DstyleDoc_Token_New extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Object Operator
+
+class DstyleDoc_Token_Object_Operator extends DstyleDoc_Token_None
+{
+}
 
 // }}}
 // {{{
