@@ -99,8 +99,8 @@ class DstyleDoc extends DstyleDoc_Properties
       $ff = (++$f%2)?'BurlyWood':'Goldenrod';
       $s = htmlentities($source); $c = get_class($current);
       echo <<<HTML
-<div style='clear:left;float:left;background:Wheat;padding:1px 3px'>$call</div>
-<div style='float:right;color:white;background:Brown;padding:1px 3px'>{$c}</div>
+<div style='clear:left;float:left;color:white;background:Brown;padding:1px 3px'>{$c}</div>
+<div style='float:left;background:Wheat;padding:1px 3px'>$call</div>
 <div style='background:{$ff};color:SaddleBrown;padding:1px 3px;'>{$s}</div>
 <div style='clear:both'></div>
 HTML;
