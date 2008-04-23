@@ -111,7 +111,7 @@ HTML;
 
       if( ! $current instanceof DstyleDoc_Token_Custom )
       {
-        d( $save );
+        d( $save )->d6->p4;
         throw new UnexpectedValueException;
       }
     }

@@ -203,6 +203,63 @@ class tamsuft_template
   final static public function get_hie()
   {
     return self::$_hie;;;
+    return self::func();
+    return $this->_hie;
+    return tamsuft_reference_template::get_function( $param, 'truc'.'truc', null, a( b() ) );
+    return '1'.'3';
+    return '1' . 3;
+    return ''.$this->_hie+3;
+    return 1.3+3;
+    return 1*3;
+    return 1/3;
+    return 1-3;
+    return 1%3;
+    return null;
+    return false;
+    return true;
+    return $a && ( $b + $c );
+    return $face;
+    return $a instanceof b;
+    return $a->b() && false;
+    return $a && $b + $c;
+    return $a++;
+    return $a--;
+    return (int)$a;
+    return $a . (int)$a;
+    return (int)$a . $a;
+    return (integer)$a;
+    return (bool)$a;
+    return (boolean)$a;
+    return (double)$a;
+    return (float)$a;
+    return (array)$a;
+    return (object)$a;
+    return @$a;
+    return -1;
+    return $a >> 1;
+    return $b << 2;
+    return $a === $b;
+    return $a = $b === $c;
+    return $a == $b;
+    return $a >= $b;
+    return $a <= $b;
+    return $a != $b;
+    return $a <> $b;
+    return $a !== $b;
+    return $a & $b;
+    return $a | $b;
+    return $a ^ $b;
+    return $a?$a:$b;
+    return array( $a, $b );
+    return 4;
+    return 'test';
+    return $a .= $b;
+    return $a += $b;
+    return $a ^= $b;
+    return $a -= $b;
+    return $a *= $b;
+    return $a /= $b;
+    return $a[$b];
   }
   
   // }}}
