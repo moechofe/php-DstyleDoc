@@ -474,6 +474,7 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     case ':' :
     case '[' :
     case ']' :
+    case '"' :
       return $current;
       break;
 
@@ -1731,7 +1732,7 @@ class DstyleDoc_Token_Clone extends DstyleDoc_Token_None
 // }}}
 // {{{ Curly Open
 
-class DstyleDoc_Token_Curly_Open extends DstyleDoc_Token_None
+class DstyleDoc_Token_Curly_Open extends DstyleDoc_Token_Context
 {
 }
 
@@ -1766,7 +1767,7 @@ class DstyleDoc_Token_Echo extends DstyleDoc_Token_None
 // }}}
 // {{{ Encapsed And Whitespace
 
-class DstyleDoc_Token_Encapsed_And_Whitespace extends DstyleDoc_Token_None
+class DstyleDoc_Token_Encapsed_And_Whitespace extends DstyleDoc_Token_String
 {
 }
 
@@ -1815,7 +1816,7 @@ class DstyleDoc_Token_Global extends DstyleDoc_Token_None
 // 
 // {{{ Ml Comment
 
-class DstyleDoc_Token_Doc_Comment extends DstyleDoc_Token_None
+class DstyleDoc_Token_Ml_Comment extends DstyleDoc_Token_Doc_Comment
 {
 }
 
@@ -1883,10 +1884,13 @@ class DstyleDoc_Token_Sr_Equal extends DstyleDoc_Token_Value
 }
 
 // }}}
-// String Varname
+// {{{ String Varname
 
+class DstyleDoc_Token_String_Varname extends DstyleDoc_Token_String
+{
+}
 
-//
+// }}}
 // {{{ Unset Cast
 
 class DstyleDoc_Token_Unset_Cast extends DstyleDoc_Token_Value
@@ -1898,5 +1902,12 @@ class DstyleDoc_Token_Unset_Cast extends DstyleDoc_Token_Value
 
 
 // 
+// {{{ Dollar Open Curly Braces
+
+class DstyleDoc_Token_Dollar_Open_Curly_Braces extends DstyleDoc_Token_Context
+{
+}
+
+// }}}
 
 ?>
