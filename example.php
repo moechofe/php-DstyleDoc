@@ -1,93 +1,6 @@
 <?php
 
-
-
-/**
- * Par à la recherche des chemins d'accès.
- * 
- * @ignore
- */
-$tamsuft_dir = dirname(realpath(__FILE__)).'/';
-
-if( ! defined('tamsuft_dir' ) )
-  /**
-   * Chemin d'acces depuis le démarreur vers le dossier de tamsuft.
-   *
-   * @var string
-   */
-  define( 'tamsuft_dir', $tamsuft_dir );
-
-elseif( substr(tamsuft_dir,-1,1) <> '/' )
-  // fixme lancer des exceptions plutot
-  trigger_error( 'The constante "tamsuft_dir" must have a slash "/" at his end.', E_USER_ERROR );
-
-$tamsuft_plugin_dir = dirname($tamsuft_dir).'/plugins/';
-
-if( ! defined('tamsuft_plugins_dir') )
-  /**
-   * Chemin d'acces depuis le démarreur vers le dossier des plugins.
-   *
-   * @var string
-   */
-  define( 'tamsuft_plugins_dir', $tamsuft_plugin_dir );
-
-elseif( substr(tamsuft_plugins_dir,-1,1) <> '/' )
-  // fixme lancer des exceptions plutot
-  trigger_error( 'The constante "tamsuft_plugins_dir" must have a slash "/" at his end.', E_USER_ERROR );
-
-// todo vire ça
-if( ! defined( 'PHP_EXT' ) )
-  /**
-   * Extension des scrits PHP
-   *
-   * @var string
-   */
-  define( 'PHP_EXT', '.php' );
-
-unset($tamsuft_index);
-unset($tamsuft_file);
-unset($tamsuft_dir);
-
-set_include_path( get_include_path().PATH_SEPARATOR.tamsuft_dir.PATH_SEPARATOR.tamsuft_plugins_dir );
-
-/**
- * Seul contrainte au lancement de tamsuft.
- *
- * @ignore
- */
-if( ! is_file( tamsuft_dir.'core.tamsuft'.PHP_EXT )
-  and ! is_readable( tamsuft_dir.'core.tamsuft'.PHP_EXT ) and false )
-    // fixme lancer des exceptions personalise
-    throw new Exception( 'Configuration error' );
-
-/**
- * Inclusion de la classe de base de tamsuft.
- */
-if( extension_loaded('xend') )
-  require_once xend('core.tamsuft.php');
-else
-  null;
-
-if( false )
-require_once 'core.tamsuft.php2';
-
-if( false ) :
-elseif( false ) :
-else :
-endif;
-
-while( false ) :
-endwhile;
-
-foreach( array() as $a ) :
-endforeach;
-
-for( $i=0; $i<1; $i++ ) :
-endfor;
-
-function a( $a )
-{
-}
+$a = " string {$a} string ${a} ";
 
 /**
  * Template de donnée de type <b>squelette tamsuft</b>.
@@ -231,6 +144,110 @@ interface template_searched_interface
  */
 class tamsuft_template
 {
+  // {{{ hie_child()
+
+  /**
+   * Instancie un template enfant.
+   *
+   * @param integer L'offset de la source de l'enfant dans la source du parent.
+   * @param integer La longeur de la source de la balise d'inclusion.
+   * @param string,null L'adresse de la source de l'enfant.
+   * @param string,null La source de donnée de l'enfant.
+   * @param tamsuft_template L'instance du template parent.
+   * @param tamsuft L'instance de {@link tamsuft} en cours.
+   * @return tamsuft_template
+   * @version 0.1.7
+   * @uses error_arguments Lancé si les arguments ne sont pas corrects.
+   * @todo créer exceptions
+   */
+  static public function hie_child( $offset, $length, $address, $source, $parent, $tamsuft )
+  {
+    if( ! is_integer($offset) or ! is_integer($length)
+      or ( ! is_string($address) and ! is_null($address) )
+      or ( ! is_string($source) and ! is_null($source) )
+      or ! $parent instanceof tamsuft_template
+      or ! $tamsuft instanceof tamsuft )
+      throw new error_arguments('iis/es/e(template_include)(tamsuft)');
+
+    if( $this->parsed )
+      throw new error_tamsuft_template_unable_to_add_after_parse;
+
+    if( $address )
+      $source = self::make_source( $address );
+
+    if( ! $source or ! $tamsuft instanceof tamsuft )
+      trigger_error("créer une exception ici");
+//      throw new error_arguments('iis/es/e(template_include)(tamsuft)');
+
+    $class_name = self::get_hie();
+    $template = new $class_name( $source, $tamsuft, $offset, $length, $parent );
+
+    if( ! $template instanceof tamsuft_template )
+      trigger_error("créer une exception ici");
+
+    return $template;
+  }
+
+  // }}}
+  // {{{ get_untransformed()
+
+  /**
+   * Renvoie la listes des balises non transforméss.
+   *
+   * {{important}} Ne pas appeler cette méthode directement. Utiliser la propriété {@link $untransformed} à la place.
+   *
+   * <h3>Recupère la listes des balises</h3>
+   * {{important}} La liste retournée est une copie de la liste des balises non compilé. Seule les instances des balises sont des références. Cela indique qu'il n'est pas possible d'intervenir sur la liste elle même.
+   * <code>
+   * <?php
+   *   foreach( $tamsuft_template->untransformed as $offset => $tag )
+   *   {
+   *     // opérations
+   *   }
+   * ?>
+   * </code>
+   *
+   * @return array
+   * @version 0.1.2
+   */
+  final protected function get_untransformed()
+  {
+    return $this->_untransformed;
+  }
+
+  // }}}
+  // {{{ isset_untransformed()
+
+  /**
+   * Renvoie si la liste des balises non transformées est vide.
+   *
+   * {{important}} Ne pas appeler cette méthode directement. Utiliser la propriété {@link $untransformed} à la place.
+   *
+   * <h3>La liste est t'elle vide</h3>
+   * L'instruction {{isset}} avec la propriétée {{@link $untransformed}} retournera {{true}} tant qu'il y aura des balises non transformées.
+   * <code>
+   * <?php
+   *   if( isset($tamsuft_template->untransformed) )
+   *   {
+   *     // operations
+   *   }
+   *   while( isset($tamsuft_template->untransformed) )
+   *   {
+   *     // operations
+   *   }
+   * ?>
+   * </code>
+   *
+   * @return boolean {{true}} si il a des balises non transformées, sinon {{false}}
+   * @version 0.1.2
+   * @since 0.2
+   */
+  protected function isset_untransformed()
+  {
+    return (boolean)$this->_untransformed;
+  }
+
+  // }}}
   // {{{ set_tamsuft()
 
   /**
@@ -457,51 +474,6 @@ class tamsuft_template
   }
   
   // }}}
-  // {{{ hie_child()
-
-  /**
-   * Instancie un template enfant.
-   *
-   * @param integer L'offset de la source de l'enfant dans la source du parent.
-   * @param integer La longeur de la source de la balise d'inclusion.
-   * @param string,null L'adresse de la source de l'enfant.
-   * @param string,null La source de donnée de l'enfant.
-   * @param tamsuft_template L'instance du template parent.
-   * @param tamsuft L'instance de {@link tamsuft} en cours.
-   * @return tamsuft_template
-   * @version 0.1.7
-   * @uses error_arguments Lancé si les arguments ne sont pas corrects.
-   * @todo créer exceptions
-   */
-  static public function hie_child( $offset, $length, $address, $source, $parent, $tamsuft )
-  {
-    if( ! is_integer($offset) or ! is_integer($length)
-      or ( ! is_string($address) and ! is_null($address) )
-      or ( ! is_string($source) and ! is_null($source) )
-      or ! $parent instanceof tamsuft_template
-      or ! $tamsuft instanceof tamsuft )
-      throw new error_arguments('iis/es/e(template_include)(tamsuft)');
-
-    if( $this->parsed )
-      throw new error_tamsuft_template_unable_to_add_after_parse;
-
-    if( $address )
-      $source = self::make_source( $address );
-
-    if( ! $source or ! $tamsuft instanceof tamsuft )
-      trigger_error("créer une exception ici");
-//      throw new error_arguments('iis/es/e(template_include)(tamsuft)');
-
-    $class_name = self::get_hie();
-    $template = new $class_name( $source, $tamsuft, $offset, $length, $parent );
-
-    if( ! $template instanceof tamsuft_template )
-      trigger_error("créer une exception ici");
-
-    return $template;
-  }
-
-  // }}}
   // {{{ $_untransformed
   
   /**
@@ -524,33 +496,6 @@ class tamsuft_template
    * @uses error_arguments Lancé si {{v|$tag}} n'est pas une instance de {{@link tag}}.
    */
   private $_untransformed = array();
-
-  // }}}
-  // {{{ get_untransformed()
-
-  /**
-   * Renvoie la listes des balises non transforméss.
-   *
-   * {{important}} Ne pas appeler cette méthode directement. Utiliser la propriété {@link $untransformed} à la place.
-   *
-   * <h3>Recupère la listes des balises</h3>
-   * {{important}} La liste retournée est une copie de la liste des balises non compilé. Seule les instances des balises sont des références. Cela indique qu'il n'est pas possible d'intervenir sur la liste elle même.
-   * <code>
-   * <?php
-   *   foreach( $tamsuft_template->untransformed as $offset => $tag )
-   *   {
-   *     // opérations
-   *   }
-   * ?>
-   * </code>
-   *
-   * @return array
-   * @version 0.1.2
-   */
-  final protected function get_untransformed()
-  {
-    return $this->_untransformed;
-  }
 
   // }}}
   // {{{ set_untransformed()
@@ -587,38 +532,6 @@ class tamsuft_template
       throw new error_arguments('(custom_tag)');
 
     $this->_untransformed[$tag->offset] = $tag;
-  }
-
-  // }}}
-  // {{{ isset_untransformed()
-
-  /**
-   * Renvoie si la liste des balises non transformées est vide.
-   *
-   * {{important}} Ne pas appeler cette méthode directement. Utiliser la propriété {@link $untransformed} à la place.
-   *
-   * <h3>La liste est t'elle vide</h3>
-   * L'instruction {{isset}} avec la propriétée {{@link $untransformed}} retournera {{true}} tant qu'il y aura des balises non transformées.
-   * <code>
-   * <?php
-   *   if( isset($tamsuft_template->untransformed) )
-   *   {
-   *     // operations
-   *   }
-   *   while( isset($tamsuft_template->untransformed) )
-   *   {
-   *     // operations
-   *   }
-   * ?>
-   * </code>
-   *
-   * @return boolean {{true}} si il a des balises non transformées, sinon {{false}}
-   * @version 0.1.2
-   * @since 0.2
-   */
-  protected function isset_untransformed()
-  {
-    return (boolean)$this->_untransformed;
   }
 
   // }}}
@@ -2678,6 +2591,106 @@ abstract class application extends error_tamsuft_template_analyse_unclosed imple
   // }}}
 }
 
+
+
+/**
+ * Par à la recherche des chemins d'accès.
+ * 
+ * @ignore
+ */
+$tamsuft_dir = dirname(realpath(__FILE__)).'/';
+
+if( ! defined('tamsuft_dir' ) )
+  /**
+   * Chemin d'acces depuis le démarreur vers le dossier de tamsuft.
+   *
+   * @var string
+   */
+  define( 'tamsuft_dir', $tamsuft_dir );
+
+elseif( substr(tamsuft_dir,-1,1) <> '/' )
+  // fixme lancer des exceptions plutot
+  trigger_error( 'The constante "tamsuft_dir" must have a slash "/" at his end.', E_USER_ERROR );
+
+$tamsuft_plugin_dir = dirname($tamsuft_dir).'/plugins/';
+
+if( ! defined('tamsuft_plugins_dir') )
+  /**
+   * Chemin d'acces depuis le démarreur vers le dossier des plugins.
+   *
+   * @var string
+   */
+  define( 'tamsuft_plugins_dir', $tamsuft_plugin_dir );
+
+elseif( substr(tamsuft_plugins_dir,-1,1) <> '/' )
+  // fixme lancer des exceptions plutot
+  trigger_error( 'The constante "tamsuft_plugins_dir" must have a slash "/" at his end.', E_USER_ERROR );
+
+// todo vire ça
+if( ! defined( 'PHP_EXT' ) )
+  /**
+   * Extension des scrits PHP
+   *
+   * @var string
+   */
+  define( 'PHP_EXT', '.php' );
+
+unset($tamsuft_index);
+unset($tamsuft_file);
+unset($tamsuft_dir);
+
+set_include_path( get_include_path().PATH_SEPARATOR.tamsuft_dir.PATH_SEPARATOR.tamsuft_plugins_dir );
+
+/**
+ * Seul contrainte au lancement de tamsuft.
+ *
+ * @ignore
+ */
+if( ! is_file( tamsuft_dir.'core.tamsuft'.PHP_EXT )
+  and ! is_readable( tamsuft_dir.'core.tamsuft'.PHP_EXT ) and false )
+    // fixme lancer des exceptions personalise
+    throw new Exception( 'Configuration error' );
+
+/**
+ * Inclusion de la classe de base de tamsuft.
+ */
+if( extension_loaded('xend') )
+  require_once xend('core.tamsuft.php');
+else
+  null;
+
+if( false )
+require_once 'core.tamsuft.php2';
+
+if( false ) :
+elseif( false ) :
+else :
+endif;
+
+while( false ) :
+endwhile;
+
+foreach( array() as $a ) :
+endforeach;
+
+for( $i=0; $i<1; $i++ ) :
+endfor;
+
+function a( $a )
+{
+}
+
+?>
+<html>
+<?php
+
+function b()
+{
+?>
+<div>
+<?php
+}
+
 // vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8
 
 /**
@@ -2709,5 +2722,9 @@ DstyleDoc::hie()
 // comment //
 // ignore
 **/
+
+__halt_compiler();
+
+bla bla connerie haha hihi
 
 ?>

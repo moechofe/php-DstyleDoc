@@ -433,7 +433,14 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
 
     case ';' :
       if( $current instanceof DstyleDoc_Token_Tuple )
-        return $current->object->object;
+      {
+        if( $current->object instanceof DstyleDoc_Token_Function and ! $current->object->object instanceof DstyleDoc_Token_Fake )
+          return $current->object->object;
+        elseif( ! $current->object instanceof DstyleDoc_Token_Fake )
+          return $current->object;
+        else
+          return $current->open_tag;
+      }
       elseif( $current instanceof DstyleDoc_Token_Function
         or $current instanceof DstyleDoc_Token_Context )
         return $current;
@@ -443,6 +450,10 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
         return $current->exit;
       elseif( $current instanceof DstyleDoc_Token_Open_Tag )
         return $current;
+      elseif( $current instanceof DstyleDoc_Token_Throw )
+      {
+        return $current->object;
+      }
       break;
 
     case '}' :
@@ -697,6 +708,7 @@ class DstyleDoc_Token_Tuple extends DstyleDoc_Token
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
     $return = new self;
+    $return->open_tag = $current;
     $return->object = $current;
 
     return $return;
@@ -831,6 +843,8 @@ class DstyleDoc_Token_Context extends DstyleDoc_Token
     {
       if( $this->object instanceof DstyleDoc_Token_Function and $this->object->object instanceof DstyleDoc_Token_Class )
         return $this->object->object;
+      else
+        return $this->open_tag;
     }
     else
       return $this;
@@ -1147,7 +1161,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
         return $this->rollback($current);
     }
 
-    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__')) )
+    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
     {
       //var_dump( __LINE__ );
       if( in_array($current->return,array('number','')) or ! in_array($current->return,$this->types) )
@@ -1193,7 +1207,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
     elseif( $current->return and in_array(strtolower($value), array('null','true','false')) )
       null;
 
-    elseif( strtolower($value) === 'null' )
+    elseif( strtolower($value) === 'null' or strtolower($value) === '(unset)' )
       $current->return = 'null';
 
     elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','true','false','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
@@ -1588,17 +1602,301 @@ class DstyleDoc_Token_Include extends DstyleDoc_Token_Require_Once
 }
 
 // }}}
-// {{{
+// {{{ While
 
-
-// }}}
-// {{{
-
-
-// }}}
-// {{{
-
+class DstyleDoc_Token_While extends DstyleDoc_Token_None
+{
+}
 
 // }}}
+// {{{ Endwhile 
+
+class DstyleDoc_Token_Endwhile extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Foreach
+
+class DstyleDoc_Token_Foreach extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Endforeach
+
+class DstyleDoc_Token_Endforeach extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ As
+
+class DstyleDoc_Token_As extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ For
+
+class DstyleDoc_Token_For extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Endfor
+
+class DstyleDoc_Token_Endfor extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Switch
+
+
+class DstyleDoc_Token_Switch extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Endswitch
+
+class DstyleDoc_Token_Endswitch extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Case
+
+class DstyleDoc_Token_Case extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Break
+
+class DstyleDoc_Token_Break extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Continue
+
+class DstyleDoc_Token_Continue extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Do
+
+class DstyleDoc_Token_Do extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Default
+
+class DstyleDoc_Token_Default extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ List
+
+class DstyleDoc_Token_List extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Bad Character
+
+class DstyleDoc_Token_Bad_Character extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Character
+
+class DstyleDoc_Token_Character extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Clone
+
+class DstyleDoc_Token_Clone extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Curly Open
+
+class DstyleDoc_Token_Curly_Open extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Declare
+
+class DstyleDoc_Token_Declare extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Double Arrow
+
+class DstyleDoc_Token_Double_Arrow extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Empty
+
+class DstyleDoc_Token_Empty extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Echo
+
+class DstyleDoc_Token_Echo extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Encapsed And Whitespace
+
+class DstyleDoc_Token_Encapsed_And_Whitespace extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ End Declare
+
+class DstyleDoc_Token_End_Declare extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ End Heredoc
+
+class DstyleDoc_Token_End_Heredoc extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Eval
+
+class DstyleDoc_Token_Eval extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Exit
+
+class DstyleDoc_Token_Exit extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Global
+
+class DstyleDoc_Token_Global extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+//  Halt_Compiler
+
+
+// 
+// Inline Html
+
+// 
+// {{{ Ml Comment
+
+class DstyleDoc_Token_Doc_Comment extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Ns C
+
+class DstyleDoc_Token_Ns_C extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Namespace
+
+class DstyleDoc_Token_Namespace extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Num String
+
+class DstyleDoc_Token_Num_String extends DstyleDoc_Token_String
+{
+}
+
+// }}}
+// {{{ Old Function
+
+class DstyleDoc_Token_Old_Function extends DstyleDoc_Token_Function
+{
+}
+
+// }}}
+// {{{ Open Tag With Echo
+
+class DstyleDoc_Token_Open_Tag_With_Echo extends DstyleDoc_Token_Function
+{
+}
+
+// }}}
+// {{{ Paamayim Nekudotayim
+
+class DstyleDoc_Token_Paamayim_Nekudotayim extends DstyleDoc_Token_Function
+{
+}
+
+// }}}
+// {{{ Print
+
+class DstyleDoc_Token_Print extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Sl Equal
+
+class DstyleDoc_Token_Sl_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Sr Equal
+
+class DstyleDoc_Token_Sr_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// String Varname
+
+
+//
+// {{{ Unset Cast
+
+class DstyleDoc_Token_Unset_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// Var
+
+
+// 
 
 ?>
