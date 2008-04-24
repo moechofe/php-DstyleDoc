@@ -363,6 +363,21 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
   }
 
   // }}}
+  // {{{ dependancies
+
+  protected $_dependancies = array();
+
+  protected function set_dependancie( $dependancie )
+  {
+    $this->_dependancies[] = (string)$dependancie;
+  }
+
+  protected function get_dependancies()
+  {
+    return $this->_dependancies;
+  }
+
+  // }}}
 }
 
 // {{{ Unknown
@@ -914,6 +929,13 @@ class DstyleDoc_Token_Else extends DstyleDoc_Token_None
 }
 
 // }}}
+// {{{ Endif
+
+class DstyleDoc_Token_Endif extends DstyleDoc_Token_None
+{
+}
+
+// }}}
 // {{{ InstanceOf
 
 class DstyleDoc_Token_InstanceOf extends DstyleDoc_Token_Value
@@ -930,6 +952,8 @@ class DstyleDoc_Token_Throw extends DstyleDoc_Token implements DstyleDoc_Token_V
     $return = new self;
     $return->object = $current;
     $return->open_tag = $current;
+    $return->file = $file;
+    $return->line = $line;
 
     return $return;
   }
@@ -1508,8 +1532,60 @@ class DstyleDoc_Token_Isset extends DstyleDoc_Token_None
 }
 
 // }}}
-// {{{
+// {{{ Require Once
 
+class DstyleDoc_Token_Require_Once extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    $return = new self;
+    $return->file = $file;
+    $return->line = $line;
+    $return->object = $current;
+    $return->open_tag = $current;
+    $return->documentation = $current;
+
+    return $return;
+  }
+
+  public function set_value( $value )
+  {
+    if( ( substr($value,0,1) === '\'' or substr($value,0,1) === '"' ) )
+    {
+      $file = stripslashes(substr($value,1,-1));
+      if( strpos($file,'$') === false or preg_match( '/(?<=\\\)\\$/', $file ) )
+        $this->open_tag->dependancie = $file;
+    }
+  }
+  public function get_value()
+  {
+    if( ! $this->object instanceof DstyleDoc_Token_Fake )
+      return $this->object;
+    else
+      return $this->open_tag;
+  }
+}
+
+// }}}
+// {{{ Require
+
+class DstyleDoc_Token_Require extends DstyleDoc_Token_Require_Once
+{
+}
+
+// }}}
+// {{{ Include Once
+
+class DstyleDoc_Token_Include_Once extends DstyleDoc_Token_Require_Once
+{
+}
+
+// }}}
+// {{{ Include
+
+class DstyleDoc_Token_Include extends DstyleDoc_Token_Require_Once
+{
+}
 
 // }}}
 // {{{

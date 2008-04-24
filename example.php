@@ -68,6 +68,9 @@ if( extension_loaded('xend') )
 else
   null;
 
+if( false )
+require_once 'core.tamsuft.php2';
+
 if( false ) :
 elseif( false ) :
 else :
