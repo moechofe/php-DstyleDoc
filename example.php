@@ -1,5 +1,91 @@
 <?php
 
+
+
+/**
+ * Par à la recherche des chemins d'accès.
+ * 
+ * @ignore
+ */
+$tamsuft_dir = dirname(realpath(__FILE__)).'/';
+
+if( ! defined('tamsuft_dir' ) )
+  /**
+   * Chemin d'acces depuis le démarreur vers le dossier de tamsuft.
+   *
+   * @var string
+   */
+  define( 'tamsuft_dir', $tamsuft_dir );
+
+elseif( substr(tamsuft_dir,-1,1) <> '/' )
+  // fixme lancer des exceptions plutot
+  trigger_error( 'The constante "tamsuft_dir" must have a slash "/" at his end.', E_USER_ERROR );
+
+$tamsuft_plugin_dir = dirname($tamsuft_dir).'/plugins/';
+
+if( ! defined('tamsuft_plugins_dir') )
+  /**
+   * Chemin d'acces depuis le démarreur vers le dossier des plugins.
+   *
+   * @var string
+   */
+  define( 'tamsuft_plugins_dir', $tamsuft_plugin_dir );
+
+elseif( substr(tamsuft_plugins_dir,-1,1) <> '/' )
+  // fixme lancer des exceptions plutot
+  trigger_error( 'The constante "tamsuft_plugins_dir" must have a slash "/" at his end.', E_USER_ERROR );
+
+// todo vire ça
+if( ! defined( 'PHP_EXT' ) )
+  /**
+   * Extension des scrits PHP
+   *
+   * @var string
+   */
+  define( 'PHP_EXT', '.php' );
+
+unset($tamsuft_index);
+unset($tamsuft_file);
+unset($tamsuft_dir);
+
+set_include_path( get_include_path().PATH_SEPARATOR.tamsuft_dir.PATH_SEPARATOR.tamsuft_plugins_dir );
+
+/**
+ * Seul contrainte au lancement de tamsuft.
+ *
+ * @ignore
+ */
+if( ! is_file( tamsuft_dir.'core.tamsuft'.PHP_EXT )
+  and ! is_readable( tamsuft_dir.'core.tamsuft'.PHP_EXT ) and false )
+    // fixme lancer des exceptions personalise
+    throw new Exception( 'Configuration error' );
+
+/**
+ * Inclusion de la classe de base de tamsuft.
+ */
+if( extension_loaded('xend') )
+  require_once xend('core.tamsuft.php');
+else
+  null;
+
+if( false ) :
+elseif( false ) :
+else :
+endif;
+
+while( false ) :
+endwhile;
+
+foreach( array() as $a ) :
+endforeach;
+
+for( $i=0; $i<1; $i++ ) :
+endfor;
+
+function a( $a )
+{
+}
+
 /**
  * Template de donnée de type <b>squelette tamsuft</b>.
  *
@@ -202,6 +288,7 @@ class tamsuft_template
    */
   final static public function get_hie()
   {
+    return DIRECTORY_SEPARATOR;
     return self::$_hie;;;
     return self::func();
     return $this->_hie;
@@ -217,15 +304,22 @@ class tamsuft_template
     return null;
     return false;
     return true;
+    return null + 3;
     return $a && ( $b + $c );
     return $face;
     return $a instanceof b;
     return $a->b() && false;
+    return $a->b();
+    return $a->$a;
+    return $a->a;
     return $a && $b + $c;
     return $a++;
     return $a--;
     return (int)$a;
     return $a . (int)$a;
+    return $a . (string)$a;
+    return $a . (string)$a->b();
+    return $a . (string)a::b();
     return (int)$a . $a;
     return (integer)$a;
     return (bool)$a;
@@ -234,6 +328,7 @@ class tamsuft_template
     return (float)$a;
     return (array)$a;
     return (object)$a;
+    return (real)$a;
     return @$a;
     return -1;
     return $a >> 1;
@@ -243,6 +338,8 @@ class tamsuft_template
     return $a == $b;
     return $a >= $b;
     return $a <= $b;
+    return $a > $b;
+    return $a < $b;
     return $a != $b;
     return $a <> $b;
     return $a !== $b;
@@ -259,7 +356,17 @@ class tamsuft_template
     return $a -= $b;
     return $a *= $b;
     return $a /= $b;
+    return $a %= $b;
     return $a[$b];
+    return 070;
+    return 0x1A;
+    return __FILE__;
+    return __FUNCTION__;
+    return __CLASS__.__METHOD__;
+    return __LINE__;
+    return $a and $b;
+    return $a or $b;
+    return $a xor $b;
   }
   
   // }}}
@@ -2569,73 +2676,6 @@ abstract class application extends error_tamsuft_template_analyse_unclosed imple
 }
 
 // vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8
-
-
-/**
- * Par à la recherche des chemins d'accès.
- * 
- * @ignore
- */
-$tamsuft_dir = dirname(realpath(__FILE__)).'/';
-
-if( ! defined('tamsuft_dir' ) )
-  /**
-   * Chemin d'acces depuis le démarreur vers le dossier de tamsuft.
-   *
-   * @var string
-   */
-  define( 'tamsuft_dir', $tamsuft_dir );
-
-elseif( substr(tamsuft_dir,-1,1) <> '/' )
-  // fixme lancer des exceptions plutot
-  trigger_error( 'The constante "tamsuft_dir" must have a slash "/" at his end.', E_USER_ERROR );
-
-$tamsuft_plugin_dir = dirname($tamsuft_dir).'/plugins/';
-
-if( ! defined('tamsuft_plugins_dir') )
-  /**
-   * Chemin d'acces depuis le démarreur vers le dossier des plugins.
-   *
-   * @var string
-   */
-  define( 'tamsuft_plugins_dir', $tamsuft_plugin_dir );
-
-elseif( substr(tamsuft_plugins_dir,-1,1) <> '/' )
-  // fixme lancer des exceptions plutot
-  trigger_error( 'The constante "tamsuft_plugins_dir" must have a slash "/" at his end.', E_USER_ERROR );
-
-// todo vire ça
-if( ! defined( 'PHP_EXT' ) )
-  /**
-   * Extension des scrits PHP
-   *
-   * @var string
-   */
-  define( 'PHP_EXT', '.php' );
-
-unset($tamsuft_index);
-unset($tamsuft_file);
-unset($tamsuft_dir);
-
-set_include_path( get_include_path().PATH_SEPARATOR.tamsuft_dir.PATH_SEPARATOR.tamsuft_plugins_dir );
-
-/**
- * Seul contrainte au lancement de tamsuft.
- *
- * @ignore
- */
-if( ! is_file( tamsuft_dir.'core.tamsuft'.PHP_EXT )
-  and ! is_readable( tamsuft_dir.'core.tamsuft'.PHP_EXT ) and false )
-    // fixme lancer des exceptions personalise
-    throw new Exception( 'Configuration error' );
-
-/**
- * Inclusion de la classe de base de tamsuft.
- */
-if( extension_loaded('xend') )
-  require_once xend('core.tamsuft.php');
-else
-  null;
 
 /**
  * Plugins de démarrage.

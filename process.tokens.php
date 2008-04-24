@@ -359,7 +359,8 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     switch( $source )
     {
     case '{' :
-      if( $current instanceof DstyleDoc_Token_Tuple )
+      if( $current instanceof DstyleDoc_Token_Tuple
+        or $current instanceof DstyleDoc_Token_Context )
         return DstyleDoc_Token_Context::hie( $converter, $current, $source, $file, $line );
       else
         return $current;
@@ -419,12 +420,17 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
         return $current->open_tag;
       }
       elseif( $current instanceof DstyleDoc_Token_Context )
-       return $current->down; 
+        return $current->down; 
 //      elseif( $current instanceof DstyleDoc_Token_Function )
   //      return $current->object;
       break;
 
     case '!' :
+    case '@' :
+    case '?' :
+    case ':' :
+    case '[' :
+    case ']' :
       return $current;
       break;
 
@@ -434,6 +440,11 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     case '*' :
     case '/' :
     case '%' :
+    case '>' :
+    case '<' :
+    case '&' :
+    case '|' :
+    case '^' :
       if( $current instanceof DstyleDoc_Token_Return )
       {
         $current->value = $source;
@@ -858,9 +869,23 @@ class DstyleDoc_Token_If extends DstyleDoc_Token_None
 }
 
 // }}}
+// {{{ Elseif
+
+class DstyleDoc_Token_Elseif extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Else
+
+class DstyleDoc_Token_Else extends DstyleDoc_Token_None
+{
+}
+
+// }}}
 // {{{ InstanceOf
 
-class DstyleDoc_Token_InstanceOf extends DstyleDoc_Token_None
+class DstyleDoc_Token_InstanceOf extends DstyleDoc_Token_Value
 {
 }
 
@@ -970,16 +995,25 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
       $ref = $current->object;
 
     $ref->return = true;
+    $return->brackets = 0;
+    $return->rollback = false;
 
     return $return;
   }
 
-  protected function rollback( $current )
+  private $rollback = false;
+
+  private function rollback( $current )
   {
     $current->return = '';
-    var_dump( 'ROLLBACK' );
-    return $current->object;
+    $this->rollback = true;
+    //var_dump( 'ROLLBACK' );
   }
+
+  private $types = array(
+    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary' );
+
+  private $brackets = 0;
 
   public function set_value( $value )
   {
@@ -991,56 +1025,105 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
     if( ! $current )
       return;
 
-    var_dump( $value );
-    var_dump( $current->return );
+    //var_dump( "VALUE : ".$value );
+    //var_dump( "RETURN : ".$current->return );
+    //var_dump( "BRACKETS : ".$this->brackets );
 
     $r = false;
 
-    if( in_array(strtolower($value), array('self','$this')) )
+    if( $this->brackets and $value === ')' )
     {
-      var_dump( __LINE__ );
+      //var_dump( __LINE__ );
+      $this->brackets--;
+    }
+
+    elseif( $this->brackets )
+    {
+      //var_dump( __LINE__ );
+      null;
+    }
+
+    elseif( in_array(strtolower($value), array('self','$this')) )
+    {
+      //var_dump( __LINE__ );
       if( ! $current->return )
         $current->return = $current->return . $this->object->object->object->name;
     }
 
-    elseif( substr($current->return,-1) === ')' )
-      null;
-
     elseif( substr($current->return,-1) === '(' and $value !== ')' )
       null;
 
-    elseif( substr($value,0,1) === '\'' or substr($value,0,1) === '"' )
+    elseif( in_array(substr($value,0,1), array('\'','"')) or in_array(strtolower($value), array('(string)','__file__','__function__','__class__','__dir__','__method__','__namespace__')) )
     {
-      var_dump( __LINE__ );
+      //var_dump( __LINE__ );
       if( in_array($current->return,array('string','')) )
         $current->return = 'string';
     }
 
     elseif( $value === '::' or $value === '->' )
     {
-      var_dump( __LINE__ );
-      if( ! in_array($current->return,array('number','string')) )
+      //var_dump( __LINE__ );
+      if( $current->return and ! in_array($current->return,$this->types) )
         $current->return = $current->return . $value;
     }
 
     elseif( $value === '(' )
-      $current->return = $current->return . '()';
-
-    elseif( $value === '.' )
-      $current->return = 'string'; 
-
-    elseif( in_array($value, array('+','-','*','/','*','%')) )
     {
-      var_dump( __LINE__ );
-      if( in_array($current->return,array('number','')) )
+      //var_dump( __LINE__ );
+      if( ! in_array($current->return,$this->types) and $current->return )
+        $current->return = $current->return . '()';
+      else
+         $this->brackets++;
+    }
+
+    elseif( in_array($value, array('.','.=')) )
+    {
+      //var_dump( __LINE__ );
+      if( in_array($current->return,array('string','')) or ! in_array($current->return,$this->types) )
+        $current->return = 'string';
+      else
+        return $this->rollback($current);
+    }
+
+    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__')) )
+    {
+      //var_dump( __LINE__ );
+      if( in_array($current->return,array('number','')) or ! in_array($current->return,$this->types) )
         $current->return = 'number';
+      else
+        return $this->rollback($current);
+    }
+
+    elseif( in_array(strtolower($value), array('array','(array)')) )
+    {
+      //var_dump( __LINE__ );
+      if( in_array($current->return,array('array','')) )
+        $current->return = 'array';
+      else
+        return $this->rollback($current);
+    }
+
+    elseif( strtolower($value) === '(object)' )
+    {
+      //var_dump( __LINE__ );
+      if( in_array($current->return,array('object','')) )
+        $current->return = 'object';
+      else
+        return $this->rollback($current);
+    }
+
+    elseif( strtolower($value) === '(binary)' )
+    {
+      //var_dump( __LINE__ );
+      if( in_array($current->return,array('binary','')) )
+        $current->return = 'binary';
       else
         return $this->rollback($current);
     }
 
     elseif( preg_match('/^\d/', $value) )
     {
-      var_dump( __LINE__ );
+      //var_dump( __LINE__ );
       if( in_array($current->return,array('number','')) )
         $current->return = 'number';
     }
@@ -1051,40 +1134,56 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
     elseif( strtolower($value) === 'null' )
       $current->return = 'null';
 
-    elseif( strtolower($value) === 'true' or strtolower($value) === 'false' )
-      $current->return = 'boolean';
-
-    elseif( in_array($value, array('&&','||','!','and','or','xor')) )
-      $current->return = 'boolean';
+    elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','true','false','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
+    {
+      //var_dump( __LINE__ );
+      if( in_array($current->return,array('boolean','')) or ! in_array($current->return,$this->types) )
+        $current->return = 'boolean';
+      else
+        return $this->rollback($current);
+    }
 
     elseif( substr($current->return,-2) === '::' or substr($current->return,-2) === '->' )
     {
-      var_dump( __LINE__ );
+      //var_dump( __LINE__ );
         $current->return = $current->return . $value;
+    }
+
+    elseif( substr($current->return,-1) === ')' )
+      null;
+
+    elseif( substr($value,0,1) === '$' )
+    {
+      //var_dump( __LINE__ );
+      if( ! in_array($current->return,$this->types) and substr($current->return,0,1) !== '$' )
+        $current->return .= $value;
     }
 
     elseif( substr($current->return,0,1) !== '$' )
     {
-      var_dump( __LINE__ );
-      if( ! in_array($current->return,array('number','string')) )
+      //var_dump( __LINE__ );
+      if( ! in_array($current->return,$this->types) )
         $current->return = $value;
     }
 
     else
       $r = true;
 
-    var_dump( $current->return );
+    //var_dump( $current->return );
 
     if( $r) 
     {
-      return $this->rollback( $current );
+      $this->rollback( $current );
     }
 
   }
 
   public function get_value()
   {
-    return $this;
+    if( $this->rollback )
+      return $this->object;
+    else
+      return $this;
   }
   public function get_exit()
   {
@@ -1095,8 +1194,10 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     $returns = array();
     foreach( $current->returns as $return )
-      if( ! preg_match( '/^\\$\\w+$/', $return ) )
+      if( ! preg_match( '/^\\$[_\\w]+$/', $return ) and ! preg_match( '/^(?<!::|->)[_\\w]+\\(\\)$/', $return ) and ! preg_match( '/^\\$[_\\w]+(::|->)\\$?[_\\w]+\(?\)?$/', $return ) )
         $returns[] = $return;
+
+    $current->returns = $returns;
 
     return $this->object;
   }
@@ -1124,16 +1225,235 @@ class DstyleDoc_Token_Boolean_And extends DstyleDoc_Token_Value
 }
 
 // }}}
-// {{{
+// {{{ Inc
 
+class DstyleDoc_Token_Inc extends DstyleDoc_Token_Value
+{
+}
 
 // }}}
-// {{{
+// {{{ Dec
 
+class DstyleDoc_Token_Dec extends DstyleDoc_Token_Value
+{
+}
 
 // }}}
-// {{{
+// {{{ Int Cast
 
+class DstyleDoc_Token_Int_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Bool Cast
+
+class DstyleDoc_Token_Bool_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Double Cast
+
+class DstyleDoc_Token_Double_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Array Cast
+
+class DstyleDoc_Token_Array_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Object Cast
+
+class DstyleDoc_Token_Object_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Sr
+
+class DstyleDoc_Token_Sr extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Sl
+
+class DstyleDoc_Token_Sl extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Is Identical
+
+class DstyleDoc_Token_Is_Identical extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Is Equal
+
+class DstyleDoc_Token_Is_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Is Greater Or Equal
+
+class DstyleDoc_Token_Is_Greater_Or_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Is Smaller Or Equal
+
+class DstyleDoc_Token_Is_Smaller_Or_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Is Not Equal
+
+class DstyleDoc_Token_Is_Not_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Is Not Identical
+
+class DstyleDoc_Token_Is_Not_Identical extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ String Cast
+
+class DstyleDoc_Token_String_Cast extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Array
+
+class DstyleDoc_Token_Array extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Concat Equal
+
+class DstyleDoc_Token_Concat_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Plus Equal
+
+class DstyleDoc_Token_Plus_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Xor Equal
+
+class DstyleDoc_Token_Xor_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Minus Equal
+
+class DstyleDoc_Token_Minus_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Mul Equal
+
+class DstyleDoc_Token_Mul_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Div Equal
+
+class DstyleDoc_Token_Div_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Mod Equal
+
+class DstyleDoc_Token_Mod_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ File
+
+class DstyleDoc_Token_File extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Func C
+
+class DstyleDoc_Token_Func_C extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Method C
+
+class DstyleDoc_Token_Method_C extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Line
+
+class DstyleDoc_Token_Line extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Logical Or
+
+class DstyleDoc_Token_Logical_Or extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Logical And
+
+class DstyleDoc_Token_Logical_And extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Logical Xor
+
+class DstyleDoc_Token_Logical_Xor extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
+// {{{ Try
+
+class DstyleDoc_Token_Try extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Catch
+
+class DstyleDoc_Token_Catch extends DstyleDoc_Token_None
+{
+}
 
 // }}}
 // {{{
