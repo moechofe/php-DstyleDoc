@@ -1,6 +1,5 @@
 <?php
 
-
 abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
 {
   // {{{ link()
@@ -65,7 +64,7 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ id()
 
-  protected function id( $id )
+  protected function convert_id( $id )
   {
     return $id;
   }
@@ -75,14 +74,15 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
 
   public function convert_all()
   {
-    d($this)->d8;
-
     echo <<<HTML
 <style>
 dl dt { margin-top: 0px; font-weight: bold; }
 dl dd { margin-left: 20px; }
 </style>
 HTML;
+
+    $this->all_functions();
+/*
 
     foreach( $this->classes as $class )
     {
@@ -113,13 +113,20 @@ HTML;
 <dl>
 {$this->element_filed($function)}
 </dl>
-HTML;
-    }
+HTML;*/
+  }
 
+  protected function all_functions()
+  {
+    echo <<<HTML
+<h1>Indexes des fonctions</h1>
+<ul>
+HTML;
+    foreach( $this->fonctions
   }
 
   // }}}
-  // {{{ common()
+  // {{{ element_filed()
 
   protected function element_filed( DstyleDoc_Element $element )
   {

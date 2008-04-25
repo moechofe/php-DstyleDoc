@@ -332,133 +332,43 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
   // }}}
   // {{{ $classes
 
-  protected $_classes = array();
-
-  protected function set_class( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_classes) )
-    {
-      reset($this->_classes);
-      while( true)
-      {
-        $class = current($this->_classes);
-        if( $found = ($class->name == $name or $class === $name) or false === next($this->_classes) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Class )
-        $this->_classes[] = $name;
-      else
-        $this->_classes[] = new DstyleDoc_Element_Class( $this, $name );
-      end($this->_classes);
-    }
-  }
-
-  protected function get_class()
-  {
-    if( ! count($this->_classes) )
-    {
-      $this->_classes[] = new DstyleDoc_Element_Class( $this, null );
-      return end($this->_classes);
-    }
-    else
-      return current($this->_classes);
-  }
- 
   protected function get_classes()
   {
-    return $this->_classes;
+    $classes = array();
+
+    foreach( $this->converter->classes as $class )
+      if( $class->file === $this )
+        $classes[] = $class;
+
+    return $classes;
   }
 
   // }}}
   // {{{ $interfaces
 
-  protected $_interfaces = array();
-
-  protected function set_interface( $name )
-  {
-   $found = false;
-    if( ! empty($name) and count($this->_interfaces) )
-    {
-      reset($this->_interfaces);
-      while( true)
-      {
-        $interface = current($this->_interfaces);
-        if( $found = ($interface->name == $name) or false === next($this->_interfaces) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      $this->_interfaces[] = new DstyleDoc_Element_Interface( $this, $name );
-      end($this->_interfaces);
-    }
-  }
-
-  protected function get_interface()
-  {
-    if( ! count($this->_interfaces) )
-    {
-      $this->_interfaces[] = new DstyleDoc_Element_Interface( $this, null );
-      return end($this->_interfaces);
-    }
-    else
-      return current($this->_interfaces);
-  }
-
   protected function get_interfaces()
   {
-    return $this->_interfaces;
+    $interfaces = array();
+
+    foreach( $this->converter->interfaces as $interface )
+      if( $interface->file === $this )
+        $interfaces[] = $interface;
+
+    return $interfaces;
   }
 
   // }}}
   // {{{ $functions
 
-  protected $_functions = array();
-
-  protected function set_function( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_functions) )
-    {
-      reset($this->_functions);
-      while( true)
-      {
-        $function = current($this->_functions);
-        if( $found = ($function->name == $name or $function === $name) or false === next($this->_functions) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Function )
-        $this->_functions[] = $name;
-      else
-        $this->_functions[] = new DstyleDoc_Element_Function( $this, $name );
-      end($this->_functions);
-    }
-  }
-  
-  protected function get_function()
-  {
-    if( ! count($this->_functions) )
-    {
-      $this->_functions[] = new DstyleDoc_Element_Function( $this, null );
-      return end($this->_functions);
-    }
-    else
-      return current($this->_functions);
-  }
-
   protected function get_functions()
   {
-    return $this->_functions;
+    $functions = array();
+
+    foreach( $this->converter->functions as $function )
+      if( $function->file === $this )
+        $functions[] = $function;
+
+    return $functions;
   }
 
   // }}}
@@ -712,14 +622,22 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   // }}}
   // {{{ $returns
 
-  protected $_returns = null;
+  protected $_returns = array();
+
+  protected function set_return( $return )
+  {
+    if( $return instanceof DstyleDoc_Element_Return )
+      $this->_returns[] = $return;
+    else
+      $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, $return );
+  }
 
   protected function get_return()
   {
-    if( ! $this->_returns )
-      $this->_returns = new DstyleDoc_Element_Return( $this->converter );
+    if( ! count($this->_returns) )
+      $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, null );
 
-    return $this->_returns;
+    return end($this->_returns);
   }
 
   // }}}
@@ -1032,31 +950,32 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 }
 
 /**
- * Classe d'un element de type paramètre.
+ * Classe d'un element de type retour.
  */
 class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
 {
-  // {{{ $types
+  // {{{ $type
 
-  protected $_types = '';
+  protected $_type = '';
 
-  protected function set_types( $types ) 
+  protected function set_type( $type )
   {
-    $this->_types = (array)$types;
+    $this->_type = (string)$type;
   }
 
-  protected function get_types()
+  protected function get_type()
   {
-    return $this->_types;
+    return $this->_type;
   }
 
-  protected function set_type( $type ) 
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( DstyleDoc_Converter $converter, $type )
   {
-    if( ! empty($type) )
-    {
-      $this->_types[] = (string)$type;
-      $this->_types = array_unique($this->_types);
-    }
+    parent::__construct( $converter );
+    if( $type )
+      $this->type = $type;
   }
 
   // }}}

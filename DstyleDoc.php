@@ -77,7 +77,6 @@ class DstyleDoc extends DstyleDoc_Properties
 
   protected function analyse_file( DstyleDoc_Converter $converter, $file )
   {
-    d( $converter )->d8->p6;
     $line = 1;
     $current = new DstyleDoc_Token_Fake;
     $doc = '';
@@ -95,25 +94,51 @@ class DstyleDoc extends DstyleDoc_Properties
       $call = token_name($token);
       if( substr($call,0,2)==='T_' ) $call = substr($call,2);
 
-      static $f = 0;
-      $ff = (++$f%2)?'BurlyWood':'Goldenrod';
-      $s = htmlentities($source); $c = get_class($current);
-      echo <<<HTML
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'tokens')!==false )
+      {
+        static $f = 0;
+        $ff = (++$f%2)?'BurlyWood':'Goldenrod';
+        $s = htmlentities($source); if(!trim($s))$s='&nbsp;'; $c = get_class($current);
+        echo <<<HTML
 <div style='clear:left;float:left;color:white;background:Brown;padding:1px 3px'>{$c}</div>
 <div style='float:left;background:Wheat;padding:1px 3px'>$call</div>
 <div style='background:{$ff};color:SaddleBrown;padding:1px 3px;'>{$s}</div>
 <div style='clear:both'></div>
 HTML;
+      }
 
       $save = $current;
       // processing token
       $current = call_user_func( array('DstyleDoc_Token_'.$call,'hie'), $converter, $current, $source, $file, $line );
 
+      if( $current instanceof DstyleDoc_Token_Stop )
+        break;
+
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'open_tag')!==false )
+      {
+        $o = $d = '';
+        $c = get_class($current);
+        if( ! $current instanceof DstyleDoc_Token_Stop )
+        {
+          $o = get_class($current->open_tag);
+          if( $current->open_tag instanceof DstyleDoc_Token_Open_Tag )
+            $d = strlen($current->open_tag->documentation);
+        }
+        if(!trim($d))$d='&nbsp;';
+        echo <<<HTML
+<div style='clear:left;float:left;color:white;background:OliveDrab;padding:1px 3px'>{$c}</div>
+<div style='float:left;color:white;background:DarkOliveGreen;padding:1px 3px'>{$o}</div>
+<div style='background:YellowGreen;color:white;padding:1px 3px;'>{$d}</div>
+<div style='clear:both'></div>
+HTML;
+      }      
+
       if( ! $current instanceof DstyleDoc_Token_Custom )
       {
-        d( $save )->d8->p6;
+        var_dump($save);
         throw new UnexpectedValueException;
       }
+
     }
   }
 
@@ -197,6 +222,17 @@ interface DstyleDoc_Converter_Convert
   /**
    * Convertie un lien vers un element.
    */
+  function convert_link( $link );
+
+  // }}}
+  // {{{ convert_id()
+
+  /**
+   * Convertir l'id d'un element
+   * Params:
+   *    array $id = Un tableau contenant la liste des identifiants de l'elements.
+   */
+  function convert_id( $id );
 
   // }}}
 }
@@ -206,6 +242,11 @@ interface DstyleDoc_Converter_Convert
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert
 {
+  // $constants
+
+  protected $_constants = array();
+
+  // }}}
   // {{{ $files
 
   protected $_files = array();
@@ -219,7 +260,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       while( true)
       {
         $file = current($this->_files);
-        if( $found = ($file->name == $name or $file === $name) or false === next($this->_files) )
+        if( $found = ($file->file == $name or $file === $name) or false === next($this->_files) )
           break;
       }
     }
@@ -473,9 +514,33 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   {
     $classes = array();
     foreach( $this->classes as $class )
-      if( $class->file = $file )
+      if( $class->file === $file )
         $classes[] = $class;
     return $classes;
+  }
+
+  // }}}
+  // {{{ get_file_interfaces()
+
+  public function get_file_interfaces( DstyleDoc_Element_File $file )
+  {
+    $interfaces = array();
+    foreach( $this->interfaces as $interface )
+      if( $interface->file === $file )
+        $interfaces[] = $interface;
+    return $interfaces;
+  }
+
+  // }}}
+  // {{{ get_file_methods()
+
+  public function get_file_methods( DstyleDoc_Element_File $file )
+  {
+    $methods = array();
+    foreach( $this->methods as $method )
+      if( $method->file === $file )
+        $methods[] = $method;
+    return $methods;
   }
 
   // }}}

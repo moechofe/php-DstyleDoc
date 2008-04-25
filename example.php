@@ -1,5 +1,25 @@
 <?php
 
+/**
+ */
+
+function aa( $a )
+{
+}
+
+?>
+<html>
+<?php
+
+function b()
+{
+?>
+<div>
+<?php
+}
+
+$a = null;
+
 $a = " string {$a} string ${a} ";
 
 /**
@@ -2676,21 +2696,6 @@ endforeach;
 for( $i=0; $i<1; $i++ ) :
 endfor;
 
-function a( $a )
-{
-}
-
-?>
-<html>
-<?php
-
-function b()
-{
-?>
-<div>
-<?php
-}
-
 // vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8
 
 /**
@@ -2701,6 +2706,8 @@ require_once( 'xdebug.front.end.php' );
 
 require_once( 'DstyleDoc.php' );
 require_once( 'converter.toString.php' );
+
+set_time_limit( 90 );
 
 d(
 
