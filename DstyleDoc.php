@@ -182,11 +182,49 @@ interface DstyleDoc_Converter_Convert
   // {{{ get_file_classes()
 
   /**
-   * Retourne la liste des classes appartenant à un fichier donnée.
+   * Renvoie la liste des classes appartenant à un fichier donnée.
+   * Params:
+   *    $file = L'instance d'un élément de fichier.
    * Return:
    *    array(DstyleDoc_Element_Class) = Un tableau de classe.
    */
-  public function get_file_classes( DstyleDoc_Element_File $file );
+  function get_file_classes( DstyleDoc_Element_File $file );
+
+  // }}}
+  // {{{ get_file_interfaces()
+
+  /**
+   * Renvoie la liste des interfaces appartenant à un fichier donnée.
+   * Params:
+   *    $file = L'instance d'un élément de fichier.
+   * Returns:
+   *    array(DstyleDoc_Element_Interface) = Un tableau d'interface.
+   */
+  function get_file_interfaces( DstyleDoc_Element_File $file );
+
+  // }}}
+  // {{{ get_file_methods()
+
+  /**
+   * Renvoie la liste des méthodes appartenant à un fichier donnée.
+   * Params:
+   *    $file = L'instance d'un élément de fichier.
+   * Returns:
+   *    array(DstyleDoc_Element_Method) = Un tableau de méthodes.
+   */
+  function get_file_methods( DstyleDoc_Element_File $file );
+
+  // }}}
+  // {{{ get_file_functions()
+
+  /**
+   * Renvoie la liste des functions appartenant à un fichier donnée.
+   * Params:
+   *    $file = L'instance d'un élément de fichier.
+   * Returns:
+   *    array(DstyleDoc_Element_Function) = Un tablean de fonctions.
+   */
+  function get_file_functions( DstyleDoc_Element_File $file );
 
   // }}}
   // {{{ convert_all()
@@ -195,6 +233,66 @@ interface DstyleDoc_Converter_Convert
    * Converti tous elements.
    */
   function convert_all();
+
+  // }}}
+  // {{{ convert_file()
+
+  /**
+   * Génère la documentation d'un fichier.
+   * Params:
+   *    $file = L'instance du fichier à documenter.
+   * Returns:
+   *    mixed = La documentation du fichier ou pas.
+   */
+  function convert_file( DstyleDoc_Element_File $file );
+
+  // }}}
+  // {{{ convert_class()
+
+  /**
+   * Génère la documentation d'une classe.
+   * Params:
+   *    $class = L'instance de la classe à documenter.
+   * Returns:
+   *    mixed = La documentation de la classe ou pas.
+   */
+  function convert_class( DstyleDoc_Element_Class $class );
+
+  // }}}
+  // {{{ convert_interface()
+
+  /**
+   * Génère la documentation d'un interface.
+   * Params:
+   *    $interface = L'instance de l'interface à documenter.
+   * Returns:
+   *    mixed = La documentation de l'interface ou pas.
+   */
+  function convert_interface( DstyleDoc_Element_Interface $interface );
+
+  // }}}
+  // {{{ convert_function()
+
+  /**
+   * Génère la documentation d'une fonction.
+   * Params:
+   *    $function = L'instance de la fonction à documenter.
+   * Returns:
+   *    mixed = La documentation de la fonction ou pas.
+   */
+  function convert_function( DstyleDoc_Element_Function $function );
+
+  // }}}
+  // {{{ convert_method()
+
+  /**
+   * Génère la documentation d'une méthode.
+   * Params:
+   *    $method = L'instance de la méthode à documenter.
+   * Returns:
+   *    mixed = La documentation de la fonction ou pas.
+   */
+  function convert_method( DstyleDoc_Element_Method $method );
 
   // }}}
   // {{{ convert_description()
@@ -220,19 +318,38 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_link()
 
   /**
-   * Convertie un lien vers un element.
+   * Converti et renvoie un lien vers un élément.
+   * Params:
+   *    $element = L'instance de l'élément sur lequel le lien doit pointer.
+   * Returns:
+   *    mixed = Dépends du convertisseur.
    */
-  function convert_link( $link );
+  function convert_link( DstyleDoc_Element $element );
 
   // }}}
   // {{{ convert_id()
 
   /**
-   * Convertir l'id d'un element
+   * Converti et renvoie l'identifiant unique d'un élément.
    * Params:
-   *    array $id = Un tableau contenant la liste des identifiants de l'elements.
+   *    string $id = L'identifiant unique de l'élément.
+   *    array $id = Un tableau contenant la liste des identifiants de l'élément et celui de ses parents.
+   * Returns:
+   *    string = L'identifiant convertie de l'élément.
    */
   function convert_id( $id );
+
+  // }}}
+  // {{{ convert_display()
+
+  /**
+   * Convertie et renvoie le nom d'affichage d'un élément.
+   * Params:
+   *    string $name = Le nom d'affichage de l'élément.
+   * Returns:
+   *    string = Le nom d'affichage converti.
+   */
+   function convert_display( $name );    
 
   // }}}
 }
@@ -541,6 +658,18 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       if( $method->file === $file )
         $methods[] = $method;
     return $methods;
+  }
+
+  // }}}
+  // {{{ get_file_functions()
+
+  public function get_file_functions( DstyleDoc_Element_File $file )
+  {
+    $functions = array();
+    foreach( $this->functions as $function )
+      if( $function->file === $file )
+        $functions[] = $function;
+    return $functions;
   }
 
   // }}}

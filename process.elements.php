@@ -50,6 +50,16 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
   }
 
   // }}}
+  // {{{ __toString()
+
+  /**
+   * Renvoie la documentation de l'élément.
+   * Returns:
+   *    string = La documentation de l'élément.
+   */
+  abstract public function __toString();
+
+  // }}}
 }
 
 /**
@@ -148,9 +158,37 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
   }
 
   // }}}
-  // {{{ __toString()
+  // {{{ $id
 
-  abstract public function __toString();
+  /**
+   * Renvoie l'identifiant unique de l'élément basé sur ces décendants.
+   * Returns:
+   *    string = L'ID de l'élément.
+   */
+  abstract protected function get_id();
+
+  // }}}
+  // {{{ $display
+
+  /**
+   * Renvoie la version affichable du nom de l'élément.
+   * Returns:
+   *    string = Le nom affichable de l'élément.
+   */
+  abstract protected function get_display();
+
+  // }}}
+  // {{{ $link
+
+  /**
+   * Renvoie un lien vers l'élément.
+   * Returns:
+   *    mixed = Dépends du convertisseur.
+   */
+  protected function get_link()
+  {
+    return $this->converter->convert_link( $this );
+  }
 
   // }}}
   // {{{ analyse()
@@ -165,8 +203,16 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
     $current = null;
     foreach( explode("\n",strtr($this->documentation,array("\r\n"=>"\n","\r"=>"\n"))) as $source )
     {
-      echo '<hr /><h1>',htmlentities($source),'</h1>';
-      var_dump( $current );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
+      {
+        $c = htmlentities($source);
+        $s = get_class($current);
+        echo <<<HTML
+<div style='clear:left;float:left;color:white;background:SteelBlue;padding:1px 3px'>{$c}</div>
+<div style='background:DimGray;padding:1px 3px;'>{$s}</div>
+<div style='clear:left;'></div>
+HTML;
+      }
       $result = array();
       $source = DstyleDoc_Analyser::remove_stars($source);
       foreach( $analysers as $analyser )
@@ -179,7 +225,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
         ksort($result);
         $current = current($result);
 
-        echo '<hr />';
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
         var_dump( $result );
 
         if( $current instanceof DstyleDoc_Analyser )
@@ -264,7 +310,7 @@ abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 
   protected function get_line()
   {
-    return $this->_line;
+    return (integer)$this->_line;
   }
 
   // }}}
@@ -286,15 +332,7 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
 
   protected function get_name()
   {
-    return $this->_name;
-  }
-
-  // }}}
-  // {{{ __toString()
-
-  public function __toString()
-  {
-    return $this->name;
+    return (string)$this->_name;
   }
 
   // }}}
@@ -326,7 +364,7 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 
   protected function get_file()
   {
-    return $this->_file;
+    return (string)$this->_file;
   }
 
   // }}}
@@ -372,11 +410,27 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
   }
 
   // }}}
-  // {{{ __toString()
+  // {{{ $id
+
+  protected function get_id()
+  {
+    return $this->converter->convert_id( $this->file );
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $this->name );
+  }
+
+  // }}}
+  // {{{ __toString() 
 
   public function __toString()
   {
-    return $this->converter->convert_file( $this->file );
+    return $this->converter->convert_file( $this );
   }
 
   // }}}
@@ -394,7 +448,7 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 /**
  * Classe d'un element qui contient des fonctions
  */
-class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_Filed_Named
+abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_Filed_Named
 {
   // {{{ $methods
 
@@ -517,6 +571,30 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   }
 
   // }}}
+  // {{{ $id
+
+  protected function get_id()
+  {
+    return $this->converter->convert_id( array($this->file->file, $file->name) );
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->conveter_display( $this->name );
+  }
+
+  // }}} 
+  // {{{ __toString()
+
+  public function __toString()
+  {
+    return $this->converter->convert_class( $this );
+  }
+
+  // }}}
 }
 
 /**
@@ -539,6 +617,14 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ __toString()
+
+  public function __toString()
+  {
+    return $this->converter->convert_history( $this );
+  }
+
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $version )
@@ -555,6 +641,30 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
  */
 class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 {
+  // {{{ $id
+
+  protected function get_id()
+  {
+    return $this->converter->convert_id( array($this->file->file, $file->name) );
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->conveter_display( $this->name );
+  }
+
+  // }}} 
+  // {{{ __toString()
+
+  public function __toString()
+  {
+    return $this->converter->convert_interface( $this );
+  }
+
+  // }}}
 }
 
 /**
@@ -701,6 +811,30 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   }
 
   // }}}
+  // {{{ $id
+
+  protected function get_id()
+  {
+    return $this->converter->convert_id( array($this->file->file, $file->name) );
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->conveter_display( $this->name );
+  }
+
+  // }}} 
+  // {{{ __toString
+
+  public function __toString()
+  {
+    return $this->converter->conveter_function( $this );
+  } 
+
+  // }}}
 }
 
 /**
@@ -814,6 +948,30 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
   }
 
   // }}}
+  // {{{ $id
+
+  protected function get_id()
+  {
+    return $this->converter->convert_id( array($this->file->file, $this->class->name, $this->name) );
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name );
+  }
+
+  // }}} 
+  // {{{ __toString()
+
+  public function __toString()
+  {
+    return $this->converter->convert_method( $this );
+  }
+
+  // }}}
 }
 
 /**
@@ -845,6 +1003,14 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ __toString
+
+  public function __toString()
+  {
+    return $this->converter->convert_syntax( $this );
+  }
+
+  // }}}
 }
 
 /**
@@ -873,6 +1039,14 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
   {
     parent::__construct( $converter );
     $this->name = $exception;
+  }
+
+  // }}}
+  // {{{ __toString
+
+  public function __toString()
+  {
+    return $this->converter->convert_exception( $this );
   }
 
   // }}}
@@ -947,6 +1121,14 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ __toString
+
+  public function __toString()
+  {
+    return $this->converter->convert_param( $this );
+  }
+
+  // }}}
 }
 
 /**
@@ -976,6 +1158,14 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
     parent::__construct( $converter );
     if( $type )
       $this->type = $type;
+  }
+
+  // }}}
+  // {{{ __toString
+
+  public function __toString()
+  {
+    return $this->converter->convert_return( $this );
   }
 
   // }}}
