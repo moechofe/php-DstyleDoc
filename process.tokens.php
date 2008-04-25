@@ -507,9 +507,12 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
       if( $current instanceof DstyleDoc_Token_Interface or $current instanceof DstyleDoc_Token_Class )
         return $current->open_tag;
       elseif( $current instanceof DstyleDoc_Token_Context )
-        return $current->down; 
-//      elseif( $current instanceof DstyleDoc_Token_Function )
-  //      return $current->object;
+      {
+        $return = $current->down; 
+        if( $return instanceof DstyleDoc_Token_Elementable )
+          $return->to( $converter )
+        return $return;
+      }
       break;
 
     case '!' :

@@ -1,11 +1,26 @@
 <?php
 
-/**
- */
+require_once( 'xdebug.front.end.php' );
 
+require_once( 'DstyleDoc.php' );
+require_once( 'converter.toString.php' );
+
+set_time_limit( 90 );
+
+DstyleDoc::hie()
+  ->source( 'example.php' )
+  ->convert_with( new DstyleDoc_Converter_toString() );
+
+/**
+ * documentation pour aa
+ */
 function aa( $a )
 {
+  return false;
+  return 'bite';
 }
+
+__halt_compiler();
 
 ?>
 <html>
@@ -2701,21 +2716,6 @@ endfor;
 /**
  * Plugins de démarrage.
  */
-
-require_once( 'xdebug.front.end.php' );
-
-require_once( 'DstyleDoc.php' );
-require_once( 'converter.toString.php' );
-
-set_time_limit( 90 );
-
-d(
-
-DstyleDoc::hie()
-  ->source( 'example.php' )
-  ->convert_with( new DstyleDoc_Converter_toString() )
-
-)->fontend;
 
 /**
 // recupère la doc des elements parent pour les classe ou les fonction etendu

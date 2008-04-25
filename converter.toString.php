@@ -209,12 +209,17 @@ HTML;*/
 
   protected function all_functions()
   {
+    var_dump( $this );
     echo <<<HTML
 <h1>Indexes des fonctions</h1>
 <ul>
 {$this->forall($this->functions,'$value->display')}
 </ul>
 HTML;
+    foreach( $this->functions as $f )
+    {
+      var_dump( $f );
+    }
   }
 
   // }}}
