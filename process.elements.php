@@ -42,6 +42,16 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
   }
 
   // }}}
+  // {{{ $display
+
+  /**
+   * Renvoie la version affichable du nom de l'élément.
+   * Returns:
+   *    mixed = Dépends du convertisseur.
+   */
+  abstract protected function get_display();
+
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter )
@@ -49,15 +59,42 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
     $this->converter = $converter;
   }
 
+
   // }}}
   // {{{ __toString()
+
+  final private function __toString()
+  {
+    try
+    {
+      $return = $this->get_convert();
+      if( is_string($return) )
+        return $return;
+      else
+        return get_class($this).' '.$this->get_display();
+    }
+    catch( Exception $e )
+    {
+      return get_class($this).' '.(string)$e;
+    }
+  }
+
+  // }}}
+  // {{{ __clone()
+
+  private function __clone()
+  {
+  }
+
+  // }}}
+  // {{{ $convert
 
   /**
    * Renvoie la documentation de l'élément.
    * Returns:
-   *    string = La documentation de l'élément.
+   *    mixed = La documentation de l'élément ou pas.
    */
-  abstract public function __toString();
+  abstract protected function get_convert();
 
   // }}}
 }
@@ -168,16 +205,6 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
   abstract protected function get_id();
 
   // }}}
-  // {{{ $display
-
-  /**
-   * Renvoie la version affichable du nom de l'élément.
-   * Returns:
-   *    string = Le nom affichable de l'élément.
-   */
-  abstract protected function get_display();
-
-  // }}}
   // {{{ $link
 
   /**
@@ -187,7 +214,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
    */
   protected function get_link()
   {
-    return $this->converter->convert_link( $this );
+    return $this->converter->convert_link( $this->id, $this->name );
   }
 
   // }}}
@@ -206,10 +233,12 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
       {
         $c = htmlentities($source);
+        if( ! $c ) $c = '&nbsp;';
         $s = get_class($current);
+        if( ! $s ) $s = '&nbsp;';
         echo <<<HTML
 <div style='clear:left;float:left;color:white;background:SteelBlue;padding:1px 3px'>{$c}</div>
-<div style='background:DimGray;padding:1px 3px;'>{$s}</div>
+<div style='background:DimGray;color:white;padding:1px 3px;'>{$s}</div>
 <div style='clear:left;'></div>
 HTML;
       }
@@ -426,9 +455,9 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
   }
 
   // }}}
-  // {{{ __toString() 
+  // {{{ $convert 
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_file( $this );
   }
@@ -587,9 +616,9 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   }
 
   // }}} 
-  // {{{ __toString()
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_class( $this );
   }
@@ -608,7 +637,7 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
 
   protected function set_version( $version ) 
   {
-    $this->_version = $version;
+    $this->_version = (string)$version;
   }
 
   protected function get_version()
@@ -617,9 +646,17 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
   }
 
   // }}}
-  // {{{ __toString()
+  // {{{ $display
 
-  public function __toString()
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $this->version );
+  }
+
+  // }}}
+  // {{{ $convert
+
+  protected function get_convert()
   {
     return $this->converter->convert_history( $this );
   }
@@ -645,7 +682,7 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_id()
   {
-    return $this->converter->convert_id( array($this->file->file, $file->name) );
+    return $this->converter->convert_id( array($this->file->file, $this->name) );
   }
 
   // }}}
@@ -653,13 +690,13 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_display()
   {
-    return $this->converter->conveter_display( $this->name );
+    return $this->converter->convert_display( $this->name );
   }
 
   // }}} 
-  // {{{ __toString()
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_interface( $this );
   }
@@ -799,6 +836,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function set_syntax( $syntax )
   {
+    var_dump( $syntax );
     $this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $syntax );
   }
 
@@ -815,7 +853,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_id()
   {
-    return $this->converter->convert_id( array($this->file->file, $file->name) );
+    return $this->converter->convert_id( array($this->file->file, $this->name) );
   }
 
   // }}}
@@ -823,15 +861,15 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_display()
   {
-    return $this->converter->conveter_display( $this->name );
+    return $this->converter->convert_display( $this->name.'()' );
   }
 
   // }}} 
-  // {{{ __toString
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
-    return $this->converter->conveter_function( $this );
+    return $this->converter->convert_function( $this );
   } 
 
   // }}}
@@ -960,13 +998,13 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name );
+    return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name.'()' );
   }
 
   // }}} 
-  // {{{ __toString()
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_method( $this );
   }
@@ -994,18 +1032,27 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( (string)$syntax );
+  }
+
+  // }}} 
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $syntax )
   {
+    var_dump( xdebug_get_function_stack() );
     parent::__construct( $converter );
     $this->syntax = $syntax;
   }
 
   // }}}
-  // {{{ __toString
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_syntax( $this );
   }
@@ -1033,6 +1080,14 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $this->name );
+  }
+
+  // }}} 
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $exception )
@@ -1042,9 +1097,9 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
   }
 
   // }}}
-  // {{{ __toString
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_exception( $this );
   }
@@ -1111,6 +1166,14 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( '$'.$var );
+  }
+
+  // }}} 
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $var )
@@ -1121,9 +1184,9 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
   }
 
   // }}}
-  // {{{ __toString
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_param( $this );
   }
@@ -1151,6 +1214,14 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $type );
+  }
+
+  // }}} 
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $type )
@@ -1161,9 +1232,9 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   }
 
   // }}}
-  // {{{ __toString
+  // {{{ $convert
 
-  public function __toString()
+  protected function get_convert()
   {
     return $this->converter->convert_return( $this );
   }

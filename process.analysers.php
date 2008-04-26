@@ -956,6 +956,8 @@ class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
 
 /**
  * Classe d'analyse d'un élément de liste de syntaxe.
+ * Todo:
+ *    utiliser les -_\pLpN
  */
 class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -968,13 +970,14 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
     $optional = false;
     foreach( explode(',', $syntax) as $var )
     {
-      // \s*(\[?)\s*(\$[\pLpN]+|\.{3})\s*\]?
-      if( preg_match('/\\s*(\\[?)\\s*(\\$[\\pLpN]+|\\.{3})\\s*\\]?/i', $var, $matches) )
+      // \s*(\[?)\s*([-_\pLpN]+\s+)?(\$[-_\pLpN]+|\.{3})\s*\]?
+      if( preg_match('/\\s*(\\[?)\\s*([-_\\pLpN]+\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*\\]?/', $var, $matches) )
       {
         if( ! empty($matches[1]) )
           $optional = true;
-        $this->_syntax[] = array(
-          'var' => $matches[2],
+        $this->_syntax = array(
+          'type' => $matches[2],
+          'var' => $matches[3],
           'optional' => $optional );
       }
     }
@@ -1019,9 +1022,9 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // (?:[-+*]\s*)?((?:\s*,?\s*\[?\s*(?:\$[\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
+    // (?:[-+*]\s*)?((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/(?:[-+*]\\s*)?((?:\\s*,?\\s*\\[?\\s*(?:\\$[\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      and preg_match( '/(?:[-+*]\\s*)?((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/', $source, $matches ) )
     {
       if( ! trim($matches[1]) )
         return false;

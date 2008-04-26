@@ -23,18 +23,18 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   public function convert_id( $id )
   {
     if( is_array($id) )
-      return $this->html_id( implode('/', $id) );
-    else
-      return $this->html_id( $id );
+      $id = implode('_', $id);
+
+    return $this->html_id( (string)$id );
   }
 
   // }}}
   // {{{ convert_link()
 
-  public function convert_link( DstyleDoc_Element $element )
+  public function convert_link( $id, $name )
   {
     return <<<HTML
-<a href="{$element->id}">{$element->display}</a>
+<a href="{$id}">{$name}</a>
 HTML;
   }
 
@@ -43,7 +43,7 @@ HTML;
 
   public function convert_display( $name )
   {
-    return (string)htmlspecialchars( (string)$name );
+    return (string)htmlspecialchars( $name );
   }
 
   // }}}
@@ -58,7 +58,7 @@ HTML;
    */
   protected function html_id( $string )
   {
-    return (string)preg_replace( '/(?:(?!^)[^a-z]|[^-_a-z0-9])/', '', (string)$string );
+    return (string)preg_replace( '/(?:(?<=^)[^a-z]|[^-_a-z0-9])/', '_', strtolower((string)$string) );
   }
 
   // }}}
@@ -109,10 +109,12 @@ HTML;
 
   public function convert_function( DstyleDoc_Element_Function $function )
   {
+    d( $function->syntax )->d4;
     return <<<HTML
 <hr /><h1 id="{$function->id}">function: {$function->display}</h1>
 <dl>
-{$this->element_files($function)}
+{$this->element_filed($function)}
+<dt>returns</dt><dd></dd>
 </dl>
 HTML;
   }
@@ -126,7 +128,18 @@ HTML;
 <hr /><h1 id="{$method->id}">method: {$method->display}</h1>
 <dl>
 {$this->element_filed($method)}
+<dt>class</dt><dd>{$method->class->link}</dd>
 </dl>
+HTML;
+  }
+
+  // }}}
+  // {{{ convert_link()
+
+  public function convert_link( $id, $name )
+  {
+    return <<<HTML
+<a href="#{$id}">{$name}</a>
 HTML;
   }
 
@@ -169,7 +182,11 @@ dl dd { margin-left: 20px; }
 </style>
 HTML;
 
+    $this->index_functions();
+    $this->index_interfaces();
+
     $this->all_functions();
+    $this->all_interfaces();
 /*
 
     foreach( $this->classes as $class )
@@ -183,25 +200,7 @@ HTML;
 </dl>
 HTML;
     }
-
-    foreach( $this->interfaces as $interface )
-    {
-      echo <<<HTML
-<hr /><h1 id="{$this->id($interface)}">interface: {$interface->name}</h1>
-<dl>
-{$this->element_filed($interface)}
-</dl>
-HTML;
-    }
-
-    foreach( $this->functions as $function )
-    {
-      echo <<<HTML
-<hr /><h1 id="{$this->id($function)}">function: {$function->name}</h1>
-<dl>
-{$this->element_filed($function)}
-</dl>
-HTML;*/
+*/
   }
 
   // }}}
@@ -209,17 +208,57 @@ HTML;*/
 
   protected function all_functions()
   {
-    var_dump( $this );
+    foreach( $this->functions as $function )
+      echo $function;
+  }
+
+  // }}}
+  // {{{ all_interfaces()
+
+  protected function all_interfaces()
+  {
+    foreach( $this->interfaces as $interface )
+    {
+      echo <<<HTML
+<hr /><h1 id="{$interface->id}">interface: {$interface->name}</h1>
+<dl>
+{$this->element_filed($interface)}
+<dt>methods</dt>
+<dd>
+  <ul>
+    {$this->forall($interface->methods,'<li>$value->link</li>')}
+  </ul>
+  {$this->forall($interface->methods,'$value')}
+</dd>
+</dl>
+HTML;
+    }
+  }
+
+  // }}}
+  // {{{ index_functions()
+
+  protected function index_functions()
+  {
     echo <<<HTML
-<h1>Indexes des fonctions</h1>
+<h1>Functions index</h1>
 <ul>
-{$this->forall($this->functions,'$value->display')}
+  {$this->forall($this->functions,'<li>$value->link</li>')}
 </ul>
 HTML;
-    foreach( $this->functions as $f )
-    {
-      var_dump( $f );
-    }
+  }
+
+  // }}}
+  // {{{ index_interfaces()
+
+  protected function index_interfaces()
+  {
+    echo <<<HTML
+<h1>Interfaces index</h1>
+<ul>
+  {$this->forall($this->interfaces,'<li>$value->link</li>')}
+</ul>
+HTML;
   }
 
   // }}}

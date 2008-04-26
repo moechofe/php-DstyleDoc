@@ -508,9 +508,10 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
         return $current->open_tag;
       elseif( $current instanceof DstyleDoc_Token_Context )
       {
+        $save = $current->object;
         $return = $current->down; 
-        if( $return instanceof DstyleDoc_Token_Elementable )
-          $return->to( $converter )
+        if( $return !== $save and $save instanceof DstyleDoc_Token_Elementable )
+          $save->to( $converter );
         return $return;
       }
       break;
@@ -757,16 +758,16 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
 
   public function to( DstyleDoc_Converter $converter )
   {
-    if( $return->object instanceof DstyleDoc_Token_Fake )
+    if( $this->object instanceof DstyleDoc_Token_Fake )
     {
-      $converter->function = $method->name;
+      $converter->function = $this->name;
       $function = $converter->function;
 
-      $function->file = $method->file;
-      $function->line = $method->line;
-      $function->documentation = $method->documentation;
+      $function->file = $this->file;
+      $function->line = $this->line;
+      $function->documentation = $this->documentation;
 
-      foreach( $method->vars as $var )
+      foreach( $this->vars as $var )
       {
         $function->param = $var->name;
         $param = $function->param;
@@ -777,7 +778,7 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
         $param->default = $var->default;
       }
 
-      foreach( $method->returns as $return )
+      foreach( $this->returns as $return )
         $function->return = $return;
     }
   }

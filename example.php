@@ -13,6 +13,9 @@ DstyleDoc::hie()
 
 /**
  * documentation pour aa
+ * Syntax:
+ *    integer $a = Call with an integer
+ *    string $a = Call with an string
  */
 function aa( $a )
 {
@@ -26,7 +29,7 @@ __halt_compiler();
 <html>
 <?php
 
-function b()
+function b( $a = 'test' )
 {
 ?>
 <div>
@@ -90,14 +93,14 @@ interface tamsuft_template_interface
   /**
    * Fabrique pour les classes de template tamsuft.
    *
-   * <h3>Instancie avec une adresse.<h3>
+   * <h3>Instancie avec une adresse.</h3>
    * <code>
    * <?php
    *   template_tamsuft::hie( 'dir/dir/file.tpl', null, $tamsuft );
    * ?>
    * </code>
    *
-   * <h3>Instanice avce des données directe.<h3>
+   * <h3>Instanice avce des données directe.</h3>
    * <code>
    * <?php
    *   template_tamsuft::hie( null, 'data', $tamsuft );

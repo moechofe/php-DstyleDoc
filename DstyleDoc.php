@@ -320,11 +320,12 @@ interface DstyleDoc_Converter_Convert
   /**
    * Converti et renvoie un lien vers un élément.
    * Params:
-   *    $element = L'instance de l'élément sur lequel le lien doit pointer.
+   *    mixed $id = L'identifiant unique de l'élément retourné par convert_id().
+   *    mixed $name = Le nom d'affichage de l'élément retourné par convert_name().
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
-  function convert_link( DstyleDoc_Element $element );
+  function convert_link( $id, $name );
 
   // }}}
   // {{{ convert_id()
@@ -345,9 +346,9 @@ interface DstyleDoc_Converter_Convert
   /**
    * Convertie et renvoie le nom d'affichage d'un élément.
    * Params:
-   *    string $name = Le nom d'affichage de l'élément.
+   *    $name = Le nom de l'élément à afficher.
    * Returns:
-   *    string = Le nom d'affichage converti.
+   *    mixed = Dépends du convertisseur.
    */
    function convert_display( $name );    
 
@@ -356,6 +357,8 @@ interface DstyleDoc_Converter_Convert
 
 /**
  * Convertisseur abstrait
+ * Todo:
+ *    - reporter set_method() dans les autres methode de ce genre.
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert
 {
@@ -554,7 +557,8 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       while( true)
       {
         $method = current($this->_methods);
-        if( $found = ($method->name == $name or $method === $name) or false === next($this->_methods) )
+        if( $found = ( (is_object($name) and $method === $name)
+          or (is_string($name) and $method->name) ) or false === next($this->_methods) )
           break;
       }
     }
