@@ -185,7 +185,6 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected function get_history()
   {
-    if( ! $this->analysed ) $this->analyse();
     if( count($this->_historys) )
     {
       list($version) = array_reverse($this->_historys);
@@ -281,7 +280,6 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 
   protected function get_description()
   {
-    if( ! $this->analysed ) $this->analyse();
     $copy = $this->_descriptions;
     if( count($copy) )
       array_shift($copy);
@@ -293,7 +291,6 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 
   protected function get_title()
   {
-    if( ! $this->analysed ) $this->analyse();
     if( count($this->_descriptions) )
       list($result) = $this->_descriptions;
     else
@@ -759,7 +756,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_param()
   {
-    if( ! $this->analysed ) $this->analyse();
     if( ! count($this->_params) )
     {
       $this->_params[] = new DstyleDoc_Element_Param( $this->converter, null );
@@ -784,7 +780,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_return()
   {
-    if( ! $this->analysed ) $this->analyse();
     if( ! count($this->_returns) )
       $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, null );
 
@@ -830,7 +825,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_exceptions()
   {
-    if( ! $this->analysed ) $this->analyse();
     return $this->_exceptions;
   }
 
@@ -854,7 +848,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_syntaxs()
   {
-    if( ! $this->analysed ) $this->analyse();
     if( ! $this->_syntax )
       $this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $this->params );
     return $this->_syntax;
@@ -881,6 +874,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_convert()
   {
+    if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_function( $this );
   } 
 
@@ -1184,12 +1178,21 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function get_default()
   {
-    return $this->_default;
+    if( $this->_default === true )
+      return '';
+    else
+      return (string)$this->_default;
   }
 
   protected function get_optional()
   {
     return (boolean)$this->_default;
+  }
+
+  protected function set_optional( $optional )
+  {
+    if( ! $this->_default and $optional )
+      $this->_default = true;
   }
 
   // }}}

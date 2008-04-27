@@ -114,7 +114,7 @@ HTML;
 <dl>
 {$this->element_filed($function)}
 <dt>syntax</dt>{$this->forall($function->syntaxs,'<dd>$value</dd>')}
-<dt>params</dt>{$this->forall($function->params,'<li>$value</li>')}
+<dt>params</dt><dd>{$this->forall($function->params,'<li>$value</li>')}</dd>
 <dt>returns</dt><dd></dd>
 </dl>
 HTML;
@@ -159,7 +159,6 @@ HTML;
 
   public function convert_param( DstyleDoc_Element_Param $param )
   {
-    d( $param->types );
     $types = implode(', ', $param->types);
     return <<<HTML
 {$param->var}: {$this->either($param->types,'<i>('.$types.')</i> ')}{$this->either($param->default,'<i>\['.$param->default.'\]</i> ')}{$param->description}
