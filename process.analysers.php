@@ -535,13 +535,17 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
     {
       $element->param = $this->var;
 
+      // It's impossible to call a getter twice with the magic method __get()
+      //$param = $element->param;
+      $param = $element->__get('param');
+
       if( $this->var )
-        $element->param->var = $this->var;
+        $param->var = $this->var;
 
       foreach( $this->types as $type )
-        $element->param->type = $type;
+        $param->type = $type;
 
-      $element->param->description = $this->description;
+      $param->description = $this->description;
     }
     return $this;
   }
@@ -968,7 +972,7 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
         if( ! empty($matches[1]) )
           $optional = true;
         $this->_syntax[] = array(
-          'type' => $matches[2],
+          'types' => $matches[2],
           'var' => $matches[3],
           'optional' => $optional );
       }
@@ -1038,6 +1042,14 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
   {
     if( $element instanceof DstyleDoc_Element_Function )
     {
+      foreach( $this->syntax as $syntax )
+      {
+        $element->param = $syntax['var'];
+        // It's because It's impossible to call a getter twice with the magic methode __get()
+        //$param = $element->param;
+        $param = $element->__get('param');
+        $param->type = $syntax['types'];
+      }
       $element->syntax = $this->syntax;
       $element->syntax->description = $this->description;
     }

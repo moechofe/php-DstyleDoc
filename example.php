@@ -18,14 +18,14 @@ DstyleDoc::hie()
  *    and with a documentation on two line
  *    or more
  *    string $a = Call with a string
+ * Params:
+ *    $a = Description for the 1st parameter $a
  */
 function aa( $a, $b = null )
 {
   return false;
   return 'bite';
 }
-
-__halt_compiler();
 
 ?>
 <html>
@@ -37,6 +37,8 @@ function b( $a = 'test' )
 <div>
 <?php
 }
+
+__halt_compiler();
 
 $a = null;
 

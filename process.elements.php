@@ -855,6 +855,8 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   protected function get_syntaxs()
   {
     if( ! $this->analysed ) $this->analyse();
+    if( ! $this->_syntax )
+      $this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $this->params );
     return $this->_syntax;
   }
 
@@ -1043,7 +1045,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 
   protected function set_param( $param ) 
   {
-    $this->_params[] = (array)$param;
+    $this->_params[] = (object)$param;
   }
 
   protected function get_param()
@@ -1065,7 +1067,8 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
   public function __construct( DstyleDoc_Converter $converter, $syntax )
   {
     parent::__construct( $converter );
-    $this->params = $syntax;
+    foreach( $syntax as $param )
+      $this->param = $param;
   }
 
   // }}}
@@ -1133,7 +1136,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 {
   // {{{ $types
 
-  protected $_types = '';
+  protected $_types = array();
 
   protected function set_types( $types ) 
   {
