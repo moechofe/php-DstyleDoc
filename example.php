@@ -12,12 +12,14 @@ DstyleDoc::hie()
   ->convert_with( new DstyleDoc_Converter_toString() );
 
 /**
- * documentation pour aa
+ * documentation pour aa()
  * Syntax:
- *    integer $a = Call with an integer
- *    string $a = Call with an string
+ *    integer $a, [$b] = Call with an integer
+ *    and with a documentation on two line
+ *    or more
+ *    string $a = Call with a string
  */
-function aa( $a )
+function aa( $a, $b = null )
 {
   return false;
   return 'bite';

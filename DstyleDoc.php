@@ -353,6 +353,18 @@ interface DstyleDoc_Converter_Convert
    function convert_display( $name );    
 
   // }}}
+  // {{{ convert_syntax()
+
+  /**
+   * Génère la documentation d'une syntaxe d'une fonction.
+   * Params:
+   *    $syntax = L'instance de la syntaxe.
+   * Returns:
+   *    mixed = La documentation de la syntaxe ou pas.
+   */
+  function convert_syntax( DstyleDoc_Element_Syntax $syntax );
+
+  // }}}
 }
 
 /**

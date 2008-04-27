@@ -109,11 +109,11 @@ HTML;
 
   public function convert_function( DstyleDoc_Element_Function $function )
   {
-    d( $function->syntax )->d4;
     return <<<HTML
 <hr /><h1 id="{$function->id}">function: {$function->display}</h1>
 <dl>
 {$this->element_filed($function)}
+<dt>syntax</dt>{$this->forall($function->syntaxs,'<dd>$value</dd>')}
 <dt>returns</dt><dd></dd>
 </dl>
 HTML;
@@ -130,6 +130,27 @@ HTML;
 {$this->element_filed($method)}
 <dt>class</dt><dd>{$method->class->link}</dd>
 </dl>
+HTML;
+  }
+
+  // }}}
+  // {{{ convert_syntax()
+
+  public function convert_syntax( DstyleDoc_Element_Syntax $syntax )
+  {
+    d( $syntax);
+    $result = '';
+    foreach( $syntax->params as $param )
+      $result .= ', '.
+        (($param['optional'])?'[ ':'').
+        (($param['type'])?'<i>'.$param['type'].'</i> ':'').
+        $param['var'].
+        (($param['optional'])?' ]':'');
+
+    $result = substr($result,2);
+
+    return <<<HTML
+<li>{$result}<br/>{$syntax->description}</li>
 HTML;
   }
 
@@ -175,6 +196,9 @@ HTML;
 
   public function convert_all()
   {
+
+    d( $this->functions[0] );    
+
     echo <<<HTML
 <style>
 dl dt { margin-top: 0px; font-weight: bold; }

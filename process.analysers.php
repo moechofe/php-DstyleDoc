@@ -438,10 +438,6 @@ class DstyleDoc_Analyser_Param extends DstyleDoc_Analyser
   // }}}
   // {{{ apply()
 
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
   public function apply( DstyleDoc_Element $element )
   {
     return $this;
@@ -533,10 +529,6 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
   // }}}
   // {{{ apply()
 
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
   public function apply( DstyleDoc_Element $element )
   {
     if( $element instanceof DstyleDoc_Element_Function )
@@ -963,19 +955,19 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
 {
   // {{{ $syntax
 
-  protected $_syntax = '';
+  protected $_syntax = array();
 
   protected function set_syntax( $syntax ) 
   {
     $optional = false;
     foreach( explode(',', $syntax) as $var )
     {
-      // \s*(\[?)\s*([-_\pLpN]+\s+)?(\$[-_\pLpN]+|\.{3})\s*\]?
-      if( preg_match('/\\s*(\\[?)\\s*([-_\\pLpN]+\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*\\]?/', $var, $matches) )
+      // \s*(\[?)\s*(?:([-_\pLpN]+)\s)?\s*(\$[-_\pLpN]+|\.{3})\s*\]?
+      if( preg_match('/\\s*(\\[?)\\s*(?:([-_\\pLpN]+)\\s)?\\s*(\\$[-_\\pLpN]+|\\.{3})\\s*\\]?/', $var, $matches) )
       {
         if( ! empty($matches[1]) )
           $optional = true;
-        $this->_syntax = array(
+        $this->_syntax[] = array(
           'type' => $matches[2],
           'var' => $matches[3],
           'optional' => $optional );
