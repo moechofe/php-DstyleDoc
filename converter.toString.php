@@ -73,7 +73,17 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
 
   public function convert_file( DstyleDoc_Element_File $file )
   {
-    return (string)$file->file;
+    return <<<HTML
+<hr /><h1 id="{$file->id}">file: {$file->display}</h1>
+<dl>
+{$this->either($file->classes,'<dt>classes</dt><dd><ul>'.$this->forall($file->classes,'<li>$value->link</li>').'</ul></dd>')}
+{$this->either($file->interfaces,'<dt>interfaces</dt><dd><ul>'.$this->forall($file->interfaces,'<li>$value->link</li>').'</ul></dd>')}
+{$this->either($file->functions,'<dt>functions</dt><dd><ul>'.$this->forall($file->functions,'<li>$value->link</li>').'</ul></dd>')}
+</dl>
+HTML;
+      
+      
+      (string)$file->file;
   }
 
   // }}}
@@ -99,7 +109,14 @@ HTML;
     return <<<HTML
 <hr /><h1 id="{$interface->id}">interface: {$interface->display}</h1>
 <dl>
-{$this->element_files($interface)}
+{$this->element_filed($interface)}
+<dt>methods</dt>
+<dd>
+  <ul>
+    {$this->forall($interface->methods,'<li>$value->link</li>')}
+  </ul>
+  {$this->forall($interface->methods,'$value')}
+</dd>
 </dl>
 HTML;
   }
@@ -117,6 +134,8 @@ HTML;
 <dt>params</dt><dd>{$this->forall($function->params,'<li>$value</li>')}</dd>
 {$this->either($function->returns,
 '<dt>returns</dt><dd>'.$this->forall($function->returns,'<li>$value</li>').'</dd>')}
+{$this->either($function->exceptions,
+'<dt>exceptions</dt><dd>'.$this->forall($function->exceptions,'<li>$value</li>').'</dd>')}
 </dl>
 HTML;
   }
@@ -149,9 +168,10 @@ HTML;
         (($param->optional)?' ]':'');
 
     $result = substr($result,2);
+    $call = substr($syntax->function->display,0,-1);
 
     return <<<HTML
-<li>{$result}<br/>{$syntax->description}</li>
+<li>{$call} {$result} )<br/>{$syntax->description}</li>
 HTML;
   }
 
@@ -177,6 +197,16 @@ HTML;
   }
 
   // }}}
+  // {{{ convert_exception()
+
+  public function convert_exception( DstyleDoc_Element_Exception $exception )
+  {
+    return <<<HTML
+{$exception->name}: {$exception->description}
+HTML;
+  }
+
+  // }}}
   // {{{ convert_link()
 
   public function convert_link( $id, $name )
@@ -184,6 +214,27 @@ HTML;
     return <<<HTML
 <a href="#{$id}">{$name}</a>
 HTML;
+  }
+
+  // }}}
+  // {{{ convert_all()
+
+  public function convert_all()
+  {
+    echo <<<HTML
+<style>
+dl dt { margin-top: 0px; font-weight: bold; }
+dl dd { margin-left: 20px; }
+</style>
+HTML;
+
+    $this->index_files();
+    $this->index_functions();
+    $this->index_interfaces();
+
+    $this->all_files();
+    $this->all_functions();
+    $this->all_interfaces();
   }
 
   // }}}
@@ -214,38 +265,12 @@ HTML;
   }
 
   // }}}
-  // {{{ convert_all()
+  // {{{ all_files()
 
-  public function convert_all()
+  protected function all_files()
   {
-    d( $this->functions[0] );
-
-    echo <<<HTML
-<style>
-dl dt { margin-top: 0px; font-weight: bold; }
-dl dd { margin-left: 20px; }
-</style>
-HTML;
-
-    $this->index_functions();
-    $this->index_interfaces();
-
-    $this->all_functions();
-    $this->all_interfaces();
-/*
-
-    foreach( $this->classes as $class )
-    {
-      echo <<<HTML
-<hr /><h1 id="{$this->id($class)}">class: {$class->name}</h1>
-<dl>
-{$this->element_filed($class)}
-{$this->either($class->parent,'<dt>extend</dt><dd>'.$this->link($class->parent).'</dd>')}
-{$this->either($class->implements,'<dt>implement</dt><dd>'.$this->forall($class->implements,'<li>{$this->link($value)}</li>').'</dd>')}
-</dl>
-HTML;
-    }
-*/
+    foreach( $this->files as $file )
+      echo $file;
   }
 
   // }}}
@@ -263,21 +288,20 @@ HTML;
   protected function all_interfaces()
   {
     foreach( $this->interfaces as $interface )
-    {
-      echo <<<HTML
-<hr /><h1 id="{$interface->id}">interface: {$interface->name}</h1>
-<dl>
-{$this->element_filed($interface)}
-<dt>methods</dt>
-<dd>
-  <ul>
-    {$this->forall($interface->methods,'<li>$value->link</li>')}
-  </ul>
-  {$this->forall($interface->methods,'$value')}
-</dd>
-</dl>
+      echo $interface;
+  }
+
+  // }}}
+  // {{{ index_files()
+
+  protected function index_files()
+  {
+    echo <<<HTML
+<hr /><h1>Files index</h1>
+<ul>
+  {$this->forall($this->files,'<li>$value->link</li>')}
+</ul>
 HTML;
-    }
   }
 
   // }}}
@@ -286,7 +310,7 @@ HTML;
   protected function index_functions()
   {
     echo <<<HTML
-<h1>Functions index</h1>
+<hr /><h1>Functions index</h1>
 <ul>
   {$this->forall($this->functions,'<li>$value->link</li>')}
 </ul>
@@ -299,7 +323,7 @@ HTML;
   protected function index_interfaces()
   {
     echo <<<HTML
-<h1>Interfaces index</h1>
+<hr /><h1>Interfaces index</h1>
 <ul>
   {$this->forall($this->interfaces,'<li>$value->link</li>')}
 </ul>
@@ -312,7 +336,7 @@ HTML;
   protected function element_filed( DstyleDoc_Element $element )
   {
     return <<<HTML
-<dt>file</dt><dd>{$element->file}</dd>
+<dt>file</dt><dd>{$element->file->link}</dd>
 <dt>line</dt><dd>{$element->line}</dd>
 {$this->either($element->title,'<dt>title</dt><dd>'.$element->title.'</dd>')}
 {$this->either($element->description,'<dt>description</dt><dd>'.$element->description.'</dd>')}

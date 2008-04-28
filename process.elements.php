@@ -312,12 +312,8 @@ abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 
   protected function set_file( $file )
   {
-    if( is_string($file) and ($found = $this->converter->file_exists($file)) )
-      $this->_file = $found;
-    elseif( $file instanceof DstyleDoc_Element_File )
-      $this->_file = $file;
-    else
-      $this->_file = new DstyleDoc_Element_File( $this->converter, $file );
+    $this->converter->file = $file;
+    $this->_file = $this->converter->file;
   }
 
   protected function get_file()
@@ -386,10 +382,15 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 
   protected function set_file( $file )
   {
-    $this->_file = (string)$file;
+    $this->_file = strtolower((string)$file);
   }
 
   protected function get_file()
+  {
+    return (string)$this->_file;
+  }
+
+  protected function get_name()
   {
     return (string)$this->_file;
   }
@@ -449,11 +450,11 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->name );
+    return $this->converter->convert_display( $this->file );
   }
 
   // }}}
-  // {{{ $convert 
+  // {{{ $convert
 
   protected function get_convert()
   {
@@ -769,9 +770,9 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   // {{{ $returns
 
   /**
-   * La liste des valeurs de retour d'une fonction
+   * La liste des valeurs de retour d'une fonction.
    * Types:
-   *    array(DstyleDoc_Element_Return) = Un tableau d'instance de DstyleDoc_Element_Return.
+   *    array(DstyleDoc_Element_Return) = Un tableau contenant des instances de valeur de retour.
    */
   protected $_returns = array();
 
@@ -834,26 +835,34 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   // }}}
   // {{{ $exceptions
 
+  /**
+   * La liste des exception lancé par une fonction.
+   * Types:
+   *    array(DstyleDoc_Element_Exception) = Un tableau contenant des instances des exceptions.
+   */
   protected $_exceptions = array();
 
-  // Todo: corriger le bordel de detection
-  protected function set_exception( $name )
+  protected function set_exception( $exception )
   {
     $found = false;
-    if( ! empty($name) and count($this->_exceptions) )
+    if( ! empty($exception) and count($this->_exceptions) )
     {
       reset($this->_exceptions);
       while( true)
       {
-        $exception = current($this->_exceptions);
-        if( $found = ($exception->name == $name) or false === next($this->_exceptions) )
+        $current = current($this->_exceptions);
+        if( $found = ( (is_object($exception) and $current === $exception)
+          or (is_string($exception) and $current->name === strtolower($exception)) ) or false === next($this->_exceptions) )
           break;
       }
     }
 
     if( ! $found )
     {
-      $this->_exceptions[] = new DstyleDoc_Element_Exception( $this->converter, $name );
+      if( $exception instanceof DstyleDoc_Element_Exception )
+        $this->_exceptions[] = $exception;
+      else
+        $this->_exceptions[] = new DstyleDoc_Element_Exception( $this->converter, $exception );
       end($this->_exceptions);
     }
   }
@@ -895,7 +904,11 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   protected function get_syntaxs()
   {
     if( ! $this->_syntax )
+    {
       $this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $this->params );
+      $syntax = end($this->_syntax);
+      $syntax->function = $this;
+    }
     return $this->_syntax;
   }
 
@@ -1069,6 +1082,21 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
  */
 class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 {
+  // {{{ $function
+
+  protected $_function = null;
+
+  protected function set_function( DstyleDoc_Element_Function $function )
+  {
+    $this->_function = $function;
+  }
+
+  protected function get_function()
+  {
+    return $this->_function;
+  }
+
+  // }}}
   // {{{ $params
 
   protected $_params = array();

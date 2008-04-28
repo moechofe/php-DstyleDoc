@@ -23,12 +23,17 @@ DstyleDoc::hie()
  * Returns:
  *    false = Erreur
  *    string = Retourne une chaîne de caractère
+ * Throws:
+ *    Exception = une exception,
+ *    avec une documentation sur deux lignes.
+ *    LogicException = une deuxième exception.
  */
 function aa( $a, $b = null )
 {
   return false;
   return 'bite';
   throw new Exception;
+  throw new LogicException;
 }
 
 ?>
@@ -40,9 +45,8 @@ function b( $a = 'test' )
 ?>
 <div>
 <?php
+  return new tamsuft_template_interface;
 }
-
-__halt_compiler();
 
 $a = null;
 
@@ -123,6 +127,8 @@ interface tamsuft_template_interface
 
   // }}}
 }
+
+__halt_compiler();
 
 /**
  * Interface pour les tag compilés

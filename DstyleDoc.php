@@ -382,11 +382,23 @@ interface DstyleDoc_Converter_Convert
   /**
    * Génère la documentation d'une valeur de retour d'une fonction.
    * Params:
-   *    $return = L'instance de le valeur de retour.
+   *    $param = L'instance de la valeur de retour.
    * Returns:
    *    mixed = La documentation de la valeur de retour ou pas.
    */
   function convert_return( DstyleDoc_Element_Return $param );
+
+  // }}}
+  // {{{ convert_exception()
+
+  /**
+   * Génère la documentation d'un exception lancé par une fonction.
+   * Params:
+   *    $exception = L'instance de l'exception lancé par l'exception.
+   * Returns:
+   *    mixed = La documentation de l'exception lancé par l'exception ou pas.
+   */
+  function convert_exception( DstyleDoc_Element_Exception $exception );
 
   // }}}
 }
@@ -407,37 +419,36 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
 
   protected $_files = array();
 
-  protected function set_file( $name )
+  protected function set_file( $file )
   {
     $found = false;
-    if( ! empty($name) and count($this->_files) )
+    if( ! empty($file) and count($this->_files) )
     {
       reset($this->_files);
       while( true)
       {
-        $file = current($this->_files);
-        if( $found = ($file->file == $name or $file === $name) or false === next($this->_files) )
+        $current = current($this->_files);
+        if( $found = ( (is_object($file) and $current === $file)
+          or (is_string($file) and $current->file === strtolower($file)) ) or false === next($this->_files) )
           break;
       }
     }
 
     if( ! $found )
     {
-      if( $name instanceof DstyleDoc_Element_File )
-        $this->_files[] = $name;
+      if( $file instanceof DstyleDoc_Element_File )
+        $this->_files[] = $file;
       else
-        $this->_files[] = new DstyleDoc_Element_File( $this, $name );
+        $this->_files[] = new DstyleDoc_Element_File( $this, $file );
       end($this->_files);
     }
   }
 
+  // Todo: copier sur ce model = pas d'ajout de DstyleDoc_Element_File dans $_files[]
   protected function get_file()
   {
     if( ! count($this->_files) )
-    {
-      $this->_files[] = new DstyleDoc_Element_File( $this, null );
-      return end($this->_files);
-    }
+      return new DstyleDoc_Element_File( $this, null );
     else
       return current($this->_files);
   }

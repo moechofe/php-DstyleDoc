@@ -780,6 +780,9 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
 
       foreach( $this->returns as $return )
         $function->return = $return;
+
+      foreach( $this->exceptions as $exception )
+        $function->exception = $exception;
     }
   }
 }
@@ -1099,7 +1102,7 @@ class DstyleDoc_Token_Throw extends DstyleDoc_Token implements DstyleDoc_Token_V
   public function set_value( $value )
   {
     if( ! $this->object instanceof DstyleDoc_Token_Fake )
-      $this->object->exception = $value;
+      $this->object->object->exception = $value;
     else
       $this->open_tag->exception = $value;
   }
