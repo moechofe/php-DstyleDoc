@@ -20,11 +20,15 @@ DstyleDoc::hie()
  *    string $a = Call with a string
  * Params:
  *    $a = Description for the 1st parameter $a
+ * Returns:
+ *    false = Erreur
+ *    string = Retourne une chaîne de caractère
  */
 function aa( $a, $b = null )
 {
   return false;
   return 'bite';
+  throw new Exception;
 }
 
 ?>

@@ -737,7 +737,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
       while( true)
       {
         $value = current($this->_params);
-        if( $value->var == $param )
+        if( $value->var == strtolower($param) )
         {
           $found = true;
           break;
@@ -768,22 +768,67 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   // }}}
   // {{{ $returns
 
+  /**
+   * La liste des valeurs de retour d'une fonction
+   * Types:
+   *    array(DstyleDoc_Element_Return) = Un tableau d'instance de DstyleDoc_Element_Return.
+   */
   protected $_returns = array();
 
+  /**
+   * Ajoute un nouvelle ou séléctionne une valeur déjà éxistante.
+   * La valeur ainsi séléctionné peut être récupérer avec get_return().
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Params:
+   *    string $return = Le type de la valeur retourné.
+   *    DstyleDoc_Element_Return = Une instance d'une valeur de retour.
+   */
   protected function set_return( $return )
   {
-    if( $return instanceof DstyleDoc_Element_Return )
-      $this->_returns[] = $return;
-    else
-      $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, $return );
+    $found = false;
+    if( ! empty($return) and count($this->_returns) )
+    {
+      reset($this->_returns);
+      while( true)
+      {
+        $current = current($this->_returns);
+        if( $found = ( (is_object($return) and $current === $return)
+          or (is_string($return) and $current->type === strtolower($return)) ) or false === next($this->_returns) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $return instanceof DstyleDoc_Element_Return )
+        $this->_returns[] = $return;
+      else
+        $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, $return );
+      end($this->_returns);
+    }
   }
 
+  /**
+   * Renvoie l'instance de la valeur de retour précedement séléctionner ou ajouté avec set_return().
+   * Si aucune valeur de retour n'a été ajouté avant, une fausse valeur de retour sera retournée.
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Returns:
+   *    DstyleDoc_Element_Return = L'instance de la valeur de retour.
+   */
   protected function get_return()
   {
     if( ! count($this->_returns) )
+    {
       $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, null );
+      return end($this->_returns);
+    }
+    else
+      return current($this->_returns);
+  }
 
-    return end($this->_returns);
+  protected function get_returns()
+  {
+    return $this->_returns;
   }
 
   // }}}
@@ -791,6 +836,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected $_exceptions = array();
 
+  // Todo: corriger le bordel de detection
   protected function set_exception( $name )
   {
     $found = false;
@@ -1087,7 +1133,7 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 
   protected function set_name( $name ) 
   {
-    $this->_name = (string)$name;
+    $this->_name = strtolower((string)$name);
   }
 
   protected function get_name()
@@ -1146,7 +1192,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
   {
     if( ! empty($type) )
     {
-      $this->_types[] = (string)$type;
+      $this->_types[] = strtolower((string)$type);
       $this->_types = array_unique($this->_types);
     }
   }
@@ -1158,7 +1204,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function set_var( $var ) 
   {
-    $this->_var = (string)$var;
+    $this->_var = strtolower((string)$var);
   }
 
   protected function get_var()
@@ -1173,7 +1219,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function set_default( $default ) 
   {
-    $this->_default = (string)$default;
+    $this->_default = strtolower((string)$default);
   }
 
   protected function get_default()
@@ -1235,7 +1281,7 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
 
   protected function set_type( $type )
   {
-    $this->_type = (string)$type;
+    $this->_type = strtolower((string)$type);
   }
 
   protected function get_type()

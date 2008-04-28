@@ -1331,10 +1331,13 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
     elseif( $current->return and in_array(strtolower($value), array('null','true','false')) )
       null;
 
+    elseif( in_array(strtolower($value), array('null','true','false')) )
+      $current->return = strtolower($value);
+
     elseif( strtolower($value) === 'null' or strtolower($value) === '(unset)' )
       $current->return = 'null';
 
-    elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','true','false','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
+    elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
     {
       //var_dump( __LINE__ );
       if( in_array($current->return,array('boolean','')) or ! in_array($current->return,$this->types) )

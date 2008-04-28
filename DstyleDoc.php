@@ -377,6 +377,18 @@ interface DstyleDoc_Converter_Convert
   function convert_param( DstyleDoc_Element_Param $param );
 
   // }}}
+  // {{{ convert_return()
+
+  /**
+   * Génère la documentation d'une valeur de retour d'une fonction.
+   * Params:
+   *    $return = L'instance de le valeur de retour.
+   * Returns:
+   *    mixed = La documentation de la valeur de retour ou pas.
+   */
+  function convert_return( DstyleDoc_Element_Return $param );
+
+  // }}}
 }
 
 /**
@@ -525,28 +537,34 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   // }}}
   // {{{ $functions
 
+  /**
+   * La listes des instances des fonctions définies.
+   * Types:
+   *    array(DstyleDoc_Element_Function) = Un tableau d'instance de DstyleDoc_Element_Function.
+   */
   protected $_functions = array();
 
-  protected function set_function( $name )
+  protected function set_function( $function )
   {
     $found = false;
-    if( ! empty($name) and count($this->_functions) )
+    if( ! empty($function) and count($this->_functions) )
     {
       reset($this->_functions);
       while( true)
       {
-        $function = current($this->_functions);
-        if( $found = ($function->name == $name or $function === $name) or false === next($this->_functions) )
+        $current = current($this->_functions);
+        if( $found = ( (is_object($function) and $current === $function)
+          or (is_string($function) and $current->name === $function) ) or false === next($this->_functions) )
           break;
       }
     }
 
     if( ! $found )
     {
-      if( $name instanceof DstyleDoc_Element_Function )
-        $this->_functions[] = $name;
+      if( $function instanceof DstyleDoc_Element_Function )
+        $this->_functions[] = $function;
       else
-        $this->_functions[] = new DstyleDoc_Element_Function( $this, $name );
+        $this->_functions[] = new DstyleDoc_Element_Function( $this, $function );
       end($this->_functions);
     }
   }
@@ -572,27 +590,27 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
 
   protected $_methods = array();
 
-  protected function set_method( $name )
+  protected function set_method( $method )
   {
     $found = false;
-    if( ! empty($name) and count($this->_methods) )
+    if( ! empty($method) and count($this->_methods) )
     {
       reset($this->_methods);
       while( true)
       {
-        $method = current($this->_methods);
-        if( $found = ( (is_object($name) and $method === $name)
-          or (is_string($name) and $method->name) ) or false === next($this->_methods) )
+        $current = current($this->_methods);
+        if( $found = ( (is_object($method) and $current === $method)
+          or (is_string($method) and $current->name === $method) ) or false === next($this->_methods) )
           break;
       }
     }
 
     if( ! $found )
     {
-      if( $name instanceof DstyleDoc_Element_Method )
-        $this->_methods[] = $name;
+      if( $method instanceof DstyleDoc_Element_Method )
+        $this->_methods[] = $method;
       else
-        $this->_methods[] = new DstyleDoc_Element_Method( $this, $name );
+        $this->_methods[] = new DstyleDoc_Element_Method( $this, $method );
       end($this->_methods);
     }
   }

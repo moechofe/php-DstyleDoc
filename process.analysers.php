@@ -573,8 +573,8 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^returns?:\s*(?:\s(?:([^\s+]+)\s+)?(.*))?$
-    if( preg_match( '/^returns?:\\s*(?:\\s(?:([^\\s+]+)\\s+)?(.*))?$/i', $source, $matches ) )
+    // ^returns?:\s*(:([-_\pLpN]+)\s*[:=]?\s*(.*))?$
+    if( preg_match( '/^returns?:\\s*(?:([-_\\pLpN]+)\\s*[:=]?\\s*(.*))?$/i', $source, $matches ) )
     {
       $instance = new self();
       $priority = self::priority;
@@ -609,18 +609,18 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
  */
 class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
-  // {{{ $types
+  // {{{ $type
 
-  protected $_types = '';
+  protected $_type = '';
 
-  protected function set_types( $types ) 
+  protected function set_type( $type ) 
   {
-    $this->_types = (array)$types;
+    $this->_type = (string)$type;
   }
 
-  protected function get_types()
+  protected function get_type()
   {
-    return $this->_types;
+    return $this->_type;
   }
 
   // }}}
@@ -657,9 +657,9 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^\s*(?:-\s+)?(?:(?:([^\s+]+)\s+)?(.*))?$
+    // ^(?:[-+*]\s*)?([-_\pLpN]+)\s*[:=]?\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^\\s*(?:-\\s+)?(?:(?:([^\\s+]+)\\s+)?(.*))?$/i', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\\s*)?([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/', $source, $matches ) )
     {
       if( ! trim($matches[2]) )
         return false;
@@ -682,9 +682,7 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
   {
     if( $element instanceof DstyleDoc_Element_Function )
     {
-      foreach( $this->types as $type )
-        $element->return->type = $type;
-
+      $element->return = $this->type;
       $element->return->description = $this->description;
     }
     return $this;
@@ -693,9 +691,9 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
   // }}}
   // {{{ __construct()
 
-  public function __construct( $types, $description )
+  public function __construct( $type, $description )
   {
-    $this->types = preg_split('/[,|]/', $types);
+    $this->type = $type;
     $this->description = $description;
   }
 
@@ -1014,9 +1012,9 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // (?:[-+*]\s*)?((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
+    // ^(?:[-+*]\s*)?((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/(?:[-+*]\\s*)?((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\\s*)?((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/', $source, $matches ) )
     {
       if( ! trim($matches[1]) )
         return false;

@@ -115,7 +115,8 @@ HTML;
 {$this->element_filed($function)}
 <dt>syntax</dt>{$this->forall($function->syntaxs,'<dd>$value</dd>')}
 <dt>params</dt><dd>{$this->forall($function->params,'<li>$value</li>')}</dd>
-<dt>returns</dt><dd></dd>
+{$this->either($function->returns,
+'<dt>returns</dt><dd>'.$this->forall($function->returns,'<li>$value</li>').'</dd>')}
 </dl>
 HTML;
   }
@@ -166,6 +167,16 @@ HTML;
   }
 
   // }}}
+  // {{{ convert_return()
+
+  public function convert_return( DstyleDoc_Element_Return $return )
+  {
+    return <<<HTML
+{$return->type}: {$return->description}
+HTML;
+  }
+
+  // }}}
   // {{{ convert_link()
 
   public function convert_link( $id, $name )
@@ -207,8 +218,7 @@ HTML;
 
   public function convert_all()
   {
-
-    d( $this->functions[0] );    
+    d( $this->functions[0] );
 
     echo <<<HTML
 <style>
