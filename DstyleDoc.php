@@ -401,12 +401,26 @@ interface DstyleDoc_Converter_Convert
   function convert_exception( DstyleDoc_Element_Exception $exception );
 
   // }}}
+  // {{{ search_element()
+
+  /**
+   * Recherche un élément à partir de sa syntax.
+   * Params:
+   *    string $string = Une syntaxe d'un membre, d'une constante, d'une fonction ou d'un classe.
+   * Returns:
+   *    DstyleDoc_Element = L'instance de l'élément en cas de succès.
+   *    false = En cas d'échec.
+   */
+  function search_element( $string );
+
+  // }}}
 }
 
 /**
  * Convertisseur abstrait
  * Todo:
  *    - reporter set_method() dans les autres methode de ce genre.
+ * Todo: gérer les constantes
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert
 {
@@ -671,13 +685,52 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   // }}}
   // {{{ interface_exists()
 
+  // Todo: propager la vérif strtolower
   public function interface_exists( $interface )
   {
     foreach( $this->_interfaces as $value )
     {
-      if( $value->name === $interface )
+      if( strtolower($value->name) === strtolower((string)$interface) )
         return $value;
     }
+    return false;
+  }
+
+  // }}}
+  // {{{ method_exists()
+
+  /**
+   * Renvoie si une méthode existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classs ou de l'interface.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
+   *    false = En cas d'échèc.
+   */
+  public function method_exists( $class, $method )
+  {
+    $found = false;
+
+    if( is_string($class) )
+      $found = $this->class_exists($class);
+
+    if( is_string($class) )
+      $found = $this->interface_exists($class);
+
+    if( $found )
+      $class = $found;
+
+    if( $class instanceof DstyleDoc_Element_Class or $class instanceof DstyleDoc_Element_Interface )
+    {
+      if( ! $class->analysed ) $class->analyse();
+      foreach( $this->_methods as $value )
+      {
+        if( $value->class === $class and strtolower($value->name) === strtolower((string)$method) )
+          return $value;
+      }
+    }
+
     return false;
   }
 
@@ -727,6 +780,51 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       if( $function->file === $file )
         $functions[] = $function;
     return $functions;
+  }
+
+  // }}}
+  // {{{ search_element()
+
+  public function search_element( $string )
+  {
+    // un membre
+    if( strpos($string, '$') and $part = preg_split('/(::|->)/', $string) )
+    {
+      if( $class = $this->class_exists( $part[0] ) )
+        trigger_error('continu');
+    }
+
+    // une methode
+    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) )
+    {
+      if( $method = $this->method_exists( $part[0], $part[1] ) )
+      {
+        if( ! $method->analysed ) $method->analyse();
+        d( $method->returns );
+        
+      }
+
+      trigger_error('continu'); 
+    }
+
+    // une fonction
+    elseif( substr($string,-2) == '()' )
+    {
+      trigger_error('continu'); 
+    }
+
+    // une classe
+    elseif( $found = $this->class_exists( $string ) )
+      return $found;
+
+    // une interface
+    elseif( $found = $this->interface_exists( $string ) )
+      return $found;
+
+    // une constante
+
+    // rien
+    return false;
   }
 
   // }}}

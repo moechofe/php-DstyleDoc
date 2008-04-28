@@ -150,6 +150,12 @@ HTML;
 <dl>
 {$this->element_filed($method)}
 <dt>class</dt><dd>{$method->class->link}</dd>
+<dt>syntax</dt>{$this->forall($method->syntaxs,'<dd>$value</dd>')}
+<dt>params</dt><dd>{$this->forall($method->params,'<li>$value</li>')}</dd>
+{$this->either($method->returns,
+'<dt>returns</dt><dd>'.$this->forall($method->returns,'<li>$value</li>').'</dd>')}
+{$this->either($method->exceptions,
+'<dt>exceptions</dt><dd>'.$this->forall($method->exceptions,'<li>$value</li>').'</dd>')}
 </dl>
 HTML;
   }

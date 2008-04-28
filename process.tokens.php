@@ -1214,7 +1214,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
   }
 
   private $types = array(
-    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary' );
+    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource' );
 
   private $brackets = 0;
 

@@ -620,6 +620,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_convert()
   {
+    if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_class( $this );
   }
 
@@ -698,6 +699,7 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_convert()
   {
+    if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_interface( $this );
   }
 
@@ -1071,6 +1073,7 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function get_convert()
   {
+    if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_method( $this );
   }
 
@@ -1305,6 +1308,9 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
 {
   // {{{ $type
 
+  private $types = array(
+    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource', 'false', 'true' );
+
   protected $_type = '';
 
   protected function set_type( $type )
@@ -1314,7 +1320,18 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
 
   protected function get_type()
   {
-    return $this->_type;
+    if( in_array(strtolower($this->_type), $this->types) )
+      return $this->_type;
+    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element )
+      return $found->link;
+    elseif( $found instanceof DstyleDoc_Element_Method )
+    {
+      reeeeeeeeeeeeeeeeeeeee
+      $this->returns = $found->returns;
+      return $this->r
+    }
+    else
+      return $this->_type;
   }
 
   // }}}

@@ -378,27 +378,34 @@ class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser impleme
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    $return = false;
-  
     // ^(?:[-+*]\s+)?(?:v|version:?\s*)?(\d.*?)\s*[:=]\s*(?:\s+(.*))$
     if( ($current instanceof DstyleDoc_Analyser_History or $current instanceof DstyleDoc_Analyser_Element_History_List)
       and preg_match( '/^(?:[-+*]\\s+)?(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]\\s*(?:\\s+(.*))$/', $source, $matches ) )
     {
       $instance = new self( $matches[1], $matches[2] );
       $priority = self::priority;
-      $return = true;
+      return true;
     }
   
-    // ^(?:[-+*]\s+|@history\s+)(?:v|version:?\s*)?(\d.*?)\s*[:=]?\s*(?:\s+(.*))$
-    if( ($current instanceof DstyleDoc_Analyser_History or $current instanceof DstyleDoc_Analyser_Element_History_List)
-      and preg_match( '/^(?:[-+*]\\s+|@history\\s+)(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?\\s*(?:\\s+(.*))$/i', $source, $matches ) )
+    // ^(?:[-+*]\s+)(?:v|version:?\s*)?(\d.*?)\s*[:=]?\s*(?:\s+(.*))$
+    elseif( ($current instanceof DstyleDoc_Analyser_History or $current instanceof DstyleDoc_Analyser_Element_History_List)
+      and preg_match( '/^(?:[-+*]\\s+)(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?\\s*(?:\\s+(.*))$/i', $source, $matches ) )
     {
       $instance = new self( $matches[1], $matches[2] );
       $priority = self::priority;
-      $return = true;
+      return true;
     }
 
-    return $return;
+    // ^(?:@history\s+)(?:v|version:?\s*)?(\d.*?)\s*[:=]?\s*(?:\s+(.*))$
+    elseif( preg_match( '/^(?:@history\\s+)(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?\\s*(?:\\s+(.*))$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1], $matches[2] );
+      $priority = self::priority;
+      return true;
+    }
+
+    else
+      return false;
   }
 
   // }}}
@@ -541,27 +548,34 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    $return = false;
-
     // ^(?:[-+*]\s+)?(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
       and preg_match( '/^(?:[-+*]\\s+)?(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
     {
       $instance = new self( $matches[1], $matches[2], $matches[3] );
       $priority = self::priority;
-      $return = true;
+      return true;
     }
 
-    // ^(?:[-+*]\s+|@params?\s+)(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-      and preg_match( '/^(?:[-+*]\\s+|@params?\\s+)(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    // ^(?:[-+*]\s+)(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
+    elseif( ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
+      and preg_match( '/^(?:[-+*]\\s+)(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
     {
       $instance = new self( $matches[1], $matches[2], $matches[3] );
       $priority = self::priority;
-      $return = true;
+      return true;
     }
 
-    return $return;
+    // ^(?:@params?\s+)(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
+    elseif( preg_match( '/^(?:@params?\\s+)(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1], $matches[2], $matches[3] );
+      $priority = self::priority;
+      return true;
+    }
+
+    else
+      return false;
   }
 
   // }}}
@@ -696,27 +710,34 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    $return = false;
-
     // ^(?:[-+*]\s+)?([-_\pLpN]+)\s*[:=]\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
       and preg_match( '/^(?:[-+*]\\s+)?([-_\\pLpN]+)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
-        $return = true;
+        return true;
       }
 
-    // ^(?:[-+*]\s+|@returns?\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^(?:[-+*]\\s+|@returns?\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    // ^(?:[-+*]\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
+    elseif( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
+      and preg_match( '/^(?:[-+*]\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
-        $return = true;
+        return true;
       }
 
-    return $return;
+    // ^(?:@returns?\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
+    elseif( preg_match( '/^(?:@returns?\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      {
+        $instance = new self( $matches[1], $matches[2] );
+        $priority = self::priority;
+        return true;
+      }
+
+    else
+      return false;
   }
 
   // }}}
@@ -910,27 +931,34 @@ class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implement
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    $return = false;
-
     // ^\s*(?:[-+*]\s+)?([-_\pL\pN]+)\s*[:=]\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Throw or $current instanceof DstyleDoc_Analyser_Element_Throw_List)
       and preg_match( '/\\s*(?:[-+*]\\s+)?([-_\\pL\\pN]+)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
-        $return = true;
+        return true;
       }
 
-    // ^\s*(?:[-+*]\s|@throws?\s+|@exceptions?\s+)([-_\pL\pN]+)\s*[:=]?\s*(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Throw or $current instanceof DstyleDoc_Analyser_Element_Throw_List)
-      and preg_match( '/\\s*(?:[-+*]\\s+|@throws?\\s+|@exceptions?\\s+)([-_\\pL\\pN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    // ^\s*(?:[-+*]\s)([-_\pL\pN]+)\s*[:=]?\s*(.*)$
+    elseif( ($current instanceof DstyleDoc_Analyser_Throw or $current instanceof DstyleDoc_Analyser_Element_Throw_List)
+      and preg_match( '/\\s*(?:[-+*]\\s+)([-_\\pL\\pN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
-        $return = true;
+        return true;
       }
 
-    return $return;
+    // ^\s*(?:@throws?\s+|@exceptions?\s+)([-_\pL\pN]+)\s*[:=]?\s*(.*)$
+    elseif( preg_match( '/\\s*(?:@throws?\\s+|@exceptions?\\s+)([-_\\pL\\pN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      {
+        $instance = new self( $matches[1], $matches[2] );
+        $priority = self::priority;
+        return true;
+      }
+
+    else
+      return false;
   }
 
   // }}}
@@ -1077,27 +1105,34 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
    */
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    $return = false;
-
     // ^(?:[-+*]\s+)?((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]\s*(.*)$
     if( ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
       and preg_match( '/^(?:[-+*]\\s+)?((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
-        $return = true;
+        return true;
       }
 
-    // ^(?:[-+*]\s+|@syntax\s+)((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/^(?:[-+*]\\s+|@syntax\\s+)((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    // ^(?:[-+*]\s+)((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
+    elseif( ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
+      and preg_match( '/^(?:[-+*]\\s+)((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
-        $return = true;
+        return true;
       }
 
-    return $return;
+    // ^(?:@syntax\s+)((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
+    elseif( preg_match( '/^(?:@syntax\\s+)((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      {
+        $instance = new self( $matches[1], $matches[2] );
+        $priority = self::priority;
+        return true;
+      }
+
+    else
+      return false;
   }
 
   // }}}

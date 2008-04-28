@@ -45,7 +45,7 @@ function b( $a = 'test' )
 ?>
 <div>
 <?php
-  return new tamsuft_template_interface;
+  return tamsuft_template_interface::hie();
 }
 
 $a = null;
@@ -122,6 +122,7 @@ interface tamsuft_template_interface
    * @param tamsuft_template,string,null
    * @param tamsuft $tamsuft L'instance de {@link tamsuft} en cours.
    * @param tamsuft L'instance de {@link tamsuft} en cours.
+   * @return string
    */
   static function hie( PDO $template, $tamsuft = "string" );
 
