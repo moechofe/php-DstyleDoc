@@ -197,8 +197,15 @@ HTML;
 
   public function convert_return( DstyleDoc_Element_Return $return )
   {
-    return <<<HTML
-{$return->type}: {$return->description}
+    $type = $return->type;
+    if( is_array($type) and count($type) )
+      return <<<HTML
+{$type[0]->from}: {$return->description}
+<ul>{$this->forall($type,'<li>$value</li>')}</ul>
+HTML;
+    else
+      return <<<HTML
+{$type}: {$return->description}
 HTML;
   }
 

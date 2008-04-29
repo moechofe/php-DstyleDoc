@@ -179,6 +179,72 @@ HTML;
  */
 interface DstyleDoc_Converter_Convert
 {
+  // {{{ file_exists()
+
+  /**
+   * Renvoie une fonction si elle existe.
+   * Params:
+   *    string $file = Le nom de la fonction à chercher.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
+   *    false = En cas d'échèc.
+   */
+  function file_exists( $file );
+
+  // }}}
+  // {{{ class_exists()
+
+  /**
+   * Renvoie une classe si elle existe.
+   * Params:
+   *    string $class = Le nom de la classe à chercher.
+   * Returns:
+   *    DstyleDoc_Element_Class = L'instance de la classe en cas de succès.
+   *    false = En cas d'échèc.
+   */
+  function class_exists( $class );
+
+  // }}}
+  // {{{ interface_exists()
+
+  /**
+   * Renvoie une interface si elle existe.
+   * Params:
+   *    string $interface = Le nom de la interface à chercher.
+   * Returns:
+   *    DstyleDoc_Element_Interface= L'instance de la interface en cas de succès.
+   *    false = En cas d'échèc.
+   */
+  function interface_exists( $interface );
+
+  // }}}
+  // {{{ method_exists()
+
+  /**
+   * Renvoie une méthode si elle existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
+   *    false = En cas d'échèc.
+   */
+  function method_exists( $class, $method );
+
+  // }}}
+  // {{{ function_exists()
+
+  /**
+   * Renvoie une fonction si elle existe.
+   * Params:
+   *    string $function = Le nom de la fonction.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
+   *    false = En cas d'échèc.
+   */
+  function function_exists( $function );
+
+  // }}}
   // {{{ get_file_classes()
 
   /**
@@ -699,15 +765,6 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   // }}}
   // {{{ method_exists()
 
-  /**
-   * Renvoie si une méthode existe.
-   * Params:
-   *    string $class = Le nom de la classe ou de l'interface.
-   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classs ou de l'interface.
-   * Returns:
-   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
-   *    false = En cas d'échèc.
-   */
   public function method_exists( $class, $method )
   {
     $found = false;
@@ -731,6 +788,19 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       }
     }
 
+    return false;
+  }
+
+  // }}}
+  // {{{ function_exists()
+
+  public function function_exists( $function )
+  {
+    foreach( $this->_functions as $value )
+    {
+      if( strtolower($value->name) === strtolower($function) )
+        return $value;
+    }
     return false;
   }
 
@@ -802,7 +872,8 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
     // une fonction
     elseif( substr($string,-2) == '()' )
     {
-      trigger_error('continu'); 
+      if( $function = $this->function_exists( substr($string,0,-2) ) )
+        return $function;
     }
 
     // une classe

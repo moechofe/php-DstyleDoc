@@ -1306,6 +1306,21 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
  */
 class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
 {
+  // {{{ $from
+
+  protected $_from = '';
+
+  protected function set_from( $from )
+  {
+    $this->_from = (string)$from;
+  }
+
+  protected function get_from()
+  {
+    return $this->_from;
+  }
+
+  // }}}
   // {{{ $type
 
   private $types = array(
@@ -1322,11 +1337,13 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   {
     if( in_array(strtolower($this->_type), $this->types) )
       return $this->_type;
-    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element_Method )
+    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element )
     {
       if( ! $found->analysed ) $found->analyse();
-      d( $found );
-      exit;
+      $returns = $found->returns;
+      foreach( $returns as $value )
+        $value->from = $this->_type;
+      return $returns;
     }
     else
       return $this->_type;
