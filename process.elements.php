@@ -1337,7 +1337,7 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   {
     if( in_array(strtolower($this->_type), $this->types) )
       return $this->_type;
-    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element )
+    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element_Function )
     {
       if( ! $found->analysed ) $found->analyse();
       $returns = $found->returns;
@@ -1345,6 +1345,8 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
         $value->from = $this->_type;
       return $returns;
     }
+    elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
+      return $found;
     else
       return $this->_type;
   }

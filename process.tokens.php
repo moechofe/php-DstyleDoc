@@ -1210,7 +1210,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
   {
     $current->return = '';
     $this->rollback = true;
-    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
       echo <<<HTML
 <div style='color:white;background:HotPink;padding:1px 3px'><b>ROLLBACK</b></div>
 HTML;

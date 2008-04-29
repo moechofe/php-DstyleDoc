@@ -1,68 +1,6 @@
 <?php
 
-abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
-{
-  // {{{ convert_title()
-
-  public function convert_title( $title )
-  {
-    return $title;
-  }
-
-  // }}}
-  // {{{ convert_description()
-
-  public function convert_description( $description )
-  {
-    return implode('<br />',$description);
-  }
-
-  // }}}
-  // {{{ convert_id()
-
-  public function convert_id( $id )
-  {
-    if( is_array($id) )
-      $id = implode('_', $id);
-
-    return $this->html_id( (string)$id );
-  }
-
-  // }}}
-  // {{{ convert_link()
-
-  public function convert_link( $id, $name )
-  {
-    return <<<HTML
-<a href="{$id}">{$name}</a>
-HTML;
-  }
-
-  // }}}
-  // {{{ convert_display()
-
-  public function convert_display( $name )
-  {
-    return (string)htmlspecialchars( $name );
-  }
-
-  // }}}
-  // {{{ html_id()
-
-  /**
-   * S'assure que les caratères contenu dans la chaîne sont acceptées dans la valeur d'un attribut ID HTML.
-   * Params:
-   *    string $string = La chaîne à traiter.
-   * Returns:
-   *    string La chaîne traiter.
-   */
-  protected function html_id( $string )
-  {
-    return (string)preg_replace( '/(?:(?<=^)[^a-z]|[^-_a-z0-9])/', '_', strtolower((string)$string) );
-  }
-
-  // }}}
-}
+require_once( 'converter.HTML.php' );
 
 /**
  * Convertisseur qui affiche du HTML.
@@ -74,7 +12,7 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
   public function convert_file( DstyleDoc_Element_File $file )
   {
     return <<<HTML
-<hr /><h1 id="{$file->id}">file: {$file->display}</h1>
+<hr /><h1 id="{$file->id}">File: {$file->display}</h1>
 <dl>
 {$this->either($file->classes,'<dt>classes</dt><dd><ul>'.$this->forall($file->classes,'<li>$value->link</li>').'</ul></dd>')}
 {$this->either($file->interfaces,'<dt>interfaces</dt><dd><ul>'.$this->forall($file->interfaces,'<li>$value->link</li>').'</ul></dd>')}
@@ -92,7 +30,7 @@ HTML;
   public function convert_class( DstyleDoc_Element_Class $class )
   {
     return <<<HTML
-<hr /><h1 id="{$class->id}">class: {$class->display}</h1>
+<hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
 <dl>
 {$this->element_filed($class)}
 {$this->either($class->parent,'<dt>extend</dt><dd>'.$class->parent->link.'</dd>')}
@@ -107,7 +45,7 @@ HTML;
   public function convert_interface( DstyleDoc_Element_Interface $interface )
   {
     return <<<HTML
-<hr /><h1 id="{$interface->id}">interface: {$interface->display}</h1>
+<hr /><h1 id="{$interface->id}">Interface: {$interface->display}</h1>
 <dl>
 {$this->element_filed($interface)}
 <dt>methods</dt>
@@ -127,7 +65,7 @@ HTML;
   public function convert_function( DstyleDoc_Element_Function $function )
   {
     return <<<HTML
-<hr /><h1 id="{$function->id}">function: {$function->display}</h1>
+<hr /><h1 id="{$function->id}">Function: {$function->display}</h1>
 <dl>
 {$this->element_filed($function)}
 <dt>syntax</dt>{$this->forall($function->syntaxs,'<dd>$value</dd>')}
@@ -198,11 +136,18 @@ HTML;
   public function convert_return( DstyleDoc_Element_Return $return )
   {
     $type = $return->type;
+
     if( is_array($type) and count($type) )
       return <<<HTML
 {$type[0]->from}: {$return->description}
 <ul>{$this->forall($type,'<li>$value</li>')}</ul>
 HTML;
+
+    elseif( $type instanceof DstyleDoc_Element )
+      return <<<HTML
+{$type->link}: {$return->description}
+HTML;
+
     else
       return <<<HTML
 {$type}: {$return->description}

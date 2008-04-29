@@ -111,6 +111,9 @@ HTML;
       // processing token
       $current = call_user_func( array('DstyleDoc_Token_'.$call,'hie'), $converter, $current, $source, $file, $line );
 
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'tokens')!==false and strpos($_REQUEST['debug'],'current')!==false )
+        var_dump( $current );
+
       if( $current instanceof DstyleDoc_Token_Stop )
         break;
 
@@ -158,6 +161,7 @@ HTML;
 
   public function convert_with( DstyleDoc_Converter $converter )
   {
+    d( $converter );
     $this->analyse_all( $converter );
     $converter->convert_all();
     return $this;
@@ -225,6 +229,7 @@ interface DstyleDoc_Converter_Convert
    * Params:
    *    string $class = Le nom de la classe ou de l'interface.
    *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   *    string $member = Le nom de la méthode.
    * Returns:
    *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
    *    false = En cas d'échèc.
@@ -243,6 +248,20 @@ interface DstyleDoc_Converter_Convert
    *    false = En cas d'échèc.
    */
   function function_exists( $function );
+
+  // }}}
+  // {{{ member_exists()
+
+  /**
+   * Renvoie un membre si il existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   *    string $member = Le nom du membre.
+   * Returns:
+   *    DstyleDoc_Element_Member = L'instance du membre en cas de succès.
+   *    false = En cas d'échèc.
+   */
 
   // }}}
   // {{{ get_file_classes()
@@ -865,9 +884,9 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
     }
 
     // une methode
-/*    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) )
+    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) )
       if( $method = $this->method_exists( $part[0], $part[1] ) )
-        return $method;*/
+        return $method;
 
     // une fonction
     elseif( substr($string,-2) == '()' )

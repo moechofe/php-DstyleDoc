@@ -11,6 +11,14 @@ DstyleDoc::hie()
   ->source( 'example.php' )
   ->convert_with( new DstyleDoc_Converter_toString() );
 
+class a
+{
+  public $a;
+}
+
+__halt_compiler();
+
+
 /**
  * documentation pour aa()
  * Syntax:
@@ -128,8 +136,6 @@ interface tamsuft_template_interface
 
   // }}}
 }
-
-__halt_compiler();
 
 /**
  * Interface pour les tag compilés
@@ -657,7 +663,7 @@ class tamsuft_template
    *     // lancé si $tag n'est pas une balise de la liste non transformée
    *   }
    * ?>
-   * <code>
+   * </code>
    * {{important}} Même si {{@link error_tamsuft_template_tag_unexists}} est lancée, la balise sera tout de même ajoutée dans la liste des balises transformées. Même si {{@link error_tamsuft_template_tag_already_transformed}} est lancée, la balise sera tout de même retirée de la liste des balises non transformées.
    *
    * @param custom_tag
@@ -1446,6 +1452,7 @@ class tamsuft_template
 
   // }}}
 }
+
 /*
 tamsuft::$default['tamsuft_template'] = array(
 );
