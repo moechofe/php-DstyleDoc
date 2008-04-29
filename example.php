@@ -45,7 +45,7 @@ function b( $a = 'test' )
 ?>
 <div>
 <?php
-  return tamsuft_template_interface::hie();
+  return aa();
 }
 
 $a = null;

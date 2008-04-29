@@ -1210,7 +1210,11 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
   {
     $current->return = '';
     $this->rollback = true;
-    //var_dump( 'ROLLBACK' );
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      echo <<<HTML
+<div style='color:white;background:HotPink;padding:1px 3px'><b>ROLLBACK</b></div>
+HTML;
+
   }
 
   private $types = array(
@@ -1228,27 +1232,37 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
     if( ! $current )
       return;
 
-    //var_dump( "VALUE : ".$value );
-    //var_dump( "RETURN : ".$current->return );
-    //var_dump( "BRACKETS : ".$this->brackets );
+    
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
+    {
+      if( ! $r = $current->return ) $r = '&nbsp;';
+      if( ! $c = $current->name ) $c = '&nbsp;';
+      echo <<<HTML
+<div style='clear:left;float:left;color:white;background:MediumVioletRed;padding:1px 3px'>{$c}</div>
+<div style='float:left;color:white;background:PaleVioletRed;padding:1px 3px'><b>{$value}</b></div>
+<div style='float:left;color:white;background:LightPink;color:black;padding:1px 3px'><b>{$r}</b></div>
+<div style='background:IndianRed;padding:1px 3px;'><b>{$this->brackets}</b></div>
+<div style='clear:both'></div>
+HTML;
+    }
 
     $r = false;
 
     if( $this->brackets and $value === ')' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       $this->brackets--;
     }
 
     elseif( $this->brackets )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       null;
     }
 
     elseif( in_array(strtolower($value), array('self','$this')) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( ! $current->return )
         $current->return = $current->return . $this->object->object->object->name;
     }
@@ -1258,21 +1272,21 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( in_array(substr($value,0,1), array('\'','"')) or in_array(strtolower($value), array('(string)','__file__','__function__','__class__','__dir__','__method__','__namespace__')) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('string','')) )
         $current->return = 'string';
     }
 
     elseif( $value === '::' or $value === '->' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( $current->return and ! in_array($current->return,$this->types) )
         $current->return = $current->return . $value;
     }
 
     elseif( $value === '(' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( ! in_array($current->return,$this->types) and $current->return )
         $current->return = $current->return . '()';
       else
@@ -1281,7 +1295,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( in_array($value, array('.','.=')) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('string','')) or ! in_array($current->return,$this->types) )
         $current->return = 'string';
       else
@@ -1290,7 +1304,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('number','')) or ! in_array($current->return,$this->types) )
         $current->return = 'number';
       else
@@ -1299,7 +1313,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( in_array(strtolower($value), array('array','(array)')) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('array','')) )
         $current->return = 'array';
       else
@@ -1308,7 +1322,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( strtolower($value) === '(object)' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('object','')) )
         $current->return = 'object';
       else
@@ -1317,7 +1331,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( strtolower($value) === '(binary)' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('binary','')) )
         $current->return = 'binary';
       else
@@ -1326,7 +1340,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( preg_match('/^\d/', $value) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('number','')) )
         $current->return = 'number';
     }
@@ -1342,7 +1356,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($current->return,array('boolean','')) or ! in_array($current->return,$this->types) )
         $current->return = 'boolean';
       else
@@ -1351,7 +1365,7 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( substr($current->return,-2) === '::' or substr($current->return,-2) === '->' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
         $current->return = $current->return . $value;
     }
 
@@ -1360,14 +1374,14 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     elseif( substr($value,0,1) === '$' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( ! in_array($current->return,$this->types) and substr($current->return,0,1) !== '$' )
         $current->return .= $value;
     }
 
     elseif( substr($current->return,0,1) !== '$' )
     {
-      //var_dump( __LINE__ );
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( ! in_array($current->return,$this->types) )
         $current->return = $value;
     }
@@ -1375,13 +1389,12 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
     else
       $r = true;
 
-    //var_dump( $current->return );
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
 
     if( $r) 
     {
       $this->rollback( $current );
     }
-
   }
 
   public function get_value()
@@ -1400,10 +1413,12 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
 
     $returns = array();
     foreach( $current->returns as $return )
-      if( ! preg_match( '/^\\$[_\\w]+$/', $return ) and ! preg_match( '/^(?<!::|->)[_\\w]+\\(\\)$/', $return ) and ! preg_match( '/^\\$[_\\w]+(::|->)\\$?[_\\w]+\(?\)?$/', $return ) )
+//      if( ! preg_match( '/^\\$[_\\w]+$/', $return ) and ! preg_match( '/^(?<!::|->)[_\\w]+\\(\\)$/', $return ) and ! preg_match( '/^\\$[_\\w]+(::|->)\\$?[_\\w]+\(?\)?$/', $return ) )
         $returns[] = $return;
 
     $current->returns = $returns;
+
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( $returns );
 
     return $this->object;
   }

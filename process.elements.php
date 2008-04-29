@@ -1322,13 +1322,11 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   {
     if( in_array(strtolower($this->_type), $this->types) )
       return $this->_type;
-    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element )
-      return $found->link;
-    elseif( $found instanceof DstyleDoc_Element_Method )
+    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element_Method )
     {
-      reeeeeeeeeeeeeeeeeeeee
-      $this->returns = $found->returns;
-      return $this->r
+      if( ! $found->analysed ) $found->analyse();
+      d( $found );
+      exit;
     }
     else
       return $this->_type;

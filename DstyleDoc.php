@@ -795,17 +795,9 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
     }
 
     // une methode
-    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) )
-    {
+/*    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) )
       if( $method = $this->method_exists( $part[0], $part[1] ) )
-      {
-        if( ! $method->analysed ) $method->analyse();
-        d( $method->returns );
-        
-      }
-
-      trigger_error('continu'); 
-    }
+        return $method;*/
 
     // une fonction
     elseif( substr($string,-2) == '()' )
