@@ -479,6 +479,52 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
  */
 abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_Filed_Named
 {
+  // {{{ $members
+
+  protected $_members = array();
+
+  protected function set_member( $name )
+  {
+    $found = false;
+    if( ! empty($name) and count($this->_members) )
+    {
+      reset($this->_members);
+      while( true)
+      {
+        $member = current($this->_members);
+        if( $found = ($member->name == $name or $member === $name) or false === next($this->_members) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $name instanceof DstyleDoc_Element_Member )
+        $this->_members[] = $name;
+      else
+        $this->_members[] = new DstyleDoc_Element_Member( $this->converter, $name );
+      end($this->_members);
+    }
+  }
+
+  protected function get_member()
+  {
+    if( ! count($this->_members) )
+    {
+      $this->_members[] = new DstyleDoc_Element_Member( $this->converter, null );
+      return end($this->_members);
+    }
+    else
+      return current($this->_members);
+  }
+
+
+  protected function get_members()
+  {
+    return $this->_members;
+  }
+
+  // }}}
   // {{{ $methods
 
   protected $_methods = array();
@@ -604,7 +650,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_id()
   {
-    return $this->converter->convert_id( array($this->file->file, $file->name) );
+    return $this->converter->convert_id( array($this->file->file, $this->name) );
   }
 
   // }}}
@@ -612,7 +658,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_display()
   {
-    return $this->converter->conveter_display( $this->name );
+    return $this->converter->convert_display( $this->name );
   }
 
   // }}} 
@@ -1075,6 +1121,114 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
   {
     if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_method( $this );
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'un element de type membre.
+ */
+class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
+{
+  // {{{ $class
+
+  protected $_class = null;
+
+  protected function set_class( DstyleDoc_Element $class )
+  {
+    if( $class instanceof DstyleDoc_Element_Interface or $class instanceof DstyleDoc_Element_Class )
+      $this->_class = $class;
+  }
+
+  protected function get_class()
+  {
+    return $this->_class;
+  }
+
+  // }}}
+  // {{{ $static
+
+  protected $_static = false;
+
+  protected function set_static( $static )
+  {
+    $this->_static = $static;
+  }
+
+  protected function get_static()
+  {
+    return $this->_static;
+  }
+
+  // }}}
+  // {{{ $public
+
+  protected $_public = false;
+
+  protected function set_public( $public )
+  {
+    $this->_public = $public;
+  }
+
+  protected function get_public()
+  {
+    return $this->_public;
+  }
+
+  // }}}
+  // {{{ $protected
+
+  protected $_protected = false;
+
+  protected function set_protected( $protected )
+  {
+    $this->_protected = $protected;
+  }
+
+  protected function get_protected()
+  {
+    return $this->_protected;
+  }
+
+  // }}}
+  // {{{ $private
+
+  protected $_private = false;
+
+  protected function set_private( $private )
+  {
+    $this->_private = $private;
+  }
+
+  protected function get_private()
+  {
+    return $this->_private;
+  }
+
+  // }}}
+  // {{{ $id
+
+  protected function get_id()
+  {
+    return $this->converter->convert_id( array($this->file->file, $this->class->name, $this->name) );
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $this->class->name.($this->static?'::$':'->$').$this->name );
+  }
+
+  // }}} 
+  // {{{ $convert
+
+  protected function get_convert()
+  {
+    if( ! $this->analysed ) $this->analyse();
+    return $this->converter->convert_member( $this );
   }
 
   // }}}

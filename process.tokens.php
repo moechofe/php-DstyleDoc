@@ -822,9 +822,14 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
       or $current instanceof DstyleDoc_Token_Modifier )
     {
       $return = new self;
+      $return->file = $file;
+      $return->line = $line;
       $return->open_tag = $current;
       $return->object = $current;
       $return->object->var = $return;
+      $return->modifier = $current;
+      if( $current instanceof DstyleDoc_Token_Modifier )
+        $return->object->var = $return;
     }
     elseif( $current instanceof DstyleDoc_Token_Return )
     {
@@ -921,6 +926,21 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
     $class->line = $this->line;
     $class->documentation = $this->documentation;
 
+    foreach( $this->vars as $var )
+    {
+      $class->member = $var->name;
+      $member = $class->member;
+
+      $member->class = $class;
+      $member->file = $var->file;
+      $member->line = $var->line;
+      $member->public = $var->modifiers['public'];
+      $member->protected = $var->modifiers['protected'];
+      $member->private = $var->modifiers['private'];
+
+      $converter->member = $member;
+    }
+
     foreach( $this->methods as $method )
     {
       $class->method = $method->name;
@@ -930,7 +950,11 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
       $function->file = $method->file;
       $function->line = $method->line;
       $function->documentation = $method->documentation;
-      $function->public = true;
+      $function->public = $method->modifiers['public'];
+      $function->protected = $method->modifiers['protected'];
+      $function->private = $method->modifiers['private'];
+      $function->abstract = $method->modifiers['abstract'];
+      $function->final = $method->modifiers['final'];
       $function->static = $method->modifiers['static'];
 
       foreach( $method->vars as $var )

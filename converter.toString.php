@@ -33,8 +33,15 @@ HTML;
 <hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
 <dl>
 {$this->element_filed($class)}
-{$this->either($class->parent,'<dt>extend</dt><dd>'.$class->parent->link.'</dd>')}
+{$this->either($class->parent,'<dt>extend</dt><dd>{$class->parent->link}</dd>')}
 {$this->either($class->implements,'<dt>implement</dt><dd>'.$this->forall($class->implements,'<li>{$value->link}</li>').'</dd>')}
+<dt>methods</dt>
+<dd>
+  <ul>
+    {$this->forall($class->methods,'<li>$value->link</li>')}
+  </ul>
+  {$this->forall($class->methods,'$value')}
+</dd>
 </dl>
 HTML;
   }
@@ -165,6 +172,16 @@ HTML;
   }
 
   // }}}
+  // {{{ convert_member()
+
+  public function convert_member( DstyleDoc_Element_Member $member )
+  {
+    return <<<HTML
+{$member->name}: {$member->description}
+HTML;
+  }
+
+  // }}}
   // {{{ convert_link()
 
   public function convert_link( $id, $name )
@@ -189,10 +206,12 @@ HTML;
     $this->index_files();
     $this->index_functions();
     $this->index_interfaces();
+    $this->index_classes();
 
     $this->all_files();
     $this->all_functions();
     $this->all_interfaces();
+    $this->all_classes();
   }
 
   // }}}
@@ -250,6 +269,15 @@ HTML;
   }
 
   // }}}
+  // {{{ all_classes()
+
+  protected function all_classes()
+  {
+    foreach( $this->classes as $class )
+      echo $class;
+  }
+
+  // }}}
   // {{{ index_files()
 
   protected function index_files()
@@ -267,6 +295,7 @@ HTML;
 
   protected function index_functions()
   {
+    if( ! $this->functions ) return null;
     echo <<<HTML
 <hr /><h1>Functions index</h1>
 <ul>
@@ -280,10 +309,25 @@ HTML;
 
   protected function index_interfaces()
   {
+    if( ! $this->interfaces ) return null;
     echo <<<HTML
 <hr /><h1>Interfaces index</h1>
 <ul>
   {$this->forall($this->interfaces,'<li>$value->link</li>')}
+</ul>
+HTML;
+  }
+
+  // }}}
+  // {{{ index_classes()
+
+  protected function index_classes()
+  {
+    if( ! $this->classes ) return null;
+    echo <<<HTML
+<hr /><h1>Classes index</h1>
+<ul>
+  {$this->forall($this->classes,'<li>$value->link</li>')}
 </ul>
 HTML;
   }

@@ -307,9 +307,21 @@ interface DstyleDoc_Converter_Convert
    * Params:
    *    $file = L'instance d'un élément de fichier.
    * Returns:
-   *    array(DstyleDoc_Element_Function) = Un tablean de fonctions.
+   *    array(DstyleDoc_Element_Function) = Un tableau de fonctions.
    */
   function get_file_functions( DstyleDoc_Element_File $file );
+
+  // }}}
+  // {{{ get_file_members()
+
+  /**
+   * Renvoie la liste des membres appartenant à un fichier donnée.
+   * Params:
+   *    $file = L'instance d'un élément de fichier.
+   * Returns:
+   *    array(DstyleDoc_Element_Member) = Un tableau de membres.
+   */
+  function get_file_members( DstyleDoc_Element_File $file );
 
   // }}}
   // {{{ convert_all()
@@ -484,6 +496,18 @@ interface DstyleDoc_Converter_Convert
    *    mixed = La documentation de l'exception lancé par l'exception ou pas.
    */
   function convert_exception( DstyleDoc_Element_Exception $exception );
+
+  // }}}
+  // {{{ convert_member()
+
+  /**
+   * Génère la documentation d'un membre d'une classe.
+   * Params:
+   *    $member = L'instance du membre d'une classe.
+   * Returns:
+   *    mixed = La documentation du membre de la classe ou pas.
+   */
+  function convert_member( DstyleDoc_Element_Member $member );
 
   // }}}
   // {{{ search_element()
@@ -742,6 +766,52 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   }
 
   // }}}
+  // {{{ $members
+
+  protected $_members = array();
+
+  protected function set_member( $member )
+  {
+    $found = false;
+    if( ! empty($member) and count($this->_members) )
+    {
+      reset($this->_members);
+      while( true)
+      {
+        $current = current($this->_members);
+        if( $found = ( (is_object($member) and $current === $member)
+          or (is_string($member) and $current->name === $member) ) or false === next($this->_members) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $member instanceof DstyleDoc_Element_Member )
+        $this->_members[] = $member;
+      else
+        $this->_members[] = new DstyleDoc_Element_Member( $this, $member );
+      end($this->_members);
+    }
+  }
+  
+  protected function get_member()
+  {
+    if( ! count($this->_members) )
+    {
+      $this->_members[] = new DstyleDoc_Element_Member( $this, null );
+      return end($this->_members);
+    }
+    else
+      return current($this->_members);
+  }
+
+  protected function get_members()
+  {
+    return $this->_members;
+  }
+
+  // }}}
   // {{{ file_exists()
 
   public function file_exists( $file )
@@ -824,6 +894,35 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   }
 
   // }}}
+  // {{{ member_exists()
+
+  public function member_exists( $class, $member )
+  {
+    $found = false;
+
+    if( is_string($class) )
+      $found = $this->class_exists($class);
+
+    if( is_string($class) )
+      $found = $this->interface_exists($class);
+
+    if( $found )
+      $class = $found;
+
+    if( $class instanceof DstyleDoc_Element_Class )
+    {
+      if( ! $class->analysed ) $class->analyse();
+      foreach( $this->_members as $value )
+      {
+        if( $value->class === $class and strtolower($value->name) === strtolower((string)$member) )
+          return $value;
+      }
+    }
+
+    return false;
+  }
+
+  // }}}
   // {{{ get_file_classes()
 
   public function get_file_classes( DstyleDoc_Element_File $file )
@@ -869,6 +968,18 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       if( $function->file === $file )
         $functions[] = $function;
     return $functions;
+  }
+
+  // }}}
+  // {{{ get_file_members()
+
+  public function get_file_members( DstyleDoc_Element_File $file )
+  {
+    $members = array();
+    foreach( $this->members as $member )
+      if( $member->file === $file )
+        $members[] = $member;
+    return $members;
   }
 
   // }}}
