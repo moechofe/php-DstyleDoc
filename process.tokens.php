@@ -915,7 +915,7 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
   public function to( DstyleDoc_Converter $converter )
   {
     $converter->class = $this->name;
-    $class = $converter->interface;
+    $class = $converter->class;
 
     $class->file = $this->file;
     $class->line = $this->line;
