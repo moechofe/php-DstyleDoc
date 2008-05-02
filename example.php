@@ -13,7 +13,7 @@ DstyleDoc::hie()
 
 class a
 {
-  public $a;
+  var $a = 'test';
 }
 
 __halt_compiler();

@@ -421,8 +421,233 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
   }
 
   // }}}
+  // {{{ $expression
+
+  protected $_expression = null;
+
+  protected function set_expression( $expression )
+  {
+    if( $expression )
+      $this->_expression = new DstyleDoc_Token_Expression;
+  }
+
+  protected function get_expression()
+  {
+    return $this->_expression;
+  }
+
+  // }}}
 }
 
+// {{{ Expressionable
+
+interface DstyleDoc_Token_Expressionable
+{
+  // {{{ Rollback()
+
+  function rollback( DstyleDoc_Token $current );
+
+  // }}}
+}
+
+// }}}
+// {{{ Expression
+
+class DstyleDoc_Token_Expression extends DstyleDoc_Token_Custom
+{
+  private $types = array(
+    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource' );
+
+  private $brackets = 0;
+
+  protected $_rollback = false;
+
+  protected function set_rollback( $rollback )
+  {
+    $this->_rollback = (boolean)$rollback;
+  }
+
+  protected function get_rollback()
+  {
+    return $this->_rollback;
+  }
+
+  public function analyse( DstyleDoc_Token_Expressionable $token, DstyleDoc_Token $current, $value )
+  {
+    if( $current instanceof DstyleDoc_Token_Class )
+      $class = $current;
+    elseif( $current->object instanceof DstyleDoc_Token_Class )
+      $class = $current->object;
+    else
+      $class = false;
+
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
+    {
+      if( ! $r = $token->expression_value ) $r = '&nbsp;';
+      if( ! $c = $current->name ) $c = '&nbsp;';
+      echo <<<HTML
+<div style='clear:left;float:left;color:white;background:MediumVioletRed;padding:1px 3px'>{$c}</div>
+<div style='float:left;color:white;background:PaleVioletRed;padding:1px 3px'><b>{$value}</b></div>
+<div style='float:left;color:white;background:LightPink;color:black;padding:1px 3px'><b>{$r}</b></div>
+<div style='background:IndianRed;padding:1px 3px;'><b>{$this->brackets}</b></div>
+<div style='clear:both'></div>
+HTML;
+    }
+
+    $r = false;
+
+    if( $this->brackets and $value === ')' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      $this->brackets--;
+    }
+
+    elseif( $this->brackets )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      null;
+    }
+
+    elseif( in_array(strtolower($value), array('self','$this')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! $token->expression_value and $class)
+        $token->expression_value = $token->expression_value . $class->name;
+    }
+
+    elseif( substr($token->expression_value,-1) === '(' and $value !== ')' )
+      null;
+
+    elseif( in_array(substr($value,0,1), array('\'','"')) or in_array(strtolower($value), array('(string)','__file__','__function__','__class__','__dir__','__method__','__namespace__')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('string','')) )
+        $token->expression_value = 'string';
+    }
+
+    elseif( $value === '::' or $value === '->' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( $token->expression_value and ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = $token->expression_value . $value;
+    }
+
+    elseif( $value === '(' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! in_array($token->expression_value,$this->types) and $token->expression_value )
+        $token->expression_value = $token->expression_value . '()';
+      else
+         $this->brackets++;
+    }
+
+    elseif( in_array($value, array('.','.=')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('string','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = 'string';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('number','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = 'number';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( in_array(strtolower($value), array('array','(array)')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('array','')) )
+        $token->expression_value = 'array';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( strtolower($value) === '(object)' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('object','')) )
+        $token->expression_value = 'object';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( strtolower($value) === '(binary)' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('binary','')) )
+        $token->expression_value = 'binary';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( preg_match('/^\d/', $value) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('number','')) )
+        $token->expression_value = 'number';
+    }
+
+    elseif( $token->expression_value and in_array(strtolower($value), array('null','true','false')) )
+      null;
+
+    elseif( in_array(strtolower($value), array('null','true','false')) )
+      $token->expression_value = strtolower($value);
+
+    elseif( strtolower($value) === 'null' or strtolower($value) === '(unset)' )
+      $token->expression_value = 'null';
+
+    elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('boolean','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = 'boolean';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( substr($token->expression_value,-2) === '::' or substr($token->expression_value,-2) === '->' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+        $token->expression_value = $token->expression_value . $value;
+    }
+
+    elseif( substr($token->expression_value,-1) === ')' )
+      null;
+
+    elseif( substr($value,0,1) === '$' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! in_array($token->expression_value,$this->types) and substr($token->expression_value,0,1) !== '$' )
+        $token->expression_value .= $value;
+    }
+
+    elseif( substr($token->expression_value,0,1) !== '$' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = $value;
+    }
+
+    else
+      $r = true;
+
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+
+    if( $r) 
+    {
+      $token->rollback( $current );
+    }
+  }
+
+}
+
+// }}}
 // {{{ Unknown
 
 class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
@@ -805,7 +1030,7 @@ class DstyleDoc_Token_Tuple extends DstyleDoc_Token
 // }}}
 // {{{ Variable
 
-class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Token_Valueable, DstyleDoc_Token_Expressionable
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
@@ -826,10 +1051,13 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
       $return->line = $line;
       $return->open_tag = $current;
       $return->object = $current;
-      $return->object->var = $return;
+      //$return->object->var = $return;
       $return->modifier = $current;
       if( $current instanceof DstyleDoc_Token_Modifier )
+      {
         $return->object->var = $return;
+        $return->expression = true;
+      }
     }
     elseif( $current instanceof DstyleDoc_Token_Return )
     {
@@ -848,14 +1076,39 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
     return $return;
   }
 
-  public function set_value( $value )
+  public function rollback( DstyleDoc_Token $current )
+  {
+    $current->return = '';
+    $this->expression->rollback = true;
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
+      echo <<<HTML
+<div style='color:white;background:HotPink;padding:1px 3px'><b>ROLLBACK</b></div>
+HTML;
+  }
+  public function set_expression_value( $value )
   {
     $this->default = $value;
+  }
+  public function get_expression_value()
+  {
+    return $this->default;
+  }
+  public function set_value( $value )
+  {
+    $current = $this->object;
+
+    if( $this->expression )
+      $this->expression->analyse( $this, $current, $value ); 
+    else
+      $this->default = $value;
   }
 
   public function get_value()
   {
-    return $this;
+    if( $this->expression->rollback )
+      return $this->object;
+    else
+      return $this;
   }
   public function get_exit()
   {
@@ -1208,13 +1461,14 @@ class DstyleDoc_Token_Class_C extends DstyleDoc_Token_Light
 // }}}
 // {{{ Return
 
-class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_Valueable
+class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_Valueable, DstyleDoc_Token_Expressionable
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
     $return = new self;
     $return->open_tag = $current;
     $return->object = $current;
+    $return->expression = true;
 
     if( $current instanceof DstyleDoc_Token_Function )
       $ref = $current;
@@ -1222,18 +1476,15 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
       $ref = $current->object;
 
     $ref->return = true;
-    $return->brackets = 0;
-    $return->rollback = false;
+    DstyleDoc_Token_Expression::reset();
 
     return $return;
   }
 
-  private $rollback = false;
-
-  private function rollback( $current )
+  public function rollback( DstyleDoc_Token $current )
   {
     $current->return = '';
-    $this->rollback = true;
+    $this->expression->rollback = true;
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
       echo <<<HTML
 <div style='color:white;background:HotPink;padding:1px 3px'><b>ROLLBACK</b></div>
@@ -1241,11 +1492,24 @@ HTML;
 
   }
 
-  private $types = array(
-    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource' );
+  public function set_expression_value( $value )
+  {
+    if( $this->object instanceof DstyleDoc_Token_Function )
+      $current = $this->object;
+    elseif( $this->object->object instanceof DstyleDoc_Token_Function )
+      $current = $this->object->object;
 
-  private $brackets = 0;
+    $current->return = $value;
+  }
+  public function get_expression_value()
+  {
+    if( $this->object instanceof DstyleDoc_Token_Function )
+      $current = $this->object;
+    elseif( $this->object->object instanceof DstyleDoc_Token_Function )
+      $current = $this->object->object;
 
+    return $current->return;
+  }
   public function set_value( $value )
   {
     if( $this->object instanceof DstyleDoc_Token_Function )
@@ -1253,177 +1517,11 @@ HTML;
     elseif( $this->object->object instanceof DstyleDoc_Token_Function )
       $current = $this->object->object;
 
-    if( ! $current )
-      return;
-
-    
-    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
-    {
-      if( ! $r = $current->return ) $r = '&nbsp;';
-      if( ! $c = $current->name ) $c = '&nbsp;';
-      echo <<<HTML
-<div style='clear:left;float:left;color:white;background:MediumVioletRed;padding:1px 3px'>{$c}</div>
-<div style='float:left;color:white;background:PaleVioletRed;padding:1px 3px'><b>{$value}</b></div>
-<div style='float:left;color:white;background:LightPink;color:black;padding:1px 3px'><b>{$r}</b></div>
-<div style='background:IndianRed;padding:1px 3px;'><b>{$this->brackets}</b></div>
-<div style='clear:both'></div>
-HTML;
-    }
-
-    $r = false;
-
-    if( $this->brackets and $value === ')' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      $this->brackets--;
-    }
-
-    elseif( $this->brackets )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      null;
-    }
-
-    elseif( in_array(strtolower($value), array('self','$this')) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( ! $current->return )
-        $current->return = $current->return . $this->object->object->object->name;
-    }
-
-    elseif( substr($current->return,-1) === '(' and $value !== ')' )
-      null;
-
-    elseif( in_array(substr($value,0,1), array('\'','"')) or in_array(strtolower($value), array('(string)','__file__','__function__','__class__','__dir__','__method__','__namespace__')) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('string','')) )
-        $current->return = 'string';
-    }
-
-    elseif( $value === '::' or $value === '->' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( $current->return and ! in_array($current->return,$this->types) )
-        $current->return = $current->return . $value;
-    }
-
-    elseif( $value === '(' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( ! in_array($current->return,$this->types) and $current->return )
-        $current->return = $current->return . '()';
-      else
-         $this->brackets++;
-    }
-
-    elseif( in_array($value, array('.','.=')) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('string','')) or ! in_array($current->return,$this->types) )
-        $current->return = 'string';
-      else
-        return $this->rollback($current);
-    }
-
-    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('number','')) or ! in_array($current->return,$this->types) )
-        $current->return = 'number';
-      else
-        return $this->rollback($current);
-    }
-
-    elseif( in_array(strtolower($value), array('array','(array)')) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('array','')) )
-        $current->return = 'array';
-      else
-        return $this->rollback($current);
-    }
-
-    elseif( strtolower($value) === '(object)' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('object','')) )
-        $current->return = 'object';
-      else
-        return $this->rollback($current);
-    }
-
-    elseif( strtolower($value) === '(binary)' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('binary','')) )
-        $current->return = 'binary';
-      else
-        return $this->rollback($current);
-    }
-
-    elseif( preg_match('/^\d/', $value) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('number','')) )
-        $current->return = 'number';
-    }
-
-    elseif( $current->return and in_array(strtolower($value), array('null','true','false')) )
-      null;
-
-    elseif( in_array(strtolower($value), array('null','true','false')) )
-      $current->return = strtolower($value);
-
-    elseif( strtolower($value) === 'null' or strtolower($value) === '(unset)' )
-      $current->return = 'null';
-
-    elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( in_array($current->return,array('boolean','')) or ! in_array($current->return,$this->types) )
-        $current->return = 'boolean';
-      else
-        return $this->rollback($current);
-    }
-
-    elseif( substr($current->return,-2) === '::' or substr($current->return,-2) === '->' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-        $current->return = $current->return . $value;
-    }
-
-    elseif( substr($current->return,-1) === ')' )
-      null;
-
-    elseif( substr($value,0,1) === '$' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( ! in_array($current->return,$this->types) and substr($current->return,0,1) !== '$' )
-        $current->return .= $value;
-    }
-
-    elseif( substr($current->return,0,1) !== '$' )
-    {
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( ! in_array($current->return,$this->types) )
-        $current->return = $value;
-    }
-
-    else
-      $r = true;
-
-    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-
-    if( $r) 
-    {
-      $this->rollback( $current );
-    }
+    $this->expression->analyse( $this, $current, $value );
   }
-
   public function get_value()
   {
-    if( $this->rollback )
+    if( $this->expression->rollback )
       return $this->object;
     else
       return $this;
@@ -2078,10 +2176,17 @@ class DstyleDoc_Token_Unset_Cast extends DstyleDoc_Token_Value
 }
 
 // }}}
-// Var
+// {{{ Var
 
+class DstyleDoc_Token_Var extends DstyleDoc_Token_Public
+{
+  static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
+  {
+    return DstyleDoc_Token_Modifier::hie( $converter, $current, 'public', $file, $line );
+  }
+}
 
-// 
+// }}}
 // {{{ Dollar Open Curly Braces
 
 class DstyleDoc_Token_Dollar_Open_Curly_Braces extends DstyleDoc_Token_Context
