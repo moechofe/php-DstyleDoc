@@ -479,52 +479,6 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
  */
 abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_Filed_Named
 {
-  // {{{ $members
-
-  protected $_members = array();
-
-  protected function set_member( $name )
-  {
-    $found = false;
-    if( ! empty($name) and count($this->_members) )
-    {
-      reset($this->_members);
-      while( true)
-      {
-        $member = current($this->_members);
-        if( $found = ($member->name == $name or $member === $name) or false === next($this->_members) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Member )
-        $this->_members[] = $name;
-      else
-        $this->_members[] = new DstyleDoc_Element_Member( $this->converter, $name );
-      end($this->_members);
-    }
-  }
-
-  protected function get_member()
-  {
-    if( ! count($this->_members) )
-    {
-      $this->_members[] = new DstyleDoc_Element_Member( $this->converter, null );
-      return end($this->_members);
-    }
-    else
-      return current($this->_members);
-  }
-
-
-  protected function get_members()
-  {
-    return $this->_members;
-  }
-
-  // }}}
   // {{{ $methods
 
   protected $_methods = array();
@@ -643,6 +597,52 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   protected function get_childs()
   {
     return $this->_childs;
+  }
+
+  // }}}
+  // {{{ $members
+
+  protected $_members = array();
+
+  protected function set_member( $name )
+  {
+    $found = false;
+    if( ! empty($name) and count($this->_members) )
+    {
+      reset($this->_members);
+      while( true)
+      {
+        $member = current($this->_members);
+        if( $found = ($member->name == $name or $member === $name) or false === next($this->_members) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $name instanceof DstyleDoc_Element_Member )
+        $this->_members[] = $name;
+      else
+        $this->_members[] = new DstyleDoc_Element_Member( $this->converter, $name );
+      end($this->_members);
+    }
+  }
+
+  protected function get_member()
+  {
+    if( ! count($this->_members) )
+    {
+      $this->_members[] = new DstyleDoc_Element_Member( $this->converter, null );
+      return end($this->_members);
+    }
+    else
+      return current($this->_members);
+  }
+
+
+  protected function get_members()
+  {
+    return $this->_members;
   }
 
   // }}}
@@ -1131,6 +1131,72 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
  */
 class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
 {
+  // {{{ $types
+
+  /**
+   * La liste des types d'un membre.
+   * Types:
+   *    array(DstyleDoc_Element_Type) = Un tableau contenant des instances des types du membre.
+   */
+  protected $_types = array();
+
+  /**
+   * Ajoute un nouvelle ou séléctionne un type déjà éxistant.
+   * Le type ainsi séléctionné peut être récupérer avec get_type().
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $type à la place.
+   * Params:
+   *    string $type = Le type du membre.
+   *    DstyleDoc_Element_Type = Une instance d'un type de membre.
+   */
+  protected function set_type( $type )
+  {
+    $found = false;
+    if( ! empty($type) and count($this->_types) )
+    {
+      reset($this->_types);
+      while( true)
+      {
+        $current = current($this->_types);
+        if( $found = ( (is_object($type) and $current === $type)
+          or (is_string($type) and $current->type === strtolower($type)) ) or false === next($this->_types) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $type instanceof DstyleDoc_Element_Type )
+        $this->_types[] = $type;
+      else
+        $this->_types[] = new DstyleDoc_Element_Type( $this->converter, $type );
+      end($this->_types);
+    }
+  }
+
+  /**
+   * Renvoie l'instance d'un type d'un membre précedement séléctionner ou ajouté avec set_type().
+   * Si aucun type de membre n'a été ajouté avant, une faux type de membre sera retourné.
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $type à la place.
+   * Returns:
+   *    DstyleDoc_Element_Type = L'instance du type d'un membre.
+   */
+  protected function get_type()
+  {
+    if( ! count($this->_types) )
+    {
+      $this->_types[] = new DstyleDoc_Element_Type( $this->converter, null );
+      return end($this->_types);
+    }
+    else
+      return current($this->_types);
+  }
+
+  protected function get_types()
+  {
+    return $this->_types;
+  }
+
+  // }}}
   // {{{ $class
 
   protected $_class = null;
@@ -1456,9 +1522,9 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 }
 
 /**
- * Classe d'un element de type retour.
+ * Classe d'un element de type type.
  */
-class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
+class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 {
   // {{{ $from
 
@@ -1480,40 +1546,37 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   private $types = array(
     'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource', 'false', 'true' );
 
-  protected $_type = '';
+  protected $_types = '';
 
   protected function set_type( $type )
   {
-    $this->_type = strtolower((string)$type);
+    $this->_types[] = strtolower((string)$type);
   }
 
   protected function get_type()
   {
-    if( in_array(strtolower($this->_type), $this->types) )
-      return $this->_type;
-    elseif( ($found = $this->converter->search_element( $this->_type )) instanceof DstyleDoc_Element_Function )
+    $types = array();
+    foreach( $this->_types as $value )
     {
-      if( ! $found->analysed ) $found->analyse();
-      $returns = $found->returns;
-      foreach( $returns as $value )
-        $value->from = $this->_type;
-      return $returns;
+      if( ! in_array(strtolower($value), $this->types) )
+        unset($this->_types[$key]);
+      elseif( ($found = $this->converter->search_element( $value )) instanceof DstyleDoc_Element_Function )
+      {
+        if( ! $found->analysed ) $found->analyse();
+        $returns = $found->returns;
+        foreach( $returns as $v )
+          $v->from = $value;
+        $types[$v];
+      }
+      elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
+        $types[] = $found;
+      else
+        $types[] = $value;
     }
-    elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
-      return $found;
-    else
-      return $this->_type;
+    return $types;
   }
 
   // }}}
-  // {{{ $display
-
-  protected function get_display()
-  {
-    return $this->converter->convert_display( $type );
-  }
-
-  // }}} 
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $type )
@@ -1524,6 +1587,29 @@ class DstyleDoc_Element_Return extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( implode(', ', $this->_types) );
+  }
+
+  // }}}
+  // {{{ $convert
+
+  protected function get_convert()
+  {
+    return $this->converter->convert_type( $this );
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'un element de type retour.
+ */
+class DstyleDoc_Element_Return extends DstyleDoc_Element_Type
+{
   // {{{ $convert
 
   protected function get_convert()

@@ -486,6 +486,18 @@ interface DstyleDoc_Converter_Convert
   function convert_return( DstyleDoc_Element_Return $param );
 
   // }}}
+  // {{{ convert_type()
+
+  /**
+   * Génére la documentation d'un type de valeur.
+   * Params:
+   *    $type = L'instance du type.
+   * Returns:
+   *    mixed = La documentation du type.
+   */
+  function convert_type( DstyleDoc_Element_Type $type );
+
+  // }}}
   // {{{ convert_exception()
 
   /**

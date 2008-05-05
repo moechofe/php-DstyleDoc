@@ -42,6 +42,13 @@ HTML;
   </ul>
   {$this->forall($class->methods,'$value')}
 </dd>
+<dt>membres</dt>
+<dd>
+  <ul>
+    {$this->forall($class->members,'<li>$value->link</li>')}
+  </ul>
+  {$this->forall($class->members,'$value')}
+</dd>
 </dl>
 HTML;
   }
@@ -138,11 +145,35 @@ HTML;
   }
 
   // }}}
+  // {{{ convert_type()
+
+  public function convert_type( DstyleDoc_Element_Type $type )
+  {
+    $value = $type->type;
+
+    if( is_array($value) and count($value) )
+      return <<<HTML
+{$value[0]->from}: {$return->description}
+<ul>{$this->forall($value,'<li>$value</li>')}</ul>
+HTML;
+
+    elseif( $value instanceof DstyleDoc_Element )
+      return <<<HTML
+{$value->link}: {$return->description}
+HTML;
+
+    else
+      return <<<HTML
+{$value}: {$return->description}
+HTML;
+  }
+
+  // }}}
   // {{{ convert_return()
 
   public function convert_return( DstyleDoc_Element_Return $return )
   {
-    $type = $return->type;
+    $type = $return->types;
 
     if( is_array($type) and count($type) )
       return <<<HTML
@@ -176,8 +207,30 @@ HTML;
 
   public function convert_member( DstyleDoc_Element_Member $member )
   {
-    return <<<HTML
-{$member->name}: {$member->description}
+    $type = $member->types;
+
+    if( is_array($type) and count($type) )
+      return <<<HTML
+<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+<dt>types</dt>
+<dd>
+  <ul>{$this->forall($type,'<li>$value</li>')}</ul>
+</dd>
+HTML;
+
+    elseif( $type instanceof DstyleDoc_Element )
+      return <<<HTML
+<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+<dt>types</dt>
+<dd>
+  {$member->type}: {$member->description}
+</dd>
+HTML;
+
+    else
+      return <<<HTML
+<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+{$type}: {$member->description}
 HTML;
   }
 

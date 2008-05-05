@@ -1191,6 +1191,8 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
       $member->protected = $var->modifiers['protected'];
       $member->private = $var->modifiers['private'];
 
+      $member->type = $var->default;
+
       $converter->member = $member;
     }
 
