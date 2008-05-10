@@ -13,6 +13,12 @@ DstyleDoc::hie()
 
 class a
 {
+  /**
+   * Documentation pour $a
+   * Var:
+   *   string = Quand c'est une string, c'est 'test'.
+   *   null = Pas de test, pas de string.
+   */
   var $a = 'test';
 }
 

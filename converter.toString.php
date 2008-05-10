@@ -153,18 +153,18 @@ HTML;
 
     if( is_array($value) and count($value) )
       return <<<HTML
-{$value[0]->from}: {$return->description}
+{$value[0]->from}: {$type->description}
 <ul>{$this->forall($value,'<li>$value</li>')}</ul>
 HTML;
 
     elseif( $value instanceof DstyleDoc_Element )
       return <<<HTML
-{$value->link}: {$return->description}
+{$value->link}: {$type->description}
 HTML;
 
     else
       return <<<HTML
-{$value}: {$return->description}
+{$value}: {$type->description}
 HTML;
   }
 
@@ -209,9 +209,15 @@ HTML;
   {
     $type = $member->types;
 
+    $return = <<<HTML
+<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+<dt>description</dt>
+<dd>{$member->title}</dd>
+HTML;
+
     if( is_array($type) and count($type) )
       return <<<HTML
-<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+{$return}
 <dt>types</dt>
 <dd>
   <ul>{$this->forall($type,'<li>$value</li>')}</ul>
@@ -220,7 +226,7 @@ HTML;
 
     elseif( $type instanceof DstyleDoc_Element )
       return <<<HTML
-<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+{$return}
 <dt>types</dt>
 <dd>
   {$member->type}: {$member->description}
@@ -229,7 +235,7 @@ HTML;
 
     else
       return <<<HTML
-<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+{$return}
 {$type}: {$member->description}
 HTML;
   }

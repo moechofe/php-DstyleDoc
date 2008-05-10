@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * POUR TOUT LES LISTES D'ELEMENTS:
  *
@@ -246,8 +245,8 @@ class DstyleDoc_Analyser_Version extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^version:\s*(.+)$
-    if( preg_match( '/^version:\\s*(.+)$/i', $source, $matches ) )
+    // ^version\s*:\\s*(.+)$
+    if( preg_match( '/^version\\s*:\\s*(.+)$/i', $source, $matches ) )
     {
       $instance = new self( $matches[1] );
       $priority = self::priority;
@@ -295,8 +294,8 @@ class DstyleDoc_Analyser_History extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^history:(?:\s*(?:v|version:?\s*)?(\d.*?)\s*[:=]?(?:\s+(.*)))?$
-    if( preg_match( '/^history:(?:\\s*(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?(?:\\s+(.*)))?$/i', $source, $matches ) )
+    // ^history\s*:(?:\s*(?:v|version:?\s*)?(\d.*?)\s*[:=]?(?:\s+(.*)))?$
+    if( preg_match( '/^history\\s*:(?:\\s*(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?(?:\\s+(.*)))?$/i', $source, $matches ) )
     {
       $instance = new self();
       $priority = self::priority;
@@ -448,8 +447,8 @@ class DstyleDoc_Analyser_Param extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^params?:\s*(?:\s(?:([^\s+]+)\s+)?(?:(\$.+?|\.{3})(?:\s*[:=]?\s+)?)(.*))?$
-    if( preg_match( '/^params?:\\s*(?:\\s(?:([^\\s+]+)\\s+)?(?:(\\$.+?|\\.{3})(?:\\s*[:=]?\\s+)?)(.*))?$/i', $source, $matches ) )
+    // ^params?\s*:\s*(?:\s(?:([^\s+]+)\s+)?(?:(\$.+?|\.{3})(?:\s*[:=]?\s+)?)(.*))?$
+    if( preg_match( '/^params?\\s*:\\s*(?:\\s(?:([^\\s+]+)\\s+)?(?:(\\$.+?|\\.{3})(?:\\s*[:=]?\\s+)?)(.*))?$/i', $source, $matches ) )
     {
       $instance = new self();
       $priority = self::priority;
@@ -626,8 +625,8 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^returns?:\s*(:([-_\pLpN]+)\s*[:=]?\s*(.*))?$
-    if( preg_match( '/^returns?:\\s*(?:([-_\\pLpN]+)\\s*[:=]?\\s*(.*))?$/i', $source, $matches ) )
+    // ^returns?\s*:\s*(:([-_\pLpN]+)\s*[:=]?\s*(.*))?$
+    if( preg_match( '/^returns?\\s*:\\s*(?:([-_\\pLpN]+)\\s*[:=]?\\s*(.*))?$/i', $source, $matches ) )
     {
       $instance = new self();
       $priority = self::priority;
@@ -798,8 +797,8 @@ class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^package:\s*(.+)$
-    if( preg_match( '/^package:\\s*(.+)$/i', $source, $matches ) )
+    // ^package\s*:\s*(.+)$
+    if( preg_match( '/^package\\s*:\\s*(.+)$/i', $source, $matches ) )
     {
       $instance = new self( $matches[1] );
       $priority = self::priority;
@@ -847,8 +846,8 @@ class DstyleDoc_Analyser_Throw extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^throws?:\s*(?:\s(?:([\pL\pN]+)\s*)(?:[:=]\s+)?(.*))?$
-    if( preg_match( '/^throws?:\\s*(?:\\s(?:([\\pL\\pN]+)\\s*)(?:[:=]\\s+)?(.*))?$/i', $source, $matches ) )
+    // ^throws?\s*:\s*(?:\s(?:([\pL\pN]+)\s*)(?:[:=]\s+)?(.*))?$
+    if( preg_match( '/^throws?\\s*:\\s*(?:\\s(?:([\\pL\\pN]+)\\s*)(?:[:=]\\s+)?(.*))?$/i', $source, $matches ) )
     {
       $instance = new self();
       $priority = self::priority;
@@ -1003,8 +1002,8 @@ class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority )
   {
-    // ^syntax:\s*$
-    if( preg_match( '/^syntax:\\s*$/i', $source, $matches ) )
+    // ^syntax\s*:\s*$
+    if( preg_match( '/^syntax\\s*:\\s*$/i', $source, $matches ) )
     {
       $instance = new self();
       $priority = self::priority;
@@ -1164,6 +1163,163 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
   public function __construct( $syntax, $description )
   {
     $this->syntax = $syntax;
+    $this->description = $description;
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'analyse d'une balise de type.
+ */
+class DstyleDoc_Analyser_Type extends DstyleDoc_Analyser
+{
+  // {{{ priority
+
+  const priority = 10;
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority )
+  {
+    // ^(?:types?|vars?)\s*:\s*(:([-_\pLpN]+)\s*[:=]?\s*(.*))?$
+    if( preg_match( '/^(?:types?|vars?)\\s*:\\s*(?:([-_\\pLpN]+)\\s*[:=]?\\s*(.*))?$/i', $source, $matches ) )
+    {
+      $instance = new self();
+      $priority = self::priority;
+      if( isset($matches[2]) )
+      {
+        $instance = new DstyleDoc_Analyser_Element_Type_List( $matches[1], $matches[2] );
+        $property = DstyleDoc_Analyser_Element_Type_List::priority;
+      }
+      return true;
+    }
+    else
+      return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  /**
+   * Ajoute un nouveau paragraphe à la description à l'élément.
+   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+   */
+  public function apply( DstyleDoc_Element $element )
+  {
+    return $this;
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'analyse d'un élément de type.
+ */
+class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
+{
+  // {{{ $type
+
+  protected $_type = '';
+
+  protected function set_type( $type ) 
+  {
+    $this->_type = (string)$type;
+  }
+
+  protected function get_type()
+  {
+    return $this->_type;
+  }
+
+  // }}}
+  // {{{ $description
+
+  protected $_description = '';
+
+  protected function set_description( $description )
+  {
+    $this->_description = (string)$description;
+  }
+
+  protected function get_description()
+  {
+    return $this->_description;
+  }
+
+  // }}}
+  // {{{ descriptable()
+
+  public function descriptable( DstyleDoc_Element $element, $description )
+  {
+    if( $element instanceof DstyleDoc_Element_Function )
+      $element->return->description = $description;
+  }
+
+  // }}}
+  // {{{ priority
+
+  const priority = 15;
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority )
+  {
+    // ^(?:[-+*]\s+)?([-_\pLpN]+)\s*[:=]\s*(.*)$
+    if( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
+      and preg_match( '/^(?:[-+*]\\s+)?([-_\\pLpN]+)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+      {
+        $instance = new self( $matches[1], $matches[2] );
+        $priority = self::priority;
+        return true;
+      }
+
+    // ^(?:[-+*]\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
+    elseif( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
+      and preg_match( '/^(?:[-+*]\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      {
+        $instance = new self( $matches[1], $matches[2] );
+        $priority = self::priority;
+        return true;
+      }
+
+    // ^(?:@returns?\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
+    elseif( preg_match( '/^(?:@returns?\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      {
+        $instance = new self( $matches[1], $matches[2] );
+        $priority = self::priority;
+        return true;
+      }
+
+    else
+      return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  /**
+   * Ajoute un nouveau paragraphe à la description à l'élément.
+   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+   */
+  public function apply( DstyleDoc_Element $element )
+  {
+    if( $element instanceof DstyleDoc_Element_Function )
+    {
+      $element->return = $this->type;
+      $element->return->description = $this->description;
+    }
+    return $this;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( $type, $description )
+  {
+    $this->type = $type;
     $this->description = $description;
   }
 

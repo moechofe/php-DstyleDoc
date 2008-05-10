@@ -1051,7 +1051,7 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
       $return->line = $line;
       $return->open_tag = $current;
       $return->object = $current;
-      //$return->object->var = $return;
+      $return->documentation = $current;
       $return->modifier = $current;
       if( $current instanceof DstyleDoc_Token_Modifier )
       {
@@ -1190,6 +1190,7 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
       $member->public = $var->modifiers['public'];
       $member->protected = $var->modifiers['protected'];
       $member->private = $var->modifiers['private'];
+      $member->documentation = $var->documentation;
 
       $member->type = $var->default;
 

@@ -1573,7 +1573,12 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
       else
         $types[] = $value;
     }
-    return $types;
+
+    if( count($types)===1 )
+      return $types[0];
+
+    else
+      return $types;
   }
 
   // }}}
