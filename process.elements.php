@@ -1131,6 +1131,17 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
  */
 class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
 {
+  // {{{ $name
+
+  protected function set_name( $name )
+  {
+    if( substr((string)$name,0,1)==='$' )
+      $this->_name = substr((string)$name,1);
+    else
+      $this->_name = (string)$name;
+  }
+
+  // }}}
   // {{{ $types
 
   /**
@@ -1528,11 +1539,11 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 {
   // {{{ $from
 
-  protected $_from = '';
+  protected $_from = null;
 
-  protected function set_from( $from )
+  protected function set_from( DstyleDoc_Element $from )
   {
-    $this->_from = (string)$from;
+    $this->_from = $from;
   }
 
   protected function get_from()
@@ -1556,20 +1567,29 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
   protected function get_type()
   {
     $types = array();
-    foreach( $this->_types as $value )
+    foreach( $this->_types as $key => $value )
     {
-      if( ! in_array(strtolower($value), $this->types) )
-        unset($this->_types[$key]);
-      elseif( ($found = $this->converter->search_element( $value )) instanceof DstyleDoc_Element_Function )
+      if( ($found = $this->converter->search_element( $value )) instanceof DstyleDoc_Element_Function )
       {
         if( ! $found->analysed ) $found->analyse();
         $returns = $found->returns;
         foreach( $returns as $v )
-          $v->from = $value;
-        $types[$v];
+          $v->from = $found;
+        $types[] = $v;
       }
       elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
         $types[] = $found;
+      elseif( $found instanceof DstyleDoc_Element_Member )
+      {
+        if( ! $found->analysed ) $found->analyse();
+        $types = $found->types;
+        d( $found );
+        foreach( $types as $v )
+          $v->from = $found;
+        $types[] = $v;
+      }
+      elseif( ! in_array(strtolower($value), $this->types) )
+        unset($this->_types[$key]);
       else
         $types[] = $value;
     }

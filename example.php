@@ -20,6 +20,11 @@ class a
    *   null = Pas de test, pas de string.
    */
   var $a = 'test';
+
+  function a()
+  {
+    return $this->a;
+  }
 }
 
 __halt_compiler();

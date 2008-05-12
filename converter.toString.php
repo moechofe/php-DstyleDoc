@@ -149,22 +149,22 @@ HTML;
 
   public function convert_type( DstyleDoc_Element_Type $type )
   {
-    $value = $type->type;
+    $types = $type->type;
 
-    if( is_array($value) and count($value) )
+    if( is_array($types) and count($types) )
       return <<<HTML
-{$value[0]->from}: {$type->description}
-<ul>{$this->forall($value,'<li>$value</li>')}</ul>
+from {$types[0]->from->link}: {$type->description}
+<ul>{$this->forall($types,'<li>$value</li>')}</ul>
 HTML;
 
-    elseif( $value instanceof DstyleDoc_Element )
+    elseif( $types instanceof DstyleDoc_Element )
       return <<<HTML
-{$value->link}: {$type->description}
+{$types->link}: {$type->description}
 HTML;
 
     else
       return <<<HTML
-{$value}: {$type->description}
+{$types}: {$type->description}
 HTML;
   }
 
@@ -173,22 +173,22 @@ HTML;
 
   public function convert_return( DstyleDoc_Element_Return $return )
   {
-    $type = $return->types;
+    $types = $return->type;
 
-    if( is_array($type) and count($type) )
+    if( is_array($types) and count($types) )
       return <<<HTML
-{$type[0]->from}: {$return->description}
-<ul>{$this->forall($type,'<li>$value</li>')}</ul>
+from {$types[0]->from->link}: {$return->description}
+<ul>{$this->forall($types,'<li>$value</li>')}</ul>
 HTML;
 
-    elseif( $type instanceof DstyleDoc_Element )
+    elseif( $types instanceof DstyleDoc_Element )
       return <<<HTML
-{$type->link}: {$return->description}
+{$types->link}: {$return->description}
 HTML;
 
     else
       return <<<HTML
-{$type}: {$return->description}
+{$types}: {$return->description}
 HTML;
   }
 
@@ -210,7 +210,7 @@ HTML;
     $type = $member->types;
 
     $return = <<<HTML
-<hr /><h1 id="{$member->id}">member: {$member->name}</h1>
+<hr /><h1 id="{$member->id}">member: {$member->display}</h1>
 <dt>description</dt>
 <dd>{$member->title}</dd>
 HTML;

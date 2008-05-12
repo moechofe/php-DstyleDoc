@@ -1479,7 +1479,6 @@ class DstyleDoc_Token_Return extends DstyleDoc_Token implements DstyleDoc_Token_
       $ref = $current->object;
 
     $ref->return = true;
-    DstyleDoc_Token_Expression::reset();
 
     return $return;
   }

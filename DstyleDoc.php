@@ -161,7 +161,7 @@ HTML;
 
   public function convert_with( DstyleDoc_Converter $converter )
   {
-    d( $converter );
+    d( $converter )->d6;
     $this->analyse_all( $converter );
     $converter->convert_all();
     return $this;
@@ -830,7 +830,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   {
     foreach( $this->_files as $value )
     {
-      if( $value->file === $file )
+      if( strtolower($value->file) === strtolower($file) )
         return $value;
     }
     return false;
@@ -843,7 +843,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   {
     foreach( $this->_classes as $value )
     {
-      if( $value->name === $class )
+      if( strtolower($value->name) === strtolower((string)$class) )
         return $value;
     }
     return false;
@@ -915,20 +915,21 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
     if( is_string($class) )
       $found = $this->class_exists($class);
 
-    if( is_string($class) )
+    elseif( is_string($class) )
       $found = $this->interface_exists($class);
 
     if( $found )
       $class = $found;
 
+    if( substr((string)$member,0,1)==='$' )
+      $member = substr((string)$member,1);
+
     if( $class instanceof DstyleDoc_Element_Class )
     {
       if( ! $class->analysed ) $class->analyse();
       foreach( $this->_members as $value )
-      {
         if( $value->class === $class and strtolower($value->name) === strtolower((string)$member) )
           return $value;
-      }
     }
 
     return false;
@@ -1000,33 +1001,32 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   public function search_element( $string )
   {
     // un membre
-    if( strpos($string, '$') and $part = preg_split('/(::|->)/', $string) )
-    {
-      if( $class = $this->class_exists( $part[0] ) )
-        trigger_error('continu');
-    }
+    if( strpos($string, '$') and $part = preg_split('/(::|->)/', $string) and isset($part[1]) and $member = $this->member_exists( $part[0], $part[1] ) )
+      return $member; 
 
     // une methode
-    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) )
-      if( $method = $this->method_exists( $part[0], $part[1] ) )
-        return $method;
+    elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) and isset($part[1]) and $method = $this->method_exists( $part[0], $part[1] ) )
+      return $method;
 
     // une fonction
-    elseif( substr($string,-2) == '()' )
-    {
-      if( $function = $this->function_exists( substr($string,0,-2) ) )
-        return $function;
-    }
+    elseif( substr($string,-2) == '()' and $function = $this->function_exists( substr($string,0,-2) ) )
+      return $function;
 
     // une classe
-    elseif( $found = $this->class_exists( $string ) )
-      return $found;
+    elseif( $class = $this->class_exists( $string ) )
+      return $class;
 
     // une interface
-    elseif( $found = $this->interface_exists( $string ) )
-      return $found;
+    elseif( $interface = $this->interface_exists( $string ) )
+      return $interface;
+
+    // un membre
+    elseif( $part = preg_split('/(::|->)/', $string) and isset($part[1])and $member = $this->member_exists( $part[0], $part[1] ) )
+      return $member;
 
     // une constante
+    elseif( $part = preg_split('/(::|->)/', $string) and isset($part[1]) and $constant = $this->constant_exists( $part[0], $part[1] ) )
+      return $constant;
 
     // rien
     return false;

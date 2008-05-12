@@ -1268,7 +1268,7 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
   static public function analyse( $current, $source, &$instance, &$priority )
   {
     // ^(?:[-+*]\s+)?([-_\pLpN]+)\s*[:=]\s*(.*)$
-    if( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
+    if( ($current instanceof DstyleDoc_Analyser_Type or $current instanceof DstyleDoc_Analyser_Element_Type_List)
       and preg_match( '/^(?:[-+*]\\s+)?([-_\\pLpN]+)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
@@ -1277,7 +1277,7 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
       }
 
     // ^(?:[-+*]\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
-    elseif( ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
+    elseif( ($current instanceof DstyleDoc_Analyser_Type or $current instanceof DstyleDoc_Analyser_Element_Type_List)
       and preg_match( '/^(?:[-+*]\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
@@ -1285,7 +1285,7 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
         return true;
       }
 
-    // ^(?:@returns?\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
+    // ^(?:@(?:vars?|types?)\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
     elseif( preg_match( '/^(?:@returns?\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
@@ -1306,10 +1306,10 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
    */
   public function apply( DstyleDoc_Element $element )
   {
-    if( $element instanceof DstyleDoc_Element_Function )
+    if( $element instanceof DstyleDoc_Element_Member )
     {
-      $element->return = $this->type;
-      $element->return->description = $this->description;
+      $element->type = $this->type;
+      $element->type->description = $this->description;
     }
     return $this;
   }
