@@ -214,7 +214,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
    */
   protected function get_link()
   {
-    return $this->converter->convert_link( $this->id, $this->name );
+    return $this->converter->convert_link( $this->id, $this->display );
   }
 
   // }}}
@@ -1582,18 +1582,18 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
       elseif( $found instanceof DstyleDoc_Element_Member )
       {
         if( ! $found->analysed ) $found->analyse();
-        $types = $found->types;
-        d( $found );
-        foreach( $types as $v )
+        $tmp = $found->types;
+        foreach( $tmp as $v )
+        {
           $v->from = $found;
-        $types[] = $v;
+          $types[] = $v;
+        }
       }
       elseif( ! in_array(strtolower($value), $this->types) )
         unset($this->_types[$key]);
       else
         $types[] = $value;
     }
-
     if( count($types)===1 )
       return $types[0];
 
