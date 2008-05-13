@@ -34,19 +34,21 @@ HTML;
 <dl>
 {$this->element_filed($class)}
 {$this->either($class->parent,'<dt>extend</dt><dd>{$class->parent->link}</dd>')}
-{$this->either($class->implements,'<dt>implement</dt><dd>'.$this->forall($class->implements,'<li>{$value->link}</li>').'</dd>')}
+{$this->either($class->implements,'<dt>implement</dt><dd><ul>'.$this->forall($class->implements,'<li>{$value->link}</li>').'</ul></dd>')}
 <dt>methods</dt>
 <dd>
   <ul>
     {$this->forall($class->methods,'<li>$value->link</li>')}
   </ul>
-  {$this->forall($class->methods,'$value')}
 </dd>
-<dt>membres</dt>
+<dt>members</dt>
 <dd>
   <ul>
     {$this->forall($class->members,'<li>$value->link</li>')}
   </ul>
+</dd>
+<dd>
+  {$this->forall($class->methods,'$value')}
   {$this->forall($class->members,'$value')}
 </dd>
 </dl>
@@ -83,11 +85,11 @@ HTML;
 <dl>
 {$this->element_filed($function)}
 <dt>syntax</dt>{$this->forall($function->syntaxs,'<dd>$value</dd>')}
-<dt>params</dt><dd>{$this->forall($function->params,'<li>$value</li>')}</dd>
+<dt>params</dt><dd><ul>{$this->forall($function->params,'<li>$value</li>')}</ul></dd>
 {$this->either($function->returns,
-'<dt>returns</dt><dd>'.$this->forall($function->returns,'<li>$value</li>').'</dd>')}
+'<dt>returns</dt><dd><ul>'.$this->forall($function->returns,'<li>$value</li>').'</ul></dd>')}
 {$this->either($function->exceptions,
-'<dt>exceptions</dt><dd>'.$this->forall($function->exceptions,'<li>$value</li>').'</dd>')}
+'<dt>exceptions</dt><dd><ul>'.$this->forall($function->exceptions,'<li>$value</li>').'</ul></dd>')}
 </dl>
 HTML;
   }
@@ -103,11 +105,11 @@ HTML;
 {$this->element_filed($method)}
 <dt>class</dt><dd>{$method->class->link}</dd>
 <dt>syntax</dt>{$this->forall($method->syntaxs,'<dd>$value</dd>')}
-<dt>params</dt><dd>{$this->forall($method->params,'<li>$value</li>')}</dd>
+<dt>params</dt><dd><ul>{$this->forall($method->params,'<li>$value</li>')}</ul></dd>
 {$this->either($method->returns,
-'<dt>returns</dt><dd>'.$this->forall($method->returns,'<li>$value</li>').'</dd>')}
+'<dt>returns</dt><dd><ul>'.$this->forall($method->returns,'<li>$value</li>').'</ul></dd>')}
 {$this->either($method->exceptions,
-'<dt>exceptions</dt><dd>'.$this->forall($method->exceptions,'<li>$value</li>').'</dd>')}
+'<dt>exceptions</dt><dd><ul>'.$this->forall($method->exceptions,'<li>$value</li>').'</ul></dd>')}
 </dl>
 HTML;
   }
@@ -146,6 +148,7 @@ HTML;
 
   // }}}
   // {{{ convert_type()
+
 
   public function convert_type( DstyleDoc_Element_Type $type )
   {
@@ -243,10 +246,10 @@ HTML;
   // }}}
   // {{{ convert_link()
 
-  public function convert_link( $id, $name )
+  public function convert_link( $id, $display )
   {
     return <<<HTML
-<a href="#{$id}">{$name}</a>
+<a href="#{$id}">{$display}</a>
 HTML;
   }
 
