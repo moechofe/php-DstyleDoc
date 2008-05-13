@@ -192,6 +192,14 @@ HTML;
     $line = $var->line;
 
     $class = $before = '';
+    
+    if( (string)$var->label )
+      $label = (string)$var->label;
+    else
+    {
+      $class = 'mark';
+      $label = "$file <u>@ $line</u>";
+    }
 
     if( (string)$var->call )
     {
@@ -200,12 +208,11 @@ HTML;
       if( (string)$dump )
         $before = '<h4 id="xdebug_call_'.$id.'">'.++$order.'</h4>';
     }
-    elseif( (string)$var->label )
-      $label = (string)$var->label;
-    else
+    elseif( (string)$var->ordered )
     {
-      $class = 'mark';
-      $label = "$file <u>@ $line</u>";
+      $class = 'call';
+      if( (string)$dump )
+        $before = '<h4 id="xdebug_call_'.$id.'">'.++$order.'</h4>';
     }
 
     if( $var->exit )
@@ -320,6 +327,7 @@ class xdebug_front_end_var
   public $call = null;
   public $exit = false;
   public $stack = null;
+  public $ordered = false;
 
   public function __construct( $var, $file, $line )
   {
@@ -370,6 +378,8 @@ HTML;
       if( @$calls[1]['function'] )
         $this->call .= $calls[1]['function'].'()';
     }
+    elseif( $property == 'o' )
+      $this->ordered = true;    
     elseif( $property == 's' and extension_loaded('xdebug') )
       $this->stack = xdebug_get_function_stack();
     elseif( $property == 'n' )
