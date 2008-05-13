@@ -1,3 +1,6 @@
+<style type="text/css">
+ul { margin: 0px; }
+</style>
 <?php
 
 require_once( 'xdebug.front.end.php' );
