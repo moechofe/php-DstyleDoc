@@ -17,7 +17,7 @@ DstyleDoc::hie()
 class a
 {
   /**
-   * Documentation pour $a
+   * Documentation pour $a a::a()
    * Var:
    *   string = Quand c'est une string, c'est 'test'.
    *   null = Pas de test, pas de string.
@@ -29,9 +29,6 @@ class a
     return $this->a;
   }
 }
-
-__halt_compiler();
-
 
 /**
  * documentation pour aa()
@@ -57,6 +54,8 @@ function aa( $a, $b = null )
   throw new Exception;
   throw new LogicException;
 }
+
+__halt_compiler();
 
 ?>
 <html>
