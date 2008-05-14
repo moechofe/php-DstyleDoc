@@ -38,7 +38,9 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
 
   protected function get_description()
   {
-    return $this->converter->convert_description( $this->_descriptions );
+    return $this->converter->come_accross_elements(
+      $this->converter->convert_description( $this->_descriptions ),
+      $this );
   }
 
   // }}}
@@ -283,7 +285,9 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
     $copy = $this->_descriptions;
     if( count($copy) )
       array_shift($copy);
-    return $this->converter->convert_description( $copy );
+    return $this->converter->come_accross_elements(
+      $this->converter->convert_description( $copy ),
+      $this );
   }
 
   // }}}
@@ -295,7 +299,9 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
       list($result) = $this->_descriptions;
     else
       $result = '';
-    return $this->converter->convert_title( $result );
+    return $this->converter->come_accross_elements(
+      $this->converter->convert_title( $result ),
+      $this );
   }
 
   // }}}
