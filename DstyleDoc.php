@@ -535,6 +535,14 @@ interface DstyleDoc_Converter_Convert
   function search_element( $string );
 
   // }}}
+  // {{{ come_accross_elements()
+
+  /**
+   * Recherche dans un text des éventuels mots ou expression correspondant à des élements existants.
+   */
+  function come_accross_elements( $string, DstyleDoc_Custom_Element $element );
+
+  // }}}
 }
 
 /**
@@ -1030,6 +1038,42 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
 
     // rien
     return false;
+  }
+
+  // }}}
+  // {{{ come_accross_elements()
+
+  function come_accross_elements( $string, DstyleDoc_Custom_Element $element )
+  {
+    $replacements = array();
+var_dump( $string );
+    // search for function or methode without the object, class or interface reference
+    // (?<!::|->)\b[-_\pLpN]+\(\)\B
+    if( preg_match_all( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
+    {
+      foreach( $matches as $match )
+        if( $found = $this->function_exists( substr($match[0][0],0,-2) ) )
+          $replacements[$match[0][1]] = $found;
+        elseif( $found = $this->method_exists( $element, substr($match[0][0],0,-2) ) )
+          $replacements[$match[0][1]] = $found;
+    }
+
+    // search for method with object, class or interface reference
+    // \b([-_\pLpN]+)(?:::|->)[-_\pLpN]+\(\)\B
+    if( preg_match_all( '/\b([-_\pLpN]+)(?:::|->)[-_\pLpN]+\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
+    {
+      d( $matches )->label($string);
+/*
+      foreach( $matches as $match )
+        if( $found = $this->function_exists( substr($match[0][0],0,-2) ) )
+          $replacements[$match[0][1]] = $found;
+        elseif( $found = $this->method_exists( $element, substr($match[0][0],0,-2) ) )
+          $replacements[$match[0][1]] = $found;*/
+    }
+
+    d( $replacements );
+
+    return $string;
   }
 
   // }}}
