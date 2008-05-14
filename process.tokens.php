@@ -1105,7 +1105,7 @@ HTML;
 
   public function get_value()
   {
-    if( $this->expression->rollback )
+    if( $this->expression and $this->expression->rollback )
       return $this->object;
     else
       return $this;
