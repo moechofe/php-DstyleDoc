@@ -252,6 +252,15 @@ class DstyleDoc_Analyser_Version extends DstyleDoc_Analyser
       $priority = self::priority;
       return true;
     }
+
+    // ^@version\s*(.+)$
+    elseif( preg_match( '/^@version\s*(.+)$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1] );
+      $priority = self::priority;
+      return true;
+    }
+
     else
       return false;
   }
@@ -1321,6 +1330,51 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
   {
     $this->type = $type;
     $this->description = $description;
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'analyse d'une balise de version minimale.
+ */
+class DstyleDoc_Analyser_Since extends DstyleDoc_Analyser_Version
+{
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority )
+  {
+    // ^since\s*:\\s*(.+)$
+    if( preg_match( '/^since\\s*:\\s*(.+)$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1] );
+      $priority = self::priority;
+      return true;
+    }
+
+    // ^@since\s*(.+)$
+    elseif( preg_match( '/^@since\s*(.+)$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1] );
+      $priority = self::priority;
+      return true;
+    }
+
+    else
+      return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  /**
+   * Ajoute un nouveau paragraphe à la description à l'élément.
+   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+   */
+  public function apply( DstyleDoc_Element $element )
+  {
+    $element->since = $this->version;
+    return $this;
   }
 
   // }}}

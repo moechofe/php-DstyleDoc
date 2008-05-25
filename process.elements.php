@@ -121,6 +121,21 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
   }
 
   // }}}
+  // {{{ $since
+
+  protected $_since = '';
+
+  protected function set_since( $since ) 
+  {
+    $this->_since = $since;
+  }
+
+  protected function get_since()
+  {
+    return $this->_since;
+  }
+
+  // }}}
   // {{{ $documentation
 
   protected $_documentation = '';
@@ -1563,7 +1578,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
   private $types = array(
     'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource', 'false', 'true' );
 
-  protected $_types = '';
+  protected $_types = array();
 
   protected function set_type( $type )
   {

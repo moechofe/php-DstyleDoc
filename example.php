@@ -11,13 +11,18 @@ require_once( 'converter.toString.php' );
 set_time_limit( 90 );
 
 DstyleDoc::hie()
+  ->enable_dstyledoc
+  ->enable_javadoc
+  ->enable_come_across_element
+  ->enable_href_link
+  ->enable_javadoc_link
   ->source( 'example.php' )
   ->convert_with( new DstyleDoc_Converter_toString() );
 
 class a
 {
   /**
-   * Documentation pour $a a::a()
+   * Documentation pour un membre : $a ; une methode : a::a() ; une fonction aa() ; une class : a ;
    * Var:
    *   string = Quand c'est une string, c'est 'test'.
    *   null = Pas de test, pas de string.
@@ -55,8 +60,6 @@ function aa( $a, $b = null )
   throw new LogicException;
 }
 
-__halt_compiler();
-
 ?>
 <html>
 <?php
@@ -72,6 +75,7 @@ function b( $a = 'test' )
 $a = null;
 
 $a = " string {$a} string ${a} ";
+
 
 /**
  * Template de donnée de type <b>squelette tamsuft</b>.
@@ -1465,6 +1469,8 @@ class tamsuft_template
 
   // }}}
 }
+
+__halt_compiler();
 
 /*
 tamsuft::$default['tamsuft_template'] = array(

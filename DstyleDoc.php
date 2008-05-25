@@ -167,12 +167,49 @@ HTML;
     return $this;
   }
 
-  // }}}
-  // {{{ hie()
+  // }}}  // {{{ hie()
 
   static public function hie()
   {
     return new self;
+  }
+
+  // }}}
+  // {{{ $config
+
+  protected $_config = array();
+
+  // }}}
+  // {{{ __get()
+
+  public function __get( $property )
+  {
+    if( substr($property,0,7)==='enable_')
+    {
+      $this->_config[ substr($property,7) ] = true;
+      return $this;
+    }
+    elseif( substr($property,0,8)==='disable_')
+    {
+      $this->_config[ substr($property,8) ] = false;
+      return $this;
+    }
+    else
+      return parent::__get( $property );
+  }
+
+  // }}}
+  // {{{ __call()
+
+  public function __call( $method, $params )
+  {
+    if( substr($method,0,7)==='enable_')
+    {
+      $this->_config[ substr($property,7) ] = $params;
+      return $this;
+    }
+    else
+      return parent::__get( $property );
   }
 
   // }}}
@@ -262,6 +299,23 @@ interface DstyleDoc_Converter_Convert
    *    DstyleDoc_Element_Member = L'instance du membre en cas de succès.
    *    false = En cas d'échèc.
    */
+  function member_exists( $class, $member );
+
+  // }}}
+  // {{{ constant_exists()
+
+  /**
+   * Renvoie une constante si elle existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Member, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   *    null $class = La constante est globale.
+   *    string $constant = Le nom de la constante.
+   * Returns:
+   *    DstyleDoc_Element_Constant = L'instance de la constance en case de succès.
+   *    false = En cas d'èchec.
+   */
+  function constant_exists( $class, $constant );
 
   // }}}
   // {{{ get_file_classes()
@@ -553,7 +607,7 @@ interface DstyleDoc_Converter_Convert
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert
 {
-  // $constants
+  //  {{{ $constants
 
   protected $_constants = array();
 
@@ -880,12 +934,15 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
 
     if( is_string($class) )
       $found = $this->class_exists($class);
-
-    if( is_string($class) )
+    elseif( is_string($class) )
       $found = $this->interface_exists($class);
 
     if( $found )
       $class = $found;
+    elseif( $class instanceof DstyleDoc_Element_Member or $class instanceof DstyleDoc_Element_Method )
+      $class = $class->class;
+    elseif( $class instanceof DstyleDoc_Element_Constant and $class->class )
+      $class = $class->class;
 
     if( $class instanceof DstyleDoc_Element_Class or $class instanceof DstyleDoc_Element_Interface )
     {
@@ -922,12 +979,15 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
 
     if( is_string($class) )
       $found = $this->class_exists($class);
-
     elseif( is_string($class) )
       $found = $this->interface_exists($class);
 
     if( $found )
       $class = $found;
+    elseif( $class instanceof DstyleDoc_Element_Member or $class instanceof DstyleDoc_Element_Method )
+      $class = $class->class;
+    elseif( $class instanceof DstyleDoc_Element_Constant and $class->class )
+      $class = $class->class;
 
     if( substr((string)$member,0,1)==='$' )
       $member = substr((string)$member,1);
@@ -937,6 +997,42 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
       if( ! $class->analysed ) $class->analyse();
       foreach( $this->_members as $value )
         if( $value->class === $class and strtolower($value->name) === strtolower((string)$member) )
+          return $value;
+    }
+
+    return false;
+  }
+
+  // }}}
+  // {{{ constant_exists()
+
+  public function constant_exists( $class, $constant )
+  {
+    $found = false;
+
+    if( is_string($class) )
+      $found = $this->class_exists($class);
+    elseif( is_string($class) )
+      $found = $this->interface_exists($class);
+
+    if( $found )
+      $class = $found;
+    elseif( $class instanceof DstyleDoc_Element_Member or $class instanceof DstyleDoc_Element_Method )
+      $class = $class->class;
+    elseif( $class instanceof DstyleDoc_Element_Constant and $class->class )
+      $class = $class->class;
+
+    if( $class instanceof DstyleDoc_Element_Class )
+    {
+      if( ! $class->analysed ) $class->analyse();
+      foreach( $this->_constants as $value )
+        if( $value->class === $class and strtolower($value->name) === strtolower((string)$constant) )
+          return $value;
+    }
+    elseif( $class === null )
+    {
+      foreach( $this->_constants as $value )
+        if( strtolower($value->name) === strtolower((string)$constant) )
           return $value;
     }
 
@@ -1046,32 +1142,52 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   function come_accross_elements( $string, DstyleDoc_Custom_Element $element )
   {
     $replacements = array();
-var_dump( $string );
-    // search for function or methode without the object, class or interface reference
+
+    // search for function or method without the object, class or interface reference
     // (?<!::|->)\b[-_\pLpN]+\(\)\B
     if( preg_match_all( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
-    {
       foreach( $matches as $match )
-        if( $found = $this->function_exists( substr($match[0][0],0,-2) ) )
-          $replacements[$match[0][1]] = $found;
-        elseif( $found = $this->method_exists( $element, substr($match[0][0],0,-2) ) )
-          $replacements[$match[0][1]] = $found;
-    }
+        if( $found = $this->function_exists( $match[1][0] ) )
+          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
+        elseif( $found = $this->method_exists( $element, $match[1][0] ) )
+          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
 
     // search for method with object, class or interface reference
-    // \b([-_\pLpN]+)(?:::|->)[-_\pLpN]+\(\)\B
-    if( preg_match_all( '/\b([-_\pLpN]+)(?:::|->)[-_\pLpN]+\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
-    {
-      d( $matches )->label($string);
-/*
+    // \b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B
+    if( preg_match_all( '/\b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
       foreach( $matches as $match )
-        if( $found = $this->function_exists( substr($match[0][0],0,-2) ) )
-          $replacements[$match[0][1]] = $found;
-        elseif( $found = $this->method_exists( $element, substr($match[0][0],0,-2) ) )
-          $replacements[$match[0][1]] = $found;*/
-    }
+        if( $found = $this->method_exists( $match[1][0], $match[2][0] ) )
+          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
+    
+    // search for a member
+    // (?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b
+    if( preg_match_all( '/(?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
+      foreach( $matches as $match )
+      {
+        if( $found = $this->member_exists( $match[1][0], $match[2][0] ) )
+          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
+        elseif( $found = $this->member_exists( $element, $match[2][0] ) )
+          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
+      }
 
-    d( $replacements );
+    // search for a class
+    // (?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)
+    if( preg_match_all( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
+      foreach( $matches as $match )
+        if( $found = $this->class_exists( $match[1][0] ) )
+          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
+
+    ksort( $replacements );
+
+    if( $replacements )
+    {
+      $add = 0;
+      foreach( $replacements as $offset => $replacement )
+      {
+        $string = substr_replace( $string, $link = $replacement[0]->link, $offset+$add, $replacement[1] );
+        $add += strlen($link) - $replacement[1];
+      }
+    }
 
     return $string;
   }
