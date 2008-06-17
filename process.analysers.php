@@ -1380,4 +1380,94 @@ class DstyleDoc_Analyser_Since extends DstyleDoc_Analyser_Version
   // }}}
 }
 
+class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
+{
+  // {{{ $code
+
+  protected $_code = '';
+
+  protected function set_code( $code ) 
+  {
+    $this->_code = (string)$code;
+  }
+
+  protected function get_code()
+  {
+    return $this->_code;
+  }
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority )
+  {
+    return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  public function apply( DstyleDoc_Element $element )
+  {
+    require_once( 'descriptable.php_code.php' );
+    $element->description = new DstyleDoc_Descritable_PHP_Code( $this->code );
+    return $this;
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'analyse d'une balise de début de code PHP.
+ */
+class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
+{
+  // {{{ priority
+
+  const priority = 25;
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority )
+  {
+    /* ^<\?php(.*)(?<!\?>)$ */
+    if( preg_match( '/^<\?php(.*)(?<!\?>)$/i', $source, $matches ) )
+      {
+        $instance = new DstyleDoc_Analyser_PHPCode( $matches[1] );
+        $priority = self::priority;
+        return true;
+      }
+
+    /* ^<\?php(.*)(?>\?>)$ */
+    elseif( preg_match( '/^<\?php(.*)(?>\?>)$/i', $source, $matches ) )
+      {
+        $instance = new DstyleDoc_Analyser_PHPCode( $matches[1] );
+        $priority = self::priority;
+        return true;
+      }
+
+    else
+      return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  public function apply( DstyleDoc_Element $element )
+  {
+    return $this;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( $code )
+  {
+    $this->code = $code;
+  }
+
+  // }}}
+}
+
 ?>

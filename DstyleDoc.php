@@ -1188,7 +1188,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
         $add += strlen($link) - $replacement[1];
       }
     }
-
+var_dump($string);
     return $string;
   }
 
