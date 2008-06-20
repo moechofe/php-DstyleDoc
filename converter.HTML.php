@@ -33,7 +33,7 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   // }}}
   // {{{ convert_link()
 
-  public function convert_link( $id, $name )
+  public function convert_link( $id, $name, DstyleDoc_Element $element )
   {
     return <<<HTML
 <a href="{$id}">{$name}</a>
@@ -46,6 +46,14 @@ HTML;
   public function convert_display( $name )
   {
     return (string)htmlspecialchars( $name );
+  }
+
+  // }}}
+  // {{{ convert_text()
+
+  public function convert_text( $text )
+  {
+    return htmlspecialchars($text);
   }
 
   // }}}

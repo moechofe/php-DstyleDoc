@@ -22,7 +22,7 @@ DstyleDoc::hie()
 class a
 {
   /**
-   * Documentation pour un membre : $a ; une methode : a::a() ; une fonction aa() ; une class : a ;
+   * Documentation pour un membre : $a ; une methode : a::a() ; une fonction aa() ; une class : a ; un javalink {@link aa() test}.
    * Var:
    *   string = Quand c'est une string, c'est 'test'.
    *   null = Pas de test, pas de string.

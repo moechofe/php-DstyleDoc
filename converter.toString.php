@@ -11,6 +11,9 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
 
   public function convert_file( DstyleDoc_Element_File $file )
   {
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
+      DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert file: <strong>{$file->display}</strong></span>", true );
+
     return <<<HTML
 <hr /><h1 id="{$file->id}">File: {$file->display}</h1>
 <dl>
@@ -29,6 +32,9 @@ HTML;
 
   public function convert_class( DstyleDoc_Element_Class $class )
   {
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
+      DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert class: <strong>{$class->display}</strong></span>", true );
+
     return <<<HTML
 <hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
 <dl>
@@ -60,6 +66,9 @@ HTML;
 
   public function convert_interface( DstyleDoc_Element_Interface $interface )
   {
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
+      DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert interface: <strong>{$interface->display}</strong></span>", true );
+
     return <<<HTML
 <hr /><h1 id="{$interface->id}">Interface: {$interface->display}</h1>
 <dl>
@@ -80,6 +89,9 @@ HTML;
 
   public function convert_function( DstyleDoc_Element_Function $function )
   {
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
+      DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert function: <strong>{$function->display}</strong></span>", true );
+
     return <<<HTML
 <hr /><h1 id="{$function->id}">Function: {$function->display}</h1>
 <dl>
@@ -99,6 +111,9 @@ HTML;
 
   public function convert_method( DstyleDoc_Element_Method $method )
   {
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
+      DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert method: <strong>{$method->display}</strong></span>", true );
+
     return <<<HTML
 <hr /><h1 id="{$method->id}">method: {$method->display}</h1>
 <dl>
@@ -246,7 +261,7 @@ HTML;
   // }}}
   // {{{ convert_link()
 
-  public function convert_link( $id, $display )
+  public function convert_link( $id, $display, DstyleDoc_Element $element )
   {
     return <<<HTML
 <a href="#{$id}">{$display}</a>

@@ -35,6 +35,14 @@ class DstyleDoc_Properties
 
     call_user_func( array($this,'unset_'.(string)$property) );
   }
+
+  protected function __call( $method, $arguments )
+  {
+    if( ! is_callable( array($this,'call_'.(string)$method) ) )
+      throw new BadMethodCallException;
+
+    return call_user_func_array( array($this,'call_'.(string)$method), $arguments );
+  }
 }
 
 // }}}
@@ -42,9 +50,27 @@ class DstyleDoc_Properties
 require_once 'process.tokens.php';
 require_once 'process.elements.php';
 require_once 'process.analysers.php';
+require_once 'process.descriptables.php';
 
 class DstyleDoc extends DstyleDoc_Properties
 {
+  // {{{ log()
+
+  static public function log()
+  {
+    $args = func_get_args();
+    foreach( $args as $arg )
+      if( is_string($arg) or is_numeric($arg) )
+        echo $arg;
+      elseif( is_array($arg) )
+        foreach( $arg as $key => $value )
+          echo "<strong>$key: </strong> $value, ";
+    $last = array_pop($args);
+    if( is_bool($last) and $last )
+      echo "<br />";
+  }
+
+  // }}}
   // {{{ $sources
 
   protected $_sources = array();
@@ -69,7 +95,11 @@ class DstyleDoc extends DstyleDoc_Properties
   protected function analyse_all( DstyleDoc_Converter $converter )
   {
     foreach( $this->sources as $file )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
+        self::log( "<span style=\"color: Crimson\">Parsing file: <strong>$file</strong></span>", true );
       $this->analyse_file( $converter, $file );
+    }
   }
 
   // }}}
@@ -161,7 +191,7 @@ HTML;
 
   public function convert_with( DstyleDoc_Converter $converter )
   {
-    d( $converter )->d6;
+//    d( $converter )->d6;
     $this->analyse_all( $converter );
     $converter->convert_all();
     return $this;
@@ -177,6 +207,7 @@ HTML;
   // }}}
   // {{{ $config
 
+  // fixme: ne sert à rien pour l'instant car l'instance de DstyleDoc_Converter n'est pas toujours disponible.
   protected $_config = array();
 
   // }}}
@@ -473,10 +504,11 @@ interface DstyleDoc_Converter_Convert
    * Params:
    *    mixed $id = L'identifiant unique de l'élément retourné par convert_id().
    *    mixed $name = Le nom d'affichage de l'élément retourné par convert_name().
+   *    DstyleDoc_Element $element = L'élément vers lequel se destine le lien.
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
-  function convert_link( $id, $name );
+  function convert_link( $id, $name, DstyleDoc_Element $element );
 
   // }}}
   // {{{ convert_id()
@@ -574,6 +606,16 @@ interface DstyleDoc_Converter_Convert
    *    mixed = La documentation du membre de la classe ou pas.
    */
   function convert_member( DstyleDoc_Element_Member $member );
+
+  // }}}
+  // {{{ convert_text()
+
+  /**
+   * Converti une portion de texte contenu dans une description.
+   * Params:
+   *    string $text = La portion de texte à convertir.
+   */
+  function convert_text( $text );
 
   // }}}
   // {{{ search_element()

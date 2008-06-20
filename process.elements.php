@@ -1,5 +1,7 @@
 <?php
 
+// todo: ajouter $element à tout les appels de des méthode convert_xxxx()
+
 abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
 {
   // {{{ $converter
@@ -38,9 +40,10 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
 
   protected function get_description()
   {
-    return $this->converter->come_accross_elements(
-      $this->converter->convert_description( $this->_descriptions ),
-      $this );
+//    DstyleDoc_Descritable::process( $this->_descriptions );
+    return /*$this->converter->come_accross_elements(*/
+      $this->converter->convert_description( $this->_descriptions )/*,
+      $this )*/;
   }
 
   // }}}
@@ -231,7 +234,22 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
    */
   protected function get_link()
   {
-    return $this->converter->convert_link( $this->id, $this->display );
+    return $this->converter->convert_link( $this->id, $this->display, $this );
+  }
+
+  // }}}
+  // {{{ link()
+
+  /**
+   * Renvoie un lien vers l'élément avec un texte donnée en paramètre.
+   * Params:
+   *    string $text = Le texte du lien.
+   * Returns:
+   *    mixed = Dépends du convertisseur.
+   */
+  protected function call_link( $text )
+  {
+    return $this->converter->convert_link( $this->id, (string)$text, $this );
   }
 
   // }}}
@@ -300,9 +318,9 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
     $copy = $this->_descriptions;
     if( count($copy) )
       array_shift($copy);
-    return $this->converter->come_accross_elements(
-      $this->converter->convert_description( $copy ),
-      $this );
+    return /*$this->converter->come_accross_elements(*/
+      $this->converter->convert_description( $copy )/*,
+        $this )*/;
   }
 
   // }}}
@@ -314,9 +332,9 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
       list($result) = $this->_descriptions;
     else
       $result = '';
-    return $this->converter->come_accross_elements(
-      $this->converter->convert_title( $result ),
-      $this );
+    return /*$this->converter->come_accross_elements(*/
+      $this->converter->convert_title( $result )/*,
+        $this )*/;
   }
 
   // }}}

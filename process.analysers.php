@@ -1,16 +1,6 @@
 <?php
 
 /**
- * POUR TOUT LES LISTES D'ELEMENTS:
- *
- * avoir soit une = ou un : au milieur
- * ou une - ou + ou * devant
- * avoir la syntaxe javaDoc
- */
-
-
-
-/**
  * Interface de la base des analysers
  */
 interface DstyleDoc_Analyseable
@@ -108,7 +98,7 @@ class DstyleDoc_Analyser_Description extends DstyleDoc_Analyser
     }
     else
     {
-      $element->description = $this->description;
+      $element->description = new DstyleDoc_Descritable( $this->description, $element );
       return $this;
     }
   }
@@ -1409,8 +1399,7 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 
   public function apply( DstyleDoc_Element $element )
   {
-    require_once( 'descriptable.php_code.php' );
-    $element->description = new DstyleDoc_Descritable_PHP_Code( $this->code );
+    $element->description = new DstyleDoc_Descritable_PHP_Code( $this->code, $element );
     return $this;
   }
 

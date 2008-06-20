@@ -1,0 +1,236 @@
+<?php
+
+/**
+ * Classe de base pour une ligne ou un morceau de description.
+ */
+class DstyleDoc_Descritable extends DstyleDoc_Properties
+{
+  // {{{ $element
+
+  protected $_element = null;
+
+  protected function set_element( DstyleDoc_Custom_Element $element )
+  {
+    $this->_element = $element;
+  }
+
+  protected function get_element()
+  {
+    return $this->_element;
+  }
+
+  // }}}
+  // {{{ $content
+
+  protected $_content = '';
+
+  protected function set_content( $content ) 
+  {
+    $this->_content = $content;
+  }
+
+  protected function get_content()
+  {
+    return $this->_content;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( $content, DstyleDoc_Custom_Element $element )
+  {
+    $this->content = $content;
+    $this->element = $element;
+  }
+
+  // }}}
+  // {{{ __toString()
+
+  public function __toString()
+  {
+//    try
+    {
+    if( $this instanceof DstyleDoc_Descritable )
+    foreach( get_declared_classes() as $class )
+      if( in_array('DstyleDoc_Descritable_Analysable',class_implements($class))
+        and $result = call_user_func( array($class,'analyse'), $this->content, $this->element) )
+      {
+        $next = '';
+        foreach( $result->nexts as $tmp )
+          $next .= (string)$tmp;
+        return (string)$result->current . $next;
+      }
+    }
+/*    catch( Exception $e )
+    {
+      d( $e )->d5;
+      exit;
+    }*/
+
+    return $this->element->converter->convert_text( $this->content );
+  }
+
+  // }}}
+}
+
+interface DstyleDoc_Descritable_Analysable
+{
+  static function analyse( $content, DstyleDoc_Custom_Element $element );
+}
+
+/**
+ * Classe de résultat si un analyse à réussi.
+ */
+final class DstyleDoc_Descritable_Analysable_Replace extends DstyleDoc_Properties
+{
+  // {{{ $element
+
+  protected $_element = null;
+
+  protected function set_element( DstyleDoc_Custom_Element $element )
+  {
+    $this->_element = $element;
+  }
+
+  protected function get_element()
+  {
+    return $this->_element;
+  }
+
+  // }}}
+  // {{{ $current
+
+  protected $_current = null;
+
+  protected function set_current( $current )
+  {
+    if( is_string($current) and $current )
+      $this->_current = $current;
+    elseif( $current instanceof DstyleDoc_Descritable and $current->content )
+      $this->_current = $current;
+  }
+
+  protected function get_current()
+  {
+    return $this->_current;
+  }
+
+  // }}}
+  // {{{ $nexts
+
+  protected $_nexts = array();
+
+  protected function set_next( $next )
+  {
+    if( is_string($next) and $next )
+      $this->_nexts[] = $next;
+    elseif( $next instanceof DstyleDoc_Descritable and $next->content )
+      $this->_nexts[] = $next;
+  }
+
+  protected function get_nexts()
+  {
+    return $this->_nexts;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct()
+  {
+    $args = func_get_args();
+    if( $args )
+      $this->current = array_shift($args);
+    foreach( $args as $arg )
+      $this->next = $arg;
+  }
+
+  // }}}
+}
+
+// todo c'est beaucoup le bordel cette partie
+class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
+{
+  static private function result( $content, $offset, $link, $length, DstyleDoc_Custom_Element $element )
+  {
+    $return = new DstyleDoc_Descritable_Analysable_Replace;
+    $return->element = $element;
+    if( $offset > 1 )
+    {
+      $return->current = new DstyleDoc_Descritable( substr($content, 0, $offset), $element );
+      $return->next = $link;
+      $return->next = new DstyleDoc_Descritable( substr($content, $offset+$length), $element );
+    }
+    else
+    {
+      $return->current = $link;
+      $return->next = new DstyleDoc_Descritable( substr($content, $length), $element );
+    }
+    return $return;
+  }
+
+  static public function analyse( $content, DstyleDoc_Custom_Element $element )
+  {
+    // search for a java doc compatible inline link
+    // {@link\s+([-_\pLpN]*(?:::|->)?\$?[-_\pLpN]+(?:\(\))?)\s*(\s[^}]+)?}
+    if( preg_match( '/\{@link\s+([-_\pLpN]*(?:::|->)?\$?[-_\pLpN]+(?:\(\))?)\s*(\s[^}]+)?\}/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    {
+      if( $scheme = @parse_url( $match[2][0], PHP_URL_SCHEME ) )
+        return self::result( $content, $match[0][1], $match[2][0], strlen($match[0][0]), $element );
+      elseif( $result = self::analyse( $match[1][0], $element ) )
+      {
+        if( ! empty($match[2][0]) )
+          return self::result( $content, $match[0][1], $result->element->link( $match[2][0] ), strlen($match[0][0]), $element );
+        else
+          return self::result( $content, $match[0][1], $result->element->link, strlen($match[0][0]), $element );
+      }
+    }
+
+    // search for function or method without the object, class or interface reference
+    // (?<!::|->)\b[-_\pLpN]+\(\)\B
+    if( preg_match( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    {
+      if( $found = $element->converter->function_exists( $match[1][0] ) )
+        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+      elseif( $found = $element->converter->method_exists( $element, $match[1][0] ) )
+        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+    }
+
+    // search for method with object, class or interface reference
+    // \b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B
+    if( preg_match( '/\b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    {
+      if( $found = $element->converter->method_exists( $match[1][0], $match[2][0] ) )
+        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+    }
+    
+    // search for a member
+    // (?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b
+    if( preg_match( '/(?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    {
+      if( $found = $element->converter->member_exists( $match[1][0], $match[2][0] ) )
+        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+      elseif( $found = $element->converter->member_exists( $element, $match[2][0] ) )
+        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+    }
+
+    // search for a class
+    // (?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)
+    if( preg_match( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    {
+      if( $found = $element->converter->class_exists( $match[1][0] ) )
+        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+    }
+
+    return false;
+  }
+}
+
+/**
+ * Classe pour une ligne ou un morceau de code de PHP.
+ */
+class DstyleDoc_Descritable_PHP_Code extends DstyleDoc_Descritable
+{
+}
+
+?>
