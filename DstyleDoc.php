@@ -191,7 +191,8 @@ HTML;
 
   public function convert_with( DstyleDoc_Converter $converter )
   {
-//    d( $converter )->d6;
+    //    d( $converter )->d6;
+    $converter->dsd => $this;
     $this->analyse_all( $converter );
     $converter->convert_all();
     return $this;
@@ -207,8 +208,13 @@ HTML;
   // }}}
   // {{{ $config
 
-  // fixme: ne sert à rien pour l'instant car l'instance de DstyleDoc_Converter n'est pas toujours disponible.
-  protected $_config = array();
+  protected $_config = array(
+    'dstyledoc' => true,
+    'javadoc' => true,
+    'href_link' => true,
+    'javadoc_link' => true,
+
+    );
 
   // }}}
   // {{{ __get()
@@ -649,6 +655,21 @@ interface DstyleDoc_Converter_Convert
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert
 {
+  // {{{ $dsd
+
+  protected $_dsd = null;
+
+  protected function set_dsd( DstyleDoc $dsd )
+  {
+    $this->_dsd = $dsd;
+  }
+
+  protected function get_dsd()
+  {
+    return $this->_dsd;
+  }
+
+  // }}}
   //  {{{ $constants
 
   protected $_constants = array();

@@ -283,7 +283,7 @@ HTML;
       $source = DstyleDoc_Analyser::remove_stars($source);
       foreach( $analysers as $analyser )
       {
-          if( call_user_func( array($analyser,'analyse'), $current, $source, &$instance, &$priority ) )
+          if( call_user_func( array($analyser,'analyse'), $current, $source, &$instance, &$priority, $this->converter->dsd ) )
             $result[$priority] = $instance;
       }
       if( $result )
