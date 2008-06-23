@@ -35,6 +35,9 @@ HTML;
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
       DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert class: <strong>{$class->display}</strong></span>", true );
 
+    if( $class->name == 'b' )
+      d( $class )->d2;
+
     return <<<HTML
 <hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
 <dl>

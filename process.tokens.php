@@ -1178,6 +1178,7 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
     $class->file = $this->file;
     $class->line = $this->line;
     $class->documentation = $this->documentation;
+    $class->parent = $this->extend;
 
     foreach( $this->vars as $var )
     {

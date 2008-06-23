@@ -129,7 +129,7 @@ HTML;
     var_dump( $var->var );
     $dump = substr(ob_get_clean(),strlen('<pre>'),-strlen('</pre>'));
 
-    for( $i=0; $i< abs((integer)$var->pass); $i++ )
+    for( $i=0; $i< abs(min((integer)$var->depth,(integer)$var->pass)); $i++ )
       $dump =
         preg_replace_callback(
           '/((?:  )*  )(<b>(?:object|array)<\/b>(?:\\(<i>(?:.*?)<\/i>\\)\\[<i>(?:\\d+)<\/i>\\])?)(\\r?\\n?)(\\r?\\n?(?:(?<!  )\\1.*\\r?\\n?)*)/',

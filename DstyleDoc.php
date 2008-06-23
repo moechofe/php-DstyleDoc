@@ -192,7 +192,7 @@ HTML;
   public function convert_with( DstyleDoc_Converter $converter )
   {
     //    d( $converter )->d6;
-    $converter->dsd => $this;
+    $converter->dsd = $this;
     $this->analyse_all( $converter );
     $converter->convert_all();
     return $this;
@@ -209,9 +209,29 @@ HTML;
   // {{{ $config
 
   protected $_config = array(
+   
     'dstyledoc' => true,
-    'javadoc' => true,
+    'version' => true,
+    'history' => true,
+    'params' => true,
+    'returns' => true,
+    'package' => true,
+    'throws' => true,
+    'syntax' => true,
+
+    'element_link' => true,
     'href_link' => true,
+   
+    'javadoc' => true,
+    'javadoc_version' => true,
+    'javadoc_history' => true,
+    'javadoc_params' => true,
+    'javadoc_returns' => true,
+    'javadoc_package' => true,
+    'javadoc_subpackage' => true,
+    'javadoc_exception' => true,
+    'javadoc_syntax' => true,
+
     'javadoc_link' => true,
 
     );
@@ -221,18 +241,22 @@ HTML;
 
   public function __get( $property )
   {
-    if( substr($property,0,7)==='enable_')
+    if( substr((string)$property,0,7)==='enable_')
     {
-      $this->_config[ substr($property,7) ] = true;
+      $this->_config[ substr((string)$property,7) ] = true;
       return $this;
     }
-    elseif( substr($property,0,8)==='disable_')
+    elseif( substr((string)$property,0,8)==='disable_')
     {
-      $this->_config[ substr($property,8) ] = false;
+      $this->_config[ substr((string)$property,8) ] = false;
       return $this;
     }
+    elseif( isset($this->_config[(string)$property]) )
+      return $this->_config[(string)$property];
+    elseif( substr((string)$property,0,4)!=='get_' )
+      return parent::__get( (string)$property );
     else
-      return parent::__get( $property );
+      throw new BadPropertyException($this, substr((string)$property,4) );      
   }
 
   // }}}

@@ -612,7 +612,10 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_parent()
   {
-    return $this->_parent;
+    if( $found = $this->converter->class_exists($this->_parent) )
+      return $found;
+    else
+      return $this->_parent;
   }
 
   // }}}

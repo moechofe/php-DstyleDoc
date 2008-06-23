@@ -35,6 +35,14 @@ class a
   }
 }
 
+class b extends a
+{
+  function a()
+  {
+    // parent::a();
+  }
+}
+
 /**
  * documentation pour aa()
  * Syntax:
