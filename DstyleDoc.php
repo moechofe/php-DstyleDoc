@@ -218,6 +218,8 @@ HTML;
     'package' => true,
     'throws' => true,
     'syntax' => true,
+    'type' => true,
+    'since' => true,
 
     'element_link' => true,
     'href_link' => true,
@@ -231,6 +233,8 @@ HTML;
     'javadoc_subpackage' => true,
     'javadoc_exception' => true,
     'javadoc_syntax' => true,
+    'javadoc_var' => true,
+    'javadoc_since' => true,
 
     'javadoc_link' => true,
 
