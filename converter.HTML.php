@@ -57,6 +57,14 @@ HTML;
   }
 
   // }}}
+  // {{{ convert_php()
+
+  public function convert_php( $code )
+  {
+    return highlight_string( "<?php\n{$code}\n?>", true );
+  }
+
+  // }}}
   // {{{ html_id()
 
   /**

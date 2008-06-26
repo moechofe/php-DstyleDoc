@@ -35,6 +35,14 @@ class DstyleDoc_Descritable extends DstyleDoc_Properties
   }
 
   // }}}
+  // {{{ $append
+
+  protected function set_append( $content )
+  {
+    $this->_content .= $content;
+  }
+
+  // }}}
   // {{{ __construct()
 
   public function __construct( $content, DstyleDoc_Custom_Element $element )
@@ -67,7 +75,7 @@ class DstyleDoc_Descritable extends DstyleDoc_Properties
       exit;
     }*/
 
-    return $this->element->converter->convert_text( $this->content );
+    return (string)$this->element->converter->convert_text( $this->content );
   }
 
   // }}}
@@ -231,6 +239,32 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
  */
 class DstyleDoc_Descritable_PHP_Code extends DstyleDoc_Descritable
 {
+  // {{{ $content
+
+  protected function set_content( $content ) 
+  {
+    if( $content )
+      $this->_content = $content;
+  }
+
+  // }}}
+  // {{{ $append
+
+  protected function set_append( $content )
+  {
+    if( $content )
+      $this->_content .= $content;
+  }
+
+  // }}}
+  // {{{ __toString()
+
+  public function __toString()
+  {
+    return (string)$this->element->converter->convert_php( $this->content );
+  }
+
+  // }}}
 }
 
 ?>

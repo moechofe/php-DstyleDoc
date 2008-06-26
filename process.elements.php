@@ -40,10 +40,7 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
 
   protected function get_description()
   {
-//    DstyleDoc_Descritable::process( $this->_descriptions );
-    return /*$this->converter->come_accross_elements(*/
-      $this->converter->convert_description( $this->_descriptions )/*,
-      $this )*/;
+    return $this->converter->convert_description( $this->_descriptions );
   }
 
   // }}}
@@ -318,9 +315,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
     $copy = $this->_descriptions;
     if( count($copy) )
       array_shift($copy);
-    return /*$this->converter->come_accross_elements(*/
-      $this->converter->convert_description( $copy )/*,
-        $this )*/;
+    return $this->converter->convert_description( $copy );
   }
 
   // }}}
@@ -332,9 +327,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
       list($result) = $this->_descriptions;
     else
       $result = '';
-    return /*$this->converter->come_accross_elements(*/
-      $this->converter->convert_title( $result )/*,
-        $this )*/;
+    return $this->converter->convert_title( $result );
   }
 
   // }}}
@@ -514,14 +507,26 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 }
 
 /**
- * Classe d'un element qui contient des fonctions
+ * Classe d'un element qui contient des fonctions.
  */
 abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_Filed_Named
 {
   // {{{ $methods
 
+  /**
+   * Contient la listes des méthodes déclarées par la classe.
+   * Type:
+   *    array(DstyleDoc_Element_Method) = Tableau à clefs numériques contentant des instances de DstyleDoc_Element_Method.
+   */
   protected $_methods = array();
 
+  /**
+   * Ajoute une méthode à la classe ou selectionne une méthode existante.
+   * Si la méthode à déjà été ajoutée, elle sera sélectionnée. La méthode sera alors renvoyé par la propriété $method.
+   * Params:
+   *    string = Le nom du membre à ajouter ou à sélectionner.
+   *    DstyleDoc_Element_Member = L'instance du membre à ajouter ou à sélectionner.
+   */
   protected function set_method( $name )
   {
     $found = false;
@@ -557,11 +562,7 @@ abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_
       return current($this->_methods);
   }
 
-
-  protected function get_methods()
-  {
-    return $this->_methods;
-  }
+  abstract protected function get_methods();
 
   // }}}
 }
@@ -571,6 +572,43 @@ abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_
  */
 class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 {
+  // {{{ $methods
+
+  protected function get_methods()
+  {
+    $methods = $this->_methods;
+
+    if( $this->parent )
+      foreach( $this->parent->heritable_methods as $method )
+        if( ! in_array($method, $methods) )
+          $methods[] = $method;
+
+    return $methods;
+  }
+
+  /**
+   * Retourne la liste des méthodes héritables de la classe.
+   * Retourne la liste des méthodes de la classe et des méthodes héritées qui ont un accès publiques ou protégées.
+   * Returns:
+   *    array(DstyleDoc_Element_Method) = La liste des méthodes héritables de la classe.
+   */
+  protected function get_heritable_methods()
+  {
+    $methods = array();
+
+    foreach( $this->_methods as $method )
+      if( $method->protected or $method->public )
+        $methods[] = $method;
+
+    if( $this->parent )
+      foreach( $this->parent->heritable_methods as $method )
+        if( ! in_array($method, $methods) )
+          $methods[] = $method;
+
+    return $methods;
+  }
+
+  // }}}
   // {{{ $abstract
 
   protected $_abstract = false;
@@ -644,8 +682,20 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   // }}}
   // {{{ $members
 
+  /**
+   * Contient la listes des membres déclarés par la classe.
+   * Type:
+   *    array(DstyleDoc_Element_Member) = Tableau à clefs numériques contentant des instances de DstyleDoc_Element_Member.
+   */
   protected $_members = array();
 
+  /**
+   * Ajoute un membre à la classe ou selectionne un membre existant.
+   * Si le membre à déjà été ajouté, il sera sélectionné. Le membre sera alors renvoyé par la propriété $membre.
+   * Params:
+   *    string = Le nom du membre à ajouter ou à sélectionner.
+   *    DstyleDoc_Element_Member = L'instance du membre à ajouter ou à sélectionner.
+   */
   protected function set_member( $name )
   {
     $found = false;
@@ -670,6 +720,11 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
     }
   }
 
+  /**
+   * Retourne le dernier membre ajouté.
+   * Returns:
+   *    DstyleDoc_Element_Member = Le dernière membre ajouté.
+   */
   protected function get_member()
   {
     if( ! count($this->_members) )
@@ -681,10 +736,43 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
       return current($this->_members);
   }
 
-
+  /**
+   * Retourne la liste des membres de la classe et des membres hérités.
+   * Returns:
+   *    array(DstyleDoc_Element_Member) = La liste des membres de la classe et des membres hérités.
+   */
   protected function get_members()
   {
-    return $this->_members;
+    $membres = $this->_members;
+
+    if( $this->parent )
+      foreach( $this->parent->heritable_members as $membre )
+        if( ! in_array($membre, $membres) )
+          $membres[] = $membre;
+
+    return $membres;
+  }
+
+  /**
+   * Retourne la liste des membres héritables de la classe.
+   * Retourne la liste des membres de la classe et des membres hérités qui ont un accès publique ou protégé.
+   * Returns:
+   *    array(DstyleDoc_Element_Member) = La liste des membres héritables de la classe.
+   */
+  protected function get_heritable_members()
+  {
+    $membres = array();
+
+    foreach( $this->_members as $membre )
+      if( $membre->protected or $membre->public )
+        $membres[] = $membre;
+
+    if( $this->parent )
+      foreach( $this->parent->heritable_members as $membre )
+        if( ! in_array($membre, $membres) )
+          $membres[] = $membre;
+
+    return $membres;
   }
 
   // }}}
@@ -767,6 +855,14 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
  */
 class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 {
+  // {{{ $methods
+
+  protected function get_methods()
+  {
+    return $this->_methods;
+  }
+
+  // }}}
   // {{{ $id
 
   protected function get_id()
@@ -1057,7 +1153,9 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function set_abstract( $abstract )
   {
-    $this->_abstract = $abstract;
+    if( $abstract )
+      $this->static = false;
+    $this->_abstract = (boolean)$abstract;
   }
 
   protected function get_abstract()
@@ -1072,7 +1170,7 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function set_static( $static )
   {
-    $this->_static = $static;
+    $this->_static = (boolean)$static;
   }
 
   protected function get_static()
@@ -1087,7 +1185,12 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function set_public( $public )
   {
-    $this->_public = $public;
+    if( $public )
+    {
+      $this->protected = false;
+      $this->private = false;
+    }
+    $this->_public = (boolean)$public;
   }
 
   protected function get_public()
@@ -1102,7 +1205,12 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function set_protected( $protected )
   {
-    $this->_protected = $protected;
+    if( $protected )
+    {
+      $this->private = false;
+      $this->public = false;
+    }
+    $this->_protected = (boolean)$protected;
   }
 
   protected function get_protected()
@@ -1117,7 +1225,12 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function set_private( $private )
   {
-    $this->_private = $private;
+    if( $private )
+    {
+      $this->protected = false;
+      $this->public = false;
+    }
+    $this->_private = (boolean)$private;
   }
 
   protected function get_private()
@@ -1132,7 +1245,9 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function set_final( $final )
   {
-    $this->_final = $final;
+    if( $final )
+      $this->abstract = false;
+    $this->_final = (boolean)$final;
   }
 
   protected function get_final()

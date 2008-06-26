@@ -1373,6 +1373,11 @@ class DstyleDoc_Analyser_Since extends DstyleDoc_Analyser_Version
 
 class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 {
+  // {{{ priority
+
+  const priority = 10;
+
+  // }}}
   // {{{ $code
 
   protected $_code = '';
@@ -1392,7 +1397,22 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    return false;
+    /* ^(.*)\?>$ */
+    if( $current instanceof DstyleDoc_Analyser_PHPOpenTag and preg_match( '/^(.*)\?>$/', $source, $match ) )
+    {
+      $instance = new DstyleDoc_Analyser_PHPCode( $match[1] );
+      $priority = self::priority;
+      return true;
+    }
+    elseif( $current instanceof DstyleDoc_Analyser_PHPOpenTag )
+    {
+      $instance = new DstyleDoc_Analyser_PHPOpenTag( $source );
+      $priority = DstyleDoc_Analyser_PHPOpenTag::priority;
+      return true;
+    }
+
+    else
+      return false;
   }
 
   // }}}
@@ -1400,8 +1420,23 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 
   public function apply( DstyleDoc_Element $element )
   {
-    $element->description = new DstyleDoc_Descritable_PHP_Code( $this->code, $element );
+    $tmp = $element->descriptions;
+    $last = end($tmp);
+
+    if( $last instanceof DstyleDoc_Descritable_PHP_Code )
+      $last->append = "\n".$this->code;
+    else
+      $element->description = new DstyleDoc_Descritable_PHP_Code( $this->code, $element );
+
     return $this;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( $code )
+  {
+    $this->code = $code;
   }
 
   // }}}
@@ -1417,25 +1452,40 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
   const priority = 25;
 
   // }}}
+  // {{{ $code
+
+  protected $_code = '';
+
+  protected function set_code( $code ) 
+  {
+    $this->_code = (string)$code;
+  }
+
+  protected function get_code()
+  {
+    return $this->_code;
+  }
+
+  // }}}
   // {{{ analyse()
 
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
     /* ^<\?php(.*)(?<!\?>)$ */
-    if( preg_match( '/^<\?php(.*)(?<!\?>)$/i', $source, $matches ) )
-      {
-        $instance = new DstyleDoc_Analyser_PHPCode( $matches[1] );
-        $priority = self::priority;
-        return true;
-      }
+    if( preg_match( '/^<\?php(.*)(?<!\?>)$/i', $source, $match ) )
+    {
+      $instance = new DstyleDoc_Analyser_PHPOpenTag( $match[1] );
+      $priority = self::priority;
+      return true;
+    }
 
     /* ^<\?php(.*)(?>\?>)$ */
-    elseif( preg_match( '/^<\?php(.*)(?>\?>)$/i', $source, $matches ) )
-      {
-        $instance = new DstyleDoc_Analyser_PHPCode( $matches[1] );
-        $priority = self::priority;
-        return true;
-      }
+    elseif( preg_match( '/^<\?php(.*)(?>\?>)$/i', $source, $match ) )
+    {
+      $instance = new DstyleDoc_Analyser_PHPCode( $match[1] );
+      $priority = DstyleDoc_Analyser_PHPCode::priority;
+      return true;
+    }
 
     else
       return false;
@@ -1446,6 +1496,14 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
 
   public function apply( DstyleDoc_Element $element )
   {
+    $tmp = $element->descriptions;
+    $last = end($tmp);
+
+    if( $last instanceof DstyleDoc_Descritable_PHP_Code )
+      $last->append = "\n".$this->code;
+    else
+      $element->description = new DstyleDoc_Descritable_PHP_Code( $this->code, $element );
+
     return $this;
   }
 
