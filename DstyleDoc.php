@@ -6,7 +6,7 @@ class DstyleDoc_Properties
 {
   protected function __get( $property )
   {
-    if( ! is_callable( array($this,'get_'.(string)$property) ) )
+    if( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
       throw new BadPropertyException($this, (string)$property);
 
     return call_user_func( array($this,'get_'.(string)$property) );
@@ -14,7 +14,7 @@ class DstyleDoc_Properties
 
   protected function __set( $property, $value )
   {
-    if( ! is_callable( array($this,'set_'.(string)$property) ) )
+    if( ! method_exists($this,'set_'.(string)$property) or ! is_callable( array($this,'set_'.(string)$property) ) )
       throw new BadPropertyException($this, (string)$property);
 
     call_user_func( array($this,'set_'.(string)$property), $value );
@@ -22,7 +22,7 @@ class DstyleDoc_Properties
 
   protected function __isset( $property )
   {
-    if( ! is_callable( array($this,'isset_'.(string)$property) ) )
+    if( ! method_exists($this,'isset_'.(string)$property) or ! is_callable( array($this,'isset_'.(string)$property) ) )
       throw new BadPropertyException($this, (string)$property);
 
     return call_user_func( array($this,'isset_'.(string)$property) );
@@ -30,7 +30,7 @@ class DstyleDoc_Properties
 
   protected function __unset( $property )
   {
-    if( ! is_callable( array($this,'unset_'.(string)$property) ) )
+    if( ! method_exists($this,'unset_'.(string)$property) or ! is_callable( array($this,'unset_'.(string)$property) ) )
       throw new BadPropertyException($this, (string)$property);
 
     call_user_func( array($this,'unset_'.(string)$property) );
@@ -273,7 +273,7 @@ HTML;
       $this->_config[ substr($property,7) ] = $params;
       return $this;
     }
-    else
+   else
       return parent::__get( $property );
   }
 
@@ -650,6 +650,16 @@ interface DstyleDoc_Converter_Convert
    *    string $text = La portion de texte à convertir.
    */
   function convert_text( $text );
+
+  // }}}
+  // {{{ convert_php()
+
+  /**
+   * Converti du code PHP.
+   * Params:
+   *    string $code = Le cde PHP à convertir.
+   */
+  function convert_php( $code );
 
   // }}}
   // {{{ search_element()
