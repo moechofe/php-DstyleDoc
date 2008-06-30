@@ -38,7 +38,7 @@ class DstyleDoc_Properties
 
   protected function __call( $method, $arguments )
   {
-    if( ! is_callable( array($this,'call_'.(string)$method) ) )
+    if( ! method_exists($this,'call_'.(string)$method) or ! is_callable( array($this,'call_'.(string)$method) ) )
       throw new BadMethodCallException;
 
     return call_user_func_array( array($this,'call_'.(string)$method), $arguments );
