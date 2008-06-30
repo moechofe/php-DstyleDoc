@@ -57,23 +57,51 @@ class DstyleDoc_Descritable extends DstyleDoc_Properties
   public function __toString()
   {
 //    try
-    {
+//    {
     if( $this instanceof DstyleDoc_Descritable )
-    foreach( get_declared_classes() as $class )
-      if( in_array('DstyleDoc_Descritable_Analysable',class_implements($class))
-        and $result = call_user_func( array($class,'analyse'), $this->content, $this->element) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'inline')!==false )
       {
-        $next = '';
-        foreach( $result->nexts as $tmp )
-          $next .= (string)$tmp;
-        return (string)$result->current . $next;
+        $c = get_class($this);
+        $h = htmlspecialchars($this->content);
+        echo <<<HTML
+<div style='clear:left;float:left;color:white;background:DarkMagenta;padding:1px 3px'>{$c}</div>
+<div style='float:left;background:Wheat;padding:1px 3px'>{$h}</div><dt style="margin-left: 22px">
+HTML;
       }
-    }
+      foreach( get_declared_classes() as $class )
+        if( in_array('DstyleDoc_Descritable_Analysable',class_implements($class))
+          and $result = call_user_func( array($class,'analyse'), $this->content, $this->element) )
+        {
+          $next = '';
+          foreach( $result->nexts as $tmp )
+            $next .= (string)$tmp;
+          if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'inline')!==false )
+          {
+            $c = is_object($result->current)?get_class($result->current).': '.htmlspecialchars($result->current->content):gettype($result->current).': '.htmlspecialchars($result->current);
+            $r = '';
+            foreach( $result->nexts as $n )
+              $r .= (is_object($n)?get_class($n).': '.htmlspecialchars($n->content):gettype($n).': '.htmlspecialchars($n)).". ";
+            echo <<<HTML
+<div style='float:left;background:MistyRose;padding:1px 3px'>{$c}</div>
+<div style='background:Gainsboro;padding:1px 3px'>{$r}</div>
+HTML;
+          }
+          return (string)$result->current . $next;
+        }
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'inline')!==false )
+      {
+        echo <<<HTML
+<div style='clear:both'></div></dt>
+HTML;
+      }
+//    }
 /*    catch( Exception $e )
     {
       d( $e )->d5;
       exit;
     }*/
+    }
 
     return (string)$this->element->converter->convert_text( $this->content );
   }
@@ -181,7 +209,7 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
   {
     // search for a java doc compatible inline link
     // {@link\s+([-_\pLpN]*(?:::|->)?\$?[-_\pLpN]+(?:\(\))?)\s*(\s[^}]+)?}
-    if( preg_match( '/\{@link\s+([-_\pLpN]*(?:::|->)?\$?[-_\pLpN]+(?:\(\))?)\s*(\s[^}]+)?\}/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    if( preg_match( '/\{@link\s+([-_\pLpN]*(?:::|->)?\$?[-_\pLpN]+(?:\(\))?)\s*(\s[^}]+)?\}/', $content, $match, PREG_OFFSET_CAPTURE ) )
     {
       if( $scheme = @parse_url( $match[2][0], PHP_URL_SCHEME ) )
         return self::result( $content, $match[0][1], $match[2][0], strlen($match[0][0]), $element );
@@ -195,8 +223,9 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
     }
 
     // search for function or method without the object, class or interface reference
+    // faut-il ajouter l'option /S ? 
     // (?<!::|->)\b[-_\pLpN]+\(\)\B
-    if( preg_match( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    if( preg_match( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/', $content, $match, PREG_OFFSET_CAPTURE ) )
     {
       if( $found = $element->converter->function_exists( $match[1][0] ) )
         return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
@@ -206,7 +235,7 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 
     // search for method with object, class or interface reference
     // \b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B
-    if( preg_match( '/\b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    if( preg_match( '/\b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B/', $content, $match, PREG_OFFSET_CAPTURE ) )
     {
       if( $found = $element->converter->method_exists( $match[1][0], $match[2][0] ) )
         return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
@@ -214,7 +243,7 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
     
     // search for a member
     // (?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b
-    if( preg_match( '/(?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    if( preg_match( '/(?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b/', $content, $match, PREG_OFFSET_CAPTURE ) )
     {
       if( $found = $element->converter->member_exists( $match[1][0], $match[2][0] ) )
         return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
@@ -224,7 +253,7 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 
     // search for a class
     // (?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)
-    if( preg_match( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/u', $content, $match, PREG_OFFSET_CAPTURE ) )
+    if( preg_match( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/', $content, $match, PREG_OFFSET_CAPTURE ) )
     {
       if( $found = $element->converter->class_exists( $match[1][0] ) )
         return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );

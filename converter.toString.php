@@ -42,7 +42,7 @@ HTML;
 <hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
 <dl>
 {$this->element_filed($class)}
-{$this->either($class->parent,'<dt>extend</dt><dd>{$class->parent->link}</dd>')}
+{$this->either($class->parent,'<dt>extend</dt><dd>$class->parent->link</dd>')}
 {$this->either($class->implements,'<dt>implement</dt><dd><ul>'.$this->forall($class->implements,'<li>{$value->link}</li>').'</ul></dd>')}
 <dt>methods</dt>
 <dd>

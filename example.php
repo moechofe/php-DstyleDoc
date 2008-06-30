@@ -29,6 +29,9 @@ class a
    */
   var $a = 'test';
 
+  /**
+   * Documentation originale de a::a(), elle devrait être aussi utilisé pour b::a().
+   */
   function a()
   {
     return $this->a;
@@ -84,6 +87,8 @@ $a = null;
 
 $a = " string {$a} string ${a} ";
 
+
+__halt_compiler();
 
 /**
  * Template de donnée de type <b>squelette tamsuft</b>.
@@ -1477,8 +1482,6 @@ class tamsuft_template
 
   // }}}
 }
-
-__halt_compiler();
 
 /*
 tamsuft::$default['tamsuft_template'] = array(
