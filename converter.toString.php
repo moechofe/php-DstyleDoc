@@ -36,7 +36,7 @@ HTML;
       DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert class: <strong>{$class->display}</strong></span>", true );
 
     if( $class->name == 'b' )
-      d( $class )->d2;
+      d( $class )->d3;
 
     return <<<HTML
 <hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
@@ -429,7 +429,5 @@ HTML;
 
   // }}}
 }
-
-// }}}
 
 ?>

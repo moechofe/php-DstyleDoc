@@ -581,10 +581,24 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
     if( $this->parent )
       foreach( $this->parent->heritable_methods as $method )
         if( ! in_array($method, $methods) )
-          $methods[] = $method;
+          self::add_uniq_name_methods( $methods, $method );
 
     return $methods;
   }
+
+  // }}}
+  // {{{ add_uniq_name_methods()
+
+  static protected function add_uniq_name_methods( &$methods, $method )
+  {
+    foreach( $methods as $value )
+      if( $value->name == $method->name )
+        return null;
+    $methods[] = $method;
+  }
+
+  // }}}
+  // {{{ $heritable_methods
 
   /**
    * Retourne la liste des méthodes héritables de la classe.
@@ -645,7 +659,8 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function set_parent( $parent )
   {
-    $this->_parent = (string)$parent;
+    if( $parent )
+      $this->_parent = (string)$parent;
   }
 
   protected function get_parent()
@@ -1131,6 +1146,32 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
  */
 class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 {
+  // {{{ $descriptions
+
+  protected function get_description()
+  {
+    if( ! $this->_descriptions and $this->parent )
+      return $this->parent->description;
+    elseif( ! $this->_descriptions )
+      return '';
+    else
+      return parent::get_description();
+  }
+
+  // }}}
+  // {{{ $title
+
+  protected function get_title()
+  {
+    if( ! $this->_descriptions and $this->parent )
+      return $this->parent->get_title();
+    elseif( ! $this->_descriptions )
+      return '';
+    else
+      return parent::get_title();
+  }
+
+  // }}}
   // {{{ $class
 
   protected $_class = null;
@@ -1144,6 +1185,19 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
   protected function get_class()
   {
     return $this->_class;
+  }
+
+  // }}}
+  // {{{ $parent
+
+  protected function get_parent()
+  {
+    if( $this->class->parent
+      and ($found = $this->converter->method_exists($this->class->parent, $this->name))
+      and ($found->protected or $found->public and ! $this->private) )
+      return $found;
+    else
+      return null;
   }
 
   // }}}

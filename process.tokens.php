@@ -958,6 +958,9 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
+    if( ! array_intersect( $current->modifiers, array_flip(array('public','private','protected')) ) )
+      $current->modifier = 'public';
+
     $return = new self;
     $return->open_tag = $current;
     $return->modifier = $current;
