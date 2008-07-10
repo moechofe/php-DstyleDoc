@@ -31,7 +31,10 @@ abstract class DstyleDoc_Token_None extends DstyleDoc_Token_Custom
       if( ! $current->object instanceof DstyleDoc_Token_Fake )
         return $current->object;
       else
+      {
+        $current->open_tag->documentation = $current;
         return $current->open_tag;
+      }
     }
     else
       return $current;
@@ -739,6 +742,8 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
           $save->to( $converter );
         return $return;
       }
+      elseif( $current instanceof DstyleDoc_Token_Open_Tag )
+        return $current;
       break;
 
     case '!' :
@@ -2054,6 +2059,13 @@ class DstyleDoc_Token_End_Declare extends DstyleDoc_Token_None
 // {{{ End Heredoc
 
 class DstyleDoc_Token_End_Heredoc extends DstyleDoc_Token_None
+{
+}
+
+// }}}
+// {{{ Start Heredoc
+
+class DstyleDoc_Token_start_heredoc extends DstyleDoc_Token_String
 {
 }
 

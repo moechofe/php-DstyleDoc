@@ -2,7 +2,7 @@
 
 // todo: ajouter $element à tout les appels de des méthode convert_xxxx()
 
-abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
+abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements ArrayAccess
 {
   // {{{ $converter
 
@@ -97,6 +97,44 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties
    *    mixed = La documentation de l'élément ou pas.
    */
   abstract protected function get_convert();
+
+  // }}}
+  // {{{ offsetExists()
+
+  final public function offsetExists( $offset )
+  {
+    try
+    {
+      return $this->$offset ? true : true;
+    }
+    catch( BadPropertyException $e )
+    {
+      return false;
+    }
+  }
+
+  // }}}
+  // {{{ offsetGet()
+
+  final public function offsetGet( $offset )
+  {
+    return $this->$offset;
+  }
+
+  // }}}
+  // {{{ offsetSet()
+
+  final public function offsetSet( $offset, $value )
+  {
+    $this->$offset = $value;
+  }
+
+  // }}}
+  // {{{ offsetUnset()
+
+  final public function offsetUnset( $offset )
+  {
+  }
 
   // }}}
 }
@@ -312,6 +350,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 
   protected function get_description()
   {
+    if( ! $this->analysed ) $this->analyse();
     $copy = $this->_descriptions;
     if( count($copy) )
       array_shift($copy);
@@ -323,11 +362,12 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 
   protected function get_title()
   {
+    if( ! $this->analysed ) $this->analyse();
     if( count($this->_descriptions) )
       list($result) = $this->_descriptions;
     else
       $result = '';
-    return $this->converter->convert_title( $result );
+    return $this->converter->convert_title( $result, $this );
   }
 
   // }}}
@@ -580,9 +620,12 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
     if( $this->parent )
       foreach( $this->parent->heritable_methods as $method )
-        if( ! in_array($method, $methods) )
-          self::add_uniq_name_methods( $methods, $method );
-
+          // todo: in_array() do not work correctly. see bug #38356 at http://bugs.php.net/bug.php?id=39356
+        //        if( ! in_array($method, $methods) )
+        foreach( $methods as $value )
+          if( $method === $value )
+            self::add_uniq_name_methods( $methods, $method );
+  
     return $methods;
   }
 

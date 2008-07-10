@@ -1,12 +1,23 @@
 <?php
 
+/**
+ * Script principale de DstyleDoc.
+ */
+
 // {{{ properties class
 
+/**
+ * Classe de prise en charge des surcharges des membres.
+ * Permet d'utiliser facilement des getter, setter, issetter, unsetter et caller.
+ */
 class DstyleDoc_Properties
 {
   protected function __get( $property )
   {
-    if( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
+    if( $property === '__class' )
+      return get_class( $this );
+
+    elseif( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
       throw new BadPropertyException($this, (string)$property);
 
     return call_user_func( array($this,'get_'.(string)$property) );
@@ -131,6 +142,7 @@ class DstyleDoc extends DstyleDoc_Properties
         $s = htmlentities($source); if(!trim($s))$s='&nbsp;'; $c = get_class($current);
         echo <<<HTML
 <div style='clear:left;float:left;color:white;background:Brown;padding:1px 3px'>{$c}</div>
+<div style='float:left;background:Chocolate;color:white;padding:1px 3px'>$line</div>
 <div style='float:left;background:Wheat;padding:1px 3px'>$call</div>
 <div style='background:{$ff};color:SaddleBrown;padding:1px 3px;'>{$s}</div>
 <div style='clear:both'></div>
@@ -524,11 +536,14 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_title()
 
   /**
-   * Convertie la description courte.
+   * Convertie la déscription courte.
    * Params:
    *    string $title = La ligne de description courte.
+   *    DstyleDoc_Element $element = L'élément concerné par la déscription courte.
+   * Returns:
+   *    mixed = Dépends du convertisseur.
    */
-  function convert_title( $title );
+  function convert_title( $title, DstyleDoc_Element $element );
 
   // }}}
   // {{{ convert_link()
@@ -691,7 +706,7 @@ interface DstyleDoc_Converter_Convert
  *    - reporter set_method() dans les autres methode de ce genre.
  * Todo: gérer les constantes
  */
-abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert
+abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert, ArrayAccess
 {
   // {{{ $dsd
 
@@ -1291,6 +1306,45 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
     }
 var_dump($string);
     return $string;
+  }
+
+  // }}}
+
+  // {{{ offsetExists()
+
+  final public function offsetExists( $offset )
+  {
+    try
+    {
+      return $this->$offset ? true : true;
+    }
+    catch( BadPropertyException $e )
+    {
+      return false;
+    }
+  }
+
+  // }}}
+  // {{{ offsetGet()
+
+  final public function offsetGet( $offset )
+  {
+    return $this->$offset;
+  }
+
+  // }}}
+  // {{{ offsetSet()
+
+  final public function offsetSet( $offset, $value )
+  {
+    $this->$offset = $value;
+  }
+
+  // }}}
+  // {{{ offsetUnset()
+
+  final public function offsetUnset( $offset )
+  {
   }
 
   // }}}

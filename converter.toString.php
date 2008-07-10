@@ -38,11 +38,16 @@ HTML;
     if( $class->name == 'b' )
       d( $class )->d3;
 
+    if( $class->parent )
+      $super = $class->parent->link;
+    else
+      $super = null;
+
     return <<<HTML
 <hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
 <dl>
 {$this->element_filed($class)}
-{$this->either($class->parent,'<dt>extend</dt><dd>$class->parent->link</dd>')}
+{$this->either($class->parent,"<dt>super class</dt><dd>$super</dd>")}
 {$this->either($class->implements,'<dt>implement</dt><dd><ul>'.$this->forall($class->implements,'<li>{$value->link}</li>').'</ul></dd>')}
 <dt>methods</dt>
 <dd>

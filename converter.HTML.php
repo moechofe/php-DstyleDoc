@@ -6,7 +6,7 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
 {
   // {{{ convert_title()
 
-  public function convert_title( $title )
+  public function convert_title( $title, DstyleDoc_Element $element )
   {
     return $title;
   }
