@@ -1,6 +1,7 @@
 <?php
 
 // todo: ajouter $element à tout les appels de des méthode convert_xxxx()
+// todo: ajouter les analyse() a tous les getters
 
 abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements ArrayAccess
 {
@@ -40,6 +41,7 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 
   protected function get_description()
   {
+    if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_description( $this->_descriptions );
   }
 
@@ -308,8 +310,12 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
         if( ! $c ) $c = '&nbsp;';
         $s = get_class($current);
         if( ! $s ) $s = '&nbsp;';
+        $e = get_class($this);
+        $ee = $this->name;
         echo <<<HTML
-<div style='clear:left;float:left;color:white;background:SteelBlue;padding:1px 3px'>{$c}</div>
+<div style='clear:left;float:left;color:black;background:PowderBlue;padding:1px 3px'>{$e}</div>
+<div style='float:left;color:black;background:LightCyan;padding:1px 3px'>{$ee}</div>
+<div style='float:left;color:white;background:SteelBlue;padding:1px 3px'>{$c}</div>
 <div style='background:DimGray;color:white;padding:1px 3px;'>{$s}</div>
 <div style='clear:left;'></div>
 HTML;
@@ -326,8 +332,18 @@ HTML;
         ksort($result);
         $current = current($result);
 
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
-        var_dump( $result );
+        if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
+        {
+          foreach( $result as $k => $v )
+          {
+            $vv = get_class($v);
+            echo <<<HTML
+<div style='clear:left;float:left;color:white;background:SteelBlue;padding:1px 3px'>{$k}</div>
+<div style='float:left;background:MediumPurple;color:white;padding:1px 3px;'>{$vv}</div>
+<div style='clear:left;'></div>
+HTML;
+          }
+        }
 
         if( $current instanceof DstyleDoc_Analyser )
           $current = $current->apply( $this );
@@ -354,7 +370,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
     $copy = $this->_descriptions;
     if( count($copy) )
       array_shift($copy);
-    return $this->converter->convert_description( $copy );
+    return $this->converter->convert_description( $copy, $this );
   }
 
   // }}}
@@ -522,7 +538,7 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->file );
+    return $this->converter->convert_display( $this->file, $this );
   }
 
   // }}}
@@ -846,7 +862,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->name );
+    return $this->converter->convert_display( $this->name, $this );
   }
 
   // }}} 
@@ -1147,6 +1163,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
   protected function get_syntaxs()
   {
+    if( ! $this->analysed ) $this->analyse();
     if( ! $this->_syntax )
     {
       $this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $this->params );
@@ -1193,8 +1210,12 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function get_description()
   {
+    if( ! $this->analysed ) $this->analyse();
     if( ! $this->_descriptions and $this->parent )
+    {
+      if( ! $this->parent->analysed ) $this->parent->analyse();
       return $this->parent->description;
+    }
     elseif( ! $this->_descriptions )
       return '';
     else
@@ -1206,8 +1227,12 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function get_title()
   {
+    if( ! $this->analysed ) $this->analyse();
     if( ! $this->_descriptions and $this->parent )
-      return $this->parent->get_title();
+    {
+      if( ! $this->parent->analysed ) $this->parent->analyse();
+      return $this->parent->title;
+    }
     elseif( ! $this->_descriptions )
       return '';
     else
@@ -1365,7 +1390,7 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name.'()' );
+    return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name.'()', $this );
   }
 
   // }}} 
@@ -1550,7 +1575,7 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->class->name.($this->static?'::$':'->$').$this->name );
+    return $this->converter->convert_display( $this->class->name.($this->static?'::$':'->$').$this->name, $this );
   }
 
   // }}} 
@@ -1614,7 +1639,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_display( (string)$syntax );
+    return $this->converter->convert_display( (string)$syntax, $this );
   }
 
   // }}} 
@@ -1623,8 +1648,9 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
   public function __construct( DstyleDoc_Converter $converter, $syntax )
   {
     parent::__construct( $converter );
-    foreach( $syntax as $param )
-      $this->param = $param;
+    if( is_array($syntax) or $syntax instanceof ArrayAccess )
+      foreach( $syntax as $param )
+        $this->param = $param;
   }
 
   // }}}
@@ -1662,7 +1688,7 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->name );
+    return $this->converter->convert_display( $this->name, $this );
   }
 
   // }}} 
@@ -1762,7 +1788,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_display( '$'.$var );
+    return $this->converter->convert_display( '$'.$var, $this );
   }
 
   // }}} 
@@ -1870,7 +1896,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_display( implode(', ', $this->_types) );
+    return $this->converter->convert_display( implode(', ', $this->_types), $this );
   }
 
   // }}}
@@ -1899,4 +1925,5 @@ class DstyleDoc_Element_Return extends DstyleDoc_Element_Type
   // }}}
 }
 
+// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary
 ?>

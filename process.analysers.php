@@ -990,6 +990,7 @@ class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implement
 
 /**
  * Classe d'analyse d'une balise de syntaxe.
+ * todo: ajouter la positibilité de mettre la syntaxe apres ^syntax\s*:
  */
 class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
 {
@@ -1048,9 +1049,9 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
         if( ! empty($matches[1]) )
           $optional = true;
         $this->_syntax[] = array(
-          'types' => $matches[2],
+          'types' => $matches[2]?$matches[2]:false,
           'var' => $matches[3],
-          'optional' => $optional );
+          'optional' => ($optional)?true:(($matches[3]==='...')?true:false) );
       }
     }
   }
@@ -1144,11 +1145,13 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
   {
     if( $element instanceof DstyleDoc_Element_Function )
     {
-      foreach( $this->syntax as $syntax )
+      foreach( $this->syntax as $key => $syntax )
       {
         $element->param = $syntax['var'];
         $element->param->type = $syntax['types'];
         $element->param->optional = $syntax['optional'];
+        if( $syntax['var'] === '...' )
+          $element->param->optional = true;
       }
       $element->syntax = $this->syntax;
       $element->syntax->description = $this->description;

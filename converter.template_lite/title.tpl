@@ -1,1 +1,1 @@
-{if $_title}<div class="title title-{$_type}"><span>{$_title}</span></div>{/if}
+{if $_title}<span class="title-{$_type}">{$_title}</span>{/if}{* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary *}

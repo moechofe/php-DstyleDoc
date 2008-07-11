@@ -1,0 +1,34 @@
+body { margin: 0px; padding: 0px; position: relative; font-size: 15px; }
+
+h1 { font-family: georgia, serif; font-size: 29px; }
+h2 { font-family: georgia, serif; font-size: 21px; }
+p, li { font-family: arial, "sans serif"; font-size: 13px; line-height: 18px; }
+
+#page-header { position: absolute; top: 0px; left: 0px; width: 100%; height: 40px; }
+#page-header div.frame { background: rosybrown; border-bottom: solid 2px maroon; }
+#page-header h2 { font-weight: normal; color: white; margin: 0px; line-height: 38px; padding: 0px 10px; }
+
+#page-browser { position: absolute; top: 40px; left: 0px; width: 300px; }
+#page-browser div.frame {  }
+
+#page-content { position: absolute; top: 40px; left: 300px; }
+
+/**
+ * Les styles de texte generaux
+ */
+#page-content p.summary
+{ margin-top: 0px; }
+
+div.content-display h1 { font-weight: normal; }
+
+/**
+ * Les elements générique de la documentation
+ */
+span.display-method { background-repeat: no-repeat; background-position: left; padding-left: 18px; line-height: 18px; }
+span.display-method.method-public { background-image: url("Icon_method_public.png"); }
+span.display-method.method-protected { background-image: url("Icon_method_protected.png"); }
+span.display-method.method-private { background-image: url("Icon_method_private.png"); }
+span.display-method.method-public-static { background-image: url("Icon_method_public_static.png"); }
+h1 span.display-method { background: inherit !important; padding-left: 0px !important; }
+
+

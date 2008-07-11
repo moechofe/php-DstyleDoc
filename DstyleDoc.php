@@ -63,10 +63,21 @@ require_once 'process.elements.php';
 require_once 'process.analysers.php';
 require_once 'process.descriptables.php';
 
+/**
+ * Classe de control de DstyleDoc.
+ * La classe DstyleDoc permet de configurer et de lancer un processus de génération de documentation.
+ */
 class DstyleDoc extends DstyleDoc_Properties
 {
   // {{{ log()
 
+  /**
+   * Envoie un message de log sur la sortie standard.
+   * Params:
+   *    string,numeric,array ... = Une chaîne de caractère, un nombre ou un tableau de pairs clefs/valeurs à afficher.
+   * Syntax:
+   *    ... = Un nombre infinie de paramètre à afficher.
+   */
   static public function log()
   {
     $args = func_get_args();
@@ -529,8 +540,11 @@ interface DstyleDoc_Converter_Convert
    * Converti la description longue.
    * Params:
    *    array(string) $description = Toutes les lignes de la description longue.
+   *    DstyleDoc_Element $element = L'élément concerné par la déscription courte.
+   * Returns:
+   *    mixed = Dépends du convertisseur.
    */
-  function convert_description( $description );
+  function convert_description( $description, DstyleDoc_Element $element );
 
   // }}}
   // {{{ convert_title()
@@ -579,10 +593,11 @@ interface DstyleDoc_Converter_Convert
    * Convertie et renvoie le nom d'affichage d'un élément.
    * Params:
    *    $name = Le nom de l'élément à afficher.
+   *    DstyleDoc_Element $element = L'élément vers lequel se destine le lien.
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
-   function convert_display( $name );    
+   function convert_display( $name, DstyleDoc_Element $element );   
 
   // }}}
   // {{{ convert_syntax()

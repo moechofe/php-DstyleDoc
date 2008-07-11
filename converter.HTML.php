@@ -14,7 +14,7 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   // }}}
   // {{{ convert_description()
 
-  public function convert_description( $description )
+  public function convert_description( $description, DstyleDoc_Element $element )
   {
     return implode('<br />',$description);
   }
@@ -43,7 +43,7 @@ HTML;
   // }}}
   // {{{ convert_display()
 
-  public function convert_display( $name )
+  public function convert_display( $name, DstyleDoc_Element $element )
   {
     return (string)htmlspecialchars( $name );
   }

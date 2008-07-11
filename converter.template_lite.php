@@ -1,5 +1,7 @@
 <?php
 
+// todo: assign $_element for all convert_xxx() template
+
 require_once( 'converter.HTML.php' );
 require_once( 'libraries/template_lite/class.template.php' );
 
@@ -44,6 +46,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   public function convert_method( DstyleDoc_Element_Method $method )
   {
+    $this->tpl->assign( '_method', $method );
+    return $this->tpl->fetch( __CLASS__.':convert_method.tpl' );
   }
 
   // }}}
@@ -51,6 +55,9 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   public function convert_syntax( DstyleDoc_Element_Syntax $syntax )
   {
+    d( $syntax );
+    $this->tpl->assign( '_syntax', $syntax );
+    return $this->tpl->fetch( __CLASS__.':convert_syntax.tpl' );
   }
 
   // }}}
@@ -112,6 +119,16 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   }
 
   // }}}
+  // {{{ convert_description()
+
+  public function convert_description( $description, DstyleDoc_Element $element )
+  {
+    $this->tpl->assign( '_description', $description );
+    $this->tpl->assign( '_type', strtolower(substr(get_class($element),18)) );
+    return $this->tpl->fetch( __CLASS__.':description.tpl' );
+  }
+
+  // }}}
   // {{{ convert_id()
 
   public function convert_id( $id )
@@ -120,6 +137,18 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
       $id = implode(',', $id);
 
     return (string)$id;
+  }
+
+  // }}}
+  // {{{ convert_display()
+
+  public function convert_display( $name, DstyleDoc_Element $element )
+  {
+    $this->tpl->assign( array(
+      '_name' => parent::convert_display( $name, $element ),
+      '_type' => strtolower(substr(get_class($element),18)),
+      '_element' => $element ) );
+    return $this->tpl->fetch( __CLASS__.':display.tpl' );
   }
 
   // }}}
@@ -166,7 +195,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
         '_class' => $tpl->_vars['class'],
         '_methods' => $tpl->_vars['class']->methods ) );
     else
-      $tpl->trigger_error( 'invalid DstyleDoc_Element_Class for first parameter send to '.__FUNCTION__, E_USER_ERROR );
+      $tpl->trigger_error( 'unexists or invalid "class" parameter send to {methods_index}' );
 
     return $tpl->fetch( __CLASS__.':print_methods_index.tpl' );
   }
@@ -218,7 +247,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   {
     $this->tpl = new Template_Lite;
     $this->tpl->cache = false;
-    $this->tpl->compile_dir = sys_get_temp_dir();
+    // $this->tpl->compile_dir = sys_get_temp_dir();
 
     $this->tpl->assign_by_ref( '_converter', &$this );
 
@@ -239,7 +268,11 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   public function template_dir( $path )
   {
     if( is_readable($path) and is_dir($path) )
+    {
       $this->tpl->template_dir = $path;
+      $this->tpl->assign( '_template_dir', substr(realpath($path),strlen($_SERVER['DOCUMENT_ROOT'])) );
+      $this->tpl->compile_dir = $path.'/compiled';
+    }
     else
       throw new InvalidArgumentException('invalid path fot 1st parameter send to: '.__FUNCTION__);
 
@@ -290,7 +323,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   protected function write( $template )
   {
-    set_error_handler( array($this,'error_config_or_not') );
+    //set_error_handler( array($this,'error_config_or_not') );
     if( isset($this->destination_dir) )
     {
     }
@@ -298,7 +331,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     {
       $this->tpl->display( $template );
     }
-    restore_error_handler();
+    //restore_error_handler();
   }
 
   // }}}
@@ -315,4 +348,5 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
 }
 
+// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary
 ?>

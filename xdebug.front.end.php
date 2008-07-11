@@ -132,7 +132,7 @@ HTML;
     for( $i=0; $i< abs(min((integer)$var->depth,(integer)$var->pass)); $i++ )
       $dump =
         preg_replace_callback(
-          '/((?:  )*  )(<b>(?:object|array)<\/b>(?:\\(<i>(?:.*?)<\/i>\\)\\[<i>(?:\\d+)<\/i>\\])?)(\\r?\\n?)(\\r?\\n?(?:(?<!  )\\1.*\\r?\\n?)*)/',
+          '%((?:  )*  )(<b>(?:object|array)</b>(?:\(<i>(?:.*?)</i>\)\[<i>(?:\d+)</i>\])?)(\r?\n?)(\r?\n?(?:(?<!  )\1.*\r?\n?)*)%',
           'xdebug_front_end::dump_object',
         $dump );
 
