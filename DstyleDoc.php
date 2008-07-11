@@ -164,7 +164,7 @@ HTML;
       // processing token
       $current = call_user_func( array('DstyleDoc_Token_'.$call,'hie'), $converter, $current, $source, $file, $line );
 
-      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'tokens')!==false and strpos($_REQUEST['debug'],'current')!==false )
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'tokens')!==false and ( strpos($_REQUEST['debug'],'current')!==false or strpos($_REQUEST['debug'],get_class($current))!==false ) )
         var_dump( $current );
 
       if( $current instanceof DstyleDoc_Token_Stop )
@@ -540,11 +540,11 @@ interface DstyleDoc_Converter_Convert
    * Converti la description longue.
    * Params:
    *    array(string) $description = Toutes les lignes de la description longue.
-   *    DstyleDoc_Element $element = L'élément concerné par la déscription courte.
+   *    $element = L'élément concerné par la déscription courte.
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
-  function convert_description( $description, DstyleDoc_Element $element );
+  function convert_description( $description, DstyleDoc_Custom_Element $element );
 
   // }}}
   // {{{ convert_title()
@@ -553,7 +553,7 @@ interface DstyleDoc_Converter_Convert
    * Convertie la déscription courte.
    * Params:
    *    string $title = La ligne de description courte.
-   *    DstyleDoc_Element $element = L'élément concerné par la déscription courte.
+   *    $element = L'élément concerné par la déscription courte.
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
@@ -567,7 +567,7 @@ interface DstyleDoc_Converter_Convert
    * Params:
    *    mixed $id = L'identifiant unique de l'élément retourné par convert_id().
    *    mixed $name = Le nom d'affichage de l'élément retourné par convert_name().
-   *    DstyleDoc_Element $element = L'élément vers lequel se destine le lien.
+   *    $element = L'élément vers lequel se destine le lien.
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
@@ -581,10 +581,11 @@ interface DstyleDoc_Converter_Convert
    * Params:
    *    string $id = L'identifiant unique de l'élément.
    *    array $id = Un tableau contenant la liste des identifiants de l'élément et celui de ses parents.
+   *    $element = L'élément vers lequel se destine le lien.
    * Returns:
    *    string = L'identifiant convertie de l'élément.
    */
-  function convert_id( $id );
+  function convert_id( $id, DstyleDoc_Element $element );
 
   // }}}
   // {{{ convert_display()
@@ -593,7 +594,7 @@ interface DstyleDoc_Converter_Convert
    * Convertie et renvoie le nom d'affichage d'un élément.
    * Params:
    *    $name = Le nom de l'élément à afficher.
-   *    DstyleDoc_Element $element = L'élément vers lequel se destine le lien.
+   *    $element = L'élément vers lequel se destine le lien.
    * Returns:
    *    mixed = Dépends du convertisseur.
    */

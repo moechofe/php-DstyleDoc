@@ -100,11 +100,13 @@ HTML;
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
       DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert function: <strong>{$function->display}</strong></span>", true );
 
+    d( $function )->p3->d3;
+
     return <<<HTML
 <hr /><h1 id="{$function->id}">Function: {$function->display}</h1>
 <dl>
 {$this->element_filed($function)}
-<dt>syntax</dt>{$this->forall($function->syntaxs,'<dd>$value</dd>')}
+<dt>syntax</dt><dd>{$this->forall($function->syntaxs,'<ul>$value</ul>')}</dd>
 <dt>params</dt><dd><ul>{$this->forall($function->params,'<li>$value</li>')}</ul></dd>
 {$this->either($function->returns,
 '<dt>returns</dt><dd><ul>'.$this->forall($function->returns,'<li>$value</li>').'</ul></dd>')}
@@ -154,7 +156,7 @@ HTML;
     $call = substr($syntax->function->display,0,-1);
 
     return <<<HTML
-<li>{$call} {$result} )<br/>{$syntax->description}</li>
+<li><span class="syntax">{$call}</span> {$result} )<br/>{$syntax->description}</li>
 HTML;
   }
 

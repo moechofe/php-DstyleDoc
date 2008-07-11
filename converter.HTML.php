@@ -14,7 +14,7 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   // }}}
   // {{{ convert_description()
 
-  public function convert_description( $description, DstyleDoc_Element $element )
+  public function convert_description( $description, DstyleDoc_Custom_Element $element )
   {
     return implode('<br />',$description);
   }
@@ -22,7 +22,7 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   // }}}
   // {{{ convert_id()
 
-  public function convert_id( $id )
+  public function convert_id( $id, DstyleDoc_Element $element )
   {
     if( is_array($id) )
       $id = implode('_', $id);

@@ -1008,7 +1008,8 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
         foreach( $var->types as $type )
           $param->type = $type;
 
-        $param->default = $var->default;
+        if( ! is_null($var->default) )
+          $param->default = $var->default;
       }
 
       foreach( $this->returns as $return )
@@ -1061,11 +1062,9 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
       $return->object = $current;
       $return->documentation = $current;
       $return->modifier = $current;
+      $return->object->var = $return;
       if( $current instanceof DstyleDoc_Token_Modifier )
-      {
-        $return->object->var = $return;
         $return->expression = true;
-      }
     }
     elseif( $current instanceof DstyleDoc_Token_Return )
     {

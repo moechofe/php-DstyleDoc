@@ -1,5 +1,5 @@
 <style type="text/css">
-ul { margin: 0px; }
+ul { margin: 0px; padding: 0px 0px 0px 18px; }
 </style>
 <?php
 
@@ -10,6 +10,7 @@ require_once( 'converter.toString.php' );
 
 set_time_limit( 90 );
 
+$d =
 DstyleDoc::hie()
   ->enable_dstyledoc
   ->enable_javadoc
