@@ -185,6 +185,9 @@ final class DstyleDoc_Descritable_Analysable_Replace extends DstyleDoc_Propertie
 }
 
 // todo c'est beaucoup le bordel cette partie
+// on car on cherche pas les element dans l'ordre dans lequel on les trouve mais dans un ordre de type
+// et comme la fonction est recusrive. 
+// $content est une reference
 class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 {
   static private function result( $content, $offset, $link, $length, DstyleDoc_Custom_Element $element )
@@ -253,10 +256,14 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 
     // search for a class
     // (?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)
-    if( preg_match( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/', $content, $match, PREG_OFFSET_CAPTURE ) )
+    if( preg_match_all( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/', $content, $matches, PREG_OFFSET_CAPTURE ) )
     {
-      if( $found = $element->converter->class_exists( $match[1][0] ) )
-        return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+      d( $matches );
+      foreach( $matches as $match )
+      {
+        if( $found = $element->converter->class_exists( $match[1][0] ) )
+          return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
+      }
     }
 
     return false;
@@ -296,4 +303,5 @@ class DstyleDoc_Descritable_PHP_Code extends DstyleDoc_Descritable
   // }}}
 }
 
+// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=latin1 setlocal noendofline binary
 ?>
