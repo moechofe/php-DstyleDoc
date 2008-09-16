@@ -7,20 +7,12 @@ h2 { font-family: georgia, serif; font-size: 21px; }
 p, li { font-family: arial, "sans serif"; font-size: 13px; line-height: 20px; }
 
 #page-header { position: absolute; top: 0px; left: 0px; width: 100%; height: 40px; }
-#page-header div.frame { background: rosybrown; border-bottom: solid 2px maroon; }
-#page-header h2 { font-weight: normal; color: white; margin: 0px; line-height: 38px; padding: 0px 10px; }
 
 #page-browser { position: absolute; top: 40px; left: 0px; width: 300px; }
 #page-browser div.frame {  }
 
 #page-content { position: absolute; top: 40px; left: 300px; }
 #page-footer { clear: left; }
-
-/**
- * Les styles de texte generaux
- */
-#page-content p.summary
-{ margin-top: 0px; }
 
 div.content-display h1 { font-weight: normal; }
 
@@ -38,12 +30,23 @@ span.display-class.class { background-image: url("Icon_class.png"); }
 span.display-class.class-abstract { background-image: url("Icon_class_abstract.png"); }
 span.display-class.class-final { background-image: url("Icon_class_final.png"); }
 
+h1 span.display { background: inherit !important; padding-left: 0px !important; }
+
+/**
+ * Le design pour l'entete
+ */
+#page-header div.frame { background: rosybrown; border-bottom: solid 2px maroon; }
+#page-header h2.logo { font-weight: normal; color: white; margin: 0px; line-height: 38px; padding: 0px 10px; }
+#page-header h2.logo a { text-decoration: none; color: white; }
+
+/*********************************************** sandybrown */
+
 /**
  * Le design de la partie contenu
  */
 #page-content div.page-annotation { padding-left: 30px; }
-#page-content div.page-annotation p { float: left; background: maroon; color: burlywood; margin: 0px; padding: 1px 3px; font-style: italic; }
-#page-content div.page-annotation a { color: sandybrown; }
+#page-content div.page-annotation p { font-size: 11px; line-height: 13px; float: left; background: maroon; color: burlywood; margin: 0px; padding: 1px 3px; font-style: italic; }
+#page-content div.page-annotation a { color: burlywood; }
 #page-content div.page-annotation span.display { background: inherit !important; padding-left: 0px !important; }
 #page-content div.page-content { clear: left; padding: 10px 20px 40px 30px; }
 #page-content div.page-content h1 span.display { background: inherit !important; padding-left: 0px !important; }

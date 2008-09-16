@@ -105,7 +105,7 @@ class DstyleDoc extends DstyleDoc_Properties
       foreach( $files as $file )
         $this->source = $file;
   }
-  
+
   protected function get_sources()
   {
     return $this->_sources;
@@ -187,7 +187,7 @@ HTML;
 <div style='background:YellowGreen;color:white;padding:1px 3px;'>{$d}</div>
 <div style='clear:both'></div>
 HTML;
-      }      
+      }
 
       if( ! $current instanceof DstyleDoc_Token_Custom )
       {
@@ -232,7 +232,7 @@ HTML;
   // {{{ $config
 
   protected $_config = array(
-   
+
     'dstyledoc' => true,
     'version' => true,
     'history' => true,
@@ -246,7 +246,7 @@ HTML;
 
     'element_link' => true,
     'href_link' => true,
-   
+
     'javadoc' => true,
     'javadoc_version' => true,
     'javadoc_history' => true,
@@ -283,7 +283,7 @@ HTML;
     elseif( substr((string)$property,0,4)!=='get_' )
       return parent::__get( (string)$property );
     else
-      throw new BadPropertyException($this, substr((string)$property,4) );      
+      throw new BadPropertyException($this, substr((string)$property,4) );
   }
 
   // }}}
@@ -308,90 +308,6 @@ HTML;
  */
 interface DstyleDoc_Converter_Convert
 {
-  // {{{ method_exists()
-
-  /**
-   * Renvoie une méthode si elle existe.
-   * Params:
-   *    string $class = Le nom de la classe ou de l'interface.
-   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
-   *    string $member = Le nom de la méthode.
-   * Returns:
-   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
-   *    false = En cas d'échèc.
-   */
-  function method_exists( $class, $method );
-
-  // }}}
-  // {{{ function_exists()
-
-  /**
-   * Renvoie une fonction si elle existe.
-   * Params:
-   *    string $function = Le nom de la fonction.
-   * Returns:
-   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
-   *    false = En cas d'échèc.
-   */
-  function function_exists( $function );
-
-  // }}}
-  // {{{ member_exists()
-
-  /**
-   * Renvoie un membre si il existe.
-   * Params:
-   *    string $class = Le nom de la classe ou de l'interface.
-   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
-   *    string $member = Le nom du membre.
-   * Returns:
-   *    DstyleDoc_Element_Member = L'instance du membre en cas de succès.
-   *    false = En cas d'échèc.
-   */
-  function member_exists( $class, $member );
-
-  // }}}
-  // {{{ constant_exists()
-
-  /**
-   * Renvoie une constante si elle existe.
-   * Params:
-   *    string $class = Le nom de la classe ou de l'interface.
-   *    DstyleDoc_Element_Member, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
-   *    null $class = La constante est globale.
-   *    string $constant = Le nom de la constante.
-   * Returns:
-   *    DstyleDoc_Element_Constant = L'instance de la constance en case de succès.
-   *    false = En cas d'èchec.
-   */
-  function constant_exists( $class, $constant );
-
-  // }}}
-  // {{{ get_classes()
-
-  // }}}
-  // {{{ get_all_classes()
-
-  /**
-   * Renvoie la liste de toutes les classes.
-   * Returns:
-   *   array(DstyleDoc_Element_Class) = Un tableau de classe.
-   */
-  function get_all_classes();
-
-  // }}}
-  // {{{ get_file_classes()
-
-  /**
-   * Renvoie la liste des classes appartenant à un fichier donnée.
-   * Params:
-   *    $file = L'instance d'un élément de fichier.
-   * Return:
-   *    array(DstyleDoc_Element_Class) = Un tableau de classe.
-   */
-  function get_file_classes( DstyleDoc_Element_File $file );
-
-  // }}}
   // {{{ get_file_interfaces()
 
   /**
@@ -572,7 +488,7 @@ interface DstyleDoc_Converter_Convert
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
-   function convert_display( $name, DstyleDoc_Element $element );   
+   function convert_display( $name, DstyleDoc_Element $element );
 
   // }}}
   // {{{ convert_syntax()
@@ -694,7 +610,7 @@ interface DstyleDoc_Converter_Convert
  * Convertisseur abstrait
  * Todo:
  *    - reporter set_method() dans les autres methode de ce genre.
- * Todo: gérer les constantes
+ * Todo: gÃ©rer les constantes
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements ArrayAccess
 {
@@ -755,7 +671,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
     else
       return current($this->_files);
   }
- 
+
   protected function get_files()
   {
     return $this->_files;
@@ -800,7 +716,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
     else
       return current($this->_classes);
   }
- 
+
   protected function get_classes()
   {
     return $this->_classes;
@@ -882,7 +798,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
       end($this->_functions);
     }
   }
-  
+
   protected function get_function()
   {
     if( ! count($this->_functions) )
@@ -928,7 +844,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
       end($this->_methods);
     }
   }
-  
+
   protected function get_method()
   {
     if( ! count($this->_methods) )
@@ -974,7 +890,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
       end($this->_members);
     }
   }
-  
+
   protected function get_member()
   {
     if( ! count($this->_members) )
@@ -995,12 +911,13 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // {{{ file_exists()
 
   /**
-   * Renvoie une fonction si elle existe.
+   * Renvoie un fichier si il existe.
+   * Cherche si un fichier a Ã©tÃ© ajoutÃ© dans la liste $_classes. Si il existe, file_exists() retournera l'instance de DstyleDoc_Element_File correspondante, sinon retournera false.
    * Params:
-   *    string $file = Le nom de la fonction à chercher.
+   *    string $file = Le chemin du fichier a chercher.
    * Returns:
-   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
-   *    false = En cas d'échèc.
+   *    DstyleDoc_Element_File = L'instance du en cas de succÃ¨s.
+   *    false = En cas d'Ã©chec.
    */
   public function file_exists( $file )
   {
@@ -1036,14 +953,14 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ interface_exists()
 
-  // Todo: propager la vérif strtolower sur les autres fonction de ce type
+  // Todo: propager la vÃ©rif strtolower sur les autres fonction de ce type
   /**
    * Renvoie une interface si elle existe.
    * Params:
-   *    string $interface = Le nom de la interface à chercher.
+   *    string $interface = Le nom de la interface Ã  chercher.
    * Returns:
-   *    DstyleDoc_Element_Interface= L'instance de la interface en cas de succès.
-   *    false = En cas d'échèc.
+   *    DstyleDoc_Element_Interface= L'instance de la interface en cas de succÃ¨s.
+   *    false = En cas d'Ã©chec.
    */
   public function interface_exists( $interface )
   {
@@ -1058,6 +975,16 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ method_exists()
 
+  /**
+   * Renvoie une mÃ©thode si elle existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   *    string $member = Le nom de la mÃ©thode.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succÃ¨s.
+   *    false = En cas d'Ã©chec.
+   */
   public function method_exists( $class, $method )
   {
     $found = false;
@@ -1090,6 +1017,14 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ function_exists()
 
+  /**
+   * Renvoie une fonction si elle existe.
+   * Params:
+   *    string $function = Le nom de la fonction.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succÃ¨s.
+   *    false = En cas d'Ã©chec.
+   */
   public function function_exists( $function )
   {
     foreach( $this->_functions as $value )
@@ -1103,6 +1038,16 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ member_exists()
 
+  /**
+   * Renvoie un membre si il existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   *    string $member = Le nom du membre.
+   * Returns:
+   *    DstyleDoc_Element_Member = L'instance du membre en cas de succÃ¨s.
+   *    false = En cas d'Ã©chec.
+   */
   public function member_exists( $class, $member )
   {
     $found = false;
@@ -1136,6 +1081,17 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ constant_exists()
 
+  /**
+   * Renvoie une constante si elle existe.
+   * Params:
+   *    string $class = Le nom de la classe ou de l'interface.
+   *    DstyleDoc_Element_Member, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
+   *    null $class = La constante est globale.
+   *    string $constant = Le nom de la constante.
+   * Returns:
+   *    DstyleDoc_Element_Constant = L'instance de la constance en case de succÃ¨s.
+   *    false = En cas d'Ã©chec.
+   */
   public function constant_exists( $class, $constant )
   {
     $found = false;
@@ -1172,6 +1128,13 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ get_file_classes()
 
+  /**
+   * Renvoie la liste des classes appartenant Ã  un fichier donnÃ©e.
+   * Params:
+   *    $file = L'instance d'un Ã©lÃ©ment de fichier.
+   * Return:
+   *    array(DstyleDoc_Element_Class) = Un tableau de classe.
+   */
   public function get_file_classes( DstyleDoc_Element_File $file )
   {
     $classes = array();
@@ -1236,7 +1199,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   {
     // un membre
     if( strpos($string, '$') and $part = preg_split('/(::|->)/', $string) and isset($part[1]) and $member = $this->member_exists( $part[0], $part[1] ) )
-      return $member; 
+      return $member;
 
     // une methode
     elseif( substr($string,-2) == '()' and $part = preg_split('/(::|->)/', substr($string,0,-2)) and isset($part[1]) and $method = $this->method_exists( $part[0], $part[1] ) )

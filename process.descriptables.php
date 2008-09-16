@@ -24,7 +24,7 @@ class DstyleDoc_Descritable extends DstyleDoc_Properties
 
   protected $_content = '';
 
-  protected function set_content( $content ) 
+  protected function set_content( $content )
   {
     $this->_content = $content;
   }
@@ -186,10 +186,12 @@ final class DstyleDoc_Descritable_Analysable_Replace extends DstyleDoc_Propertie
 
 // todo c'est beaucoup le bordel cette partie
 // on car on cherche pas les element dans l'ordre dans lequel on les trouve mais dans un ordre de type
-// et comme la fonction est recusrive. 
+// et comme la fonction est recusrive.
 // $content est une reference
 class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 {
+  // {{{ result()
+
   static private function result( $content, $offset, $link, $length, DstyleDoc_Custom_Element $element )
   {
     $return = new DstyleDoc_Descritable_Analysable_Replace;
@@ -207,6 +209,9 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
     }
     return $return;
   }
+
+  // }}}
+  // {{{ analyse()
 
   static public function analyse( $content, DstyleDoc_Custom_Element $element )
   {
@@ -226,7 +231,7 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
     }
 
     // search for function or method without the object, class or interface reference
-    // faut-il ajouter l'option /S ? 
+    // faut-il ajouter l'option /S ?
     // (?<!::|->)\b[-_\pLpN]+\(\)\B
     if( preg_match( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/', $content, $match, PREG_OFFSET_CAPTURE ) )
     {
@@ -243,7 +248,7 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
       if( $found = $element->converter->method_exists( $match[1][0], $match[2][0] ) )
         return self::result( $content, $match[0][1], $found->link, strlen($match[0][0]), $found );
     }
-    
+
     // search for a member
     // (?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b
     if( preg_match( '/(?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b/', $content, $match, PREG_OFFSET_CAPTURE ) )
@@ -267,6 +272,8 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 
     return false;
   }
+
+  // }}}
 }
 
 /**
@@ -276,7 +283,7 @@ class DstyleDoc_Descritable_PHP_Code extends DstyleDoc_Descritable
 {
   // {{{ $content
 
-  protected function set_content( $content ) 
+  protected function set_content( $content )
   {
     if( $content )
       $this->_content = $content;

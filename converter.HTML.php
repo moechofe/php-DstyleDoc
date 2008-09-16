@@ -43,7 +43,7 @@ HTML;
   // }}}
   // {{{ convert_display()
 
-  public function convert_display( $name, DstyleDoc_Element $element )
+  public function convert_display( $name, DstyleDoc_Custom_Element $element )
   {
     return (string)htmlspecialchars( $name );
   }

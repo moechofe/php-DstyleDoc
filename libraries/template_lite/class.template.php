@@ -79,8 +79,8 @@ class Template_Lite {
 	var $_cache_dir		= "";		// stores where this specific file is going to be cached
 	var $_cache_info	= array('config' => array(), 'template' => array());
 	var $_sl_md5		= '39fc70570b8b60cbc1b85839bf242aff';
-	var $_version		= 'V2.10 Template Lite 4 January 2007  (c) 2005-2007 Mark Dickenson. All rights reserved. Released LGPL.';
-	var $_version_date	= "2007-01-04 10:34:21";
+	var $_version		= 'V2.10.mm Modified Version Template Lite 4 September 2008  (c) 2005-2007 Mark Dickenson. 2008 Martin Mauchauffee.  All rights reserved. Released LGPL.';
+	var $_version_date	= "2008-09-16 12:34:21";
 	var $_config_module_loaded = false;
 	var $_templatelite_debug_info	= array();
 	var $_templatelite_debug_loop	= false;
@@ -535,8 +535,8 @@ class Template_Lite {
 
 		$name = ($this->encode_file_name) ? md5((($this->_resource_type == 1) ? $this->template_dir.$file : $this->_resource_type . "_" . $file)).'.php' : str_replace(".", "_", str_replace("/", "_", $this->_resource_type . "_" . $file)).'.php';
 
-		$this->_error_level = $this->debugging ? error_reporting() : error_reporting(error_reporting() & ~E_NOTICE);
-//		$this->_error_level = error_reporting(E_ALL);
+		//$this->_error_level = $this->debugging ? error_reporting() : error_reporting(error_reporting() & ~E_NOTICE);
+		$this->_error_level = error_reporting(E_ALL);
 
 		if (!$this->force_compile && $this->cache && $this->_is_cached($file, $cache_id))
 		{
@@ -742,7 +742,8 @@ class Template_Lite {
 		fclose($f);
 
 		ob_start();
-		eval(' ?>' . $output . '<?php ');
+		include( $this->compile_dir.'c_'.$name );
+		/* eval(' ?>' . $output . '<?php ');*/
 		$output = ob_get_contents();
 		ob_end_clean();
 		return $output;

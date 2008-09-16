@@ -44,6 +44,16 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
     return $this->converter->convert_description( $this->_descriptions, $this );
   }
 
+  protected function isset_descriptions()
+  {
+    return (boolean)$this->_descriptions;
+  }
+
+  protected function unset_descriptions()
+  {
+    $this->_descriptions = array();
+  }
+
   // }}}
   // {{{ $display
 
@@ -149,7 +159,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected $_version = '';
 
-  protected function set_version( $version ) 
+  protected function set_version( $version )
   {
     $this->_version = $version;
   }
@@ -164,7 +174,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected $_since = '';
 
-  protected function set_since( $since ) 
+  protected function set_since( $since )
   {
     $this->_since = $since;
   }
@@ -181,7 +191,6 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected function set_documentation( $documentation )
   {
-    d( $documentation )->c3->d2->s->label( "class: {$this->__class}, name: {$this->name}" );
     $this->_documentation = (string)$documentation;
   }
 
@@ -235,7 +244,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
     return $this->_historys;
   }
 
-  protected function set_history( $version ) 
+  protected function set_history( $version )
   {
     $this->_historys[] = new DstyleDoc_Element_History_Version( $this->converter, $version );
   }
@@ -447,7 +456,7 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
   }
 
   // }}}
-  // {{{ __construct() 
+  // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $name )
   {
@@ -641,7 +650,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
         foreach( $methods as $value )
           if( $method === $value )
             self::add_uniq_name_methods( $methods, $method );
-  
+
     return $methods;
   }
 
@@ -865,7 +874,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
     return $this->converter->convert_display( $this->name, $this );
   }
 
-  // }}} 
+  // }}}
   // {{{ $convert
 
   protected function get_convert()
@@ -886,7 +895,7 @@ class DstyleDoc_Element_History_Version extends DstyleDoc_Custom_Element
 
   protected $_version = '';
 
-  protected function set_version( $version ) 
+  protected function set_version( $version )
   {
     $this->_version = (string)$version;
   }
@@ -952,7 +961,7 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
     return $this->converter->convert_display( $this->name );
   }
 
-  // }}} 
+  // }}}
   // {{{ $convert
 
   protected function get_convert()
@@ -989,7 +998,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
    * Params:
    *  $param = Le nom de la variable existante ou qui sera créer.
    */
-  protected function set_param( $param ) 
+  protected function set_param( $param )
   {
     $found = false;
     if( ! empty($param) and count($this->_params) )
@@ -1189,14 +1198,14 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
     return $this->converter->convert_display( $this->name.'()', $this );
   }
 
-  // }}} 
+  // }}}
   // {{{ $convert
 
   protected function get_convert()
   {
     if( ! $this->analysed ) $this->analyse();
     return $this->converter->convert_function( $this );
-  } 
+  }
 
   // }}}
 }
@@ -1393,7 +1402,7 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
     return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name.'()', $this );
   }
 
-  // }}} 
+  // }}}
   // {{{ $convert
 
   protected function get_convert()
@@ -1578,7 +1587,7 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
     return $this->converter->convert_display( $this->class->name.($this->static?'::$':'->$').$this->name, $this );
   }
 
-  // }}} 
+  // }}}
   // {{{ $convert
 
   protected function get_convert()
@@ -1624,7 +1633,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
     return $this->_params;
   }
 
-  protected function set_param( $param ) 
+  protected function set_param( $param )
   {
     $this->_params[] = (object)$param;
   }
@@ -1642,7 +1651,76 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
     return $this->converter->convert_display( (string)$syntax, $this );
   }
 
-  // }}} 
+  // }}}
+  // {{{ $returns
+
+  /**
+   * La liste des valeurs de retour d'une syntaxe.
+   * Types:
+   *    array(DstyleDoc_Element_Return) = Un tableau contenant des instances de valeur de retour.
+   */
+  protected $_returns = array();
+
+  /**
+   * Ajoute un nouvelle ou séléctionne une valeur déjà éxistante.
+   * La valeur ainsi séléctionné peut être récupérer avec get_return().
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Params:
+   *    string $return = Le type de la valeur retourné.
+   *    DstyleDoc_Element_Return = Une instance d'une valeur de retour.
+   */
+  protected function set_return( $return )
+  {
+    $found = false;
+    if( ! empty($return) and count($this->_returns) )
+    {
+      reset($this->_returns);
+      while( true)
+      {
+        $current = current($this->_returns);
+        if( $found = ( (is_object($return) and $current === $return)
+          or (is_string($return) and $current->type === strtolower($return)) ) or false === next($this->_returns) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $return instanceof DstyleDoc_Element_Return )
+        $this->_returns[] = $return;
+      else
+        $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, $return );
+      end($this->_returns);
+    }
+  }
+
+  /**
+   * Renvoie l'instance de la valeur de retour précedement séléctionner ou ajouté avec set_return().
+   * Si aucune valeur de retour n'a été ajouté avant, une fausse valeur de retour sera retournée.
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Returns:
+   *    DstyleDoc_Element_Return = L'instance de la valeur de retour.
+   */
+  protected function get_return()
+  {
+    if( ! count($this->_returns) )
+    {
+      $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, null );
+      return end($this->_returns);
+    }
+    else
+      return current($this->_returns);
+  }
+
+  protected function get_returns()
+  {
+    if( empty($this->_returns) )
+      return $this->function->returns;
+    else
+      return $this->_returns;
+  }
+
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $syntax )
@@ -1673,7 +1751,7 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 
   protected $_name = '';
 
-  protected function set_name( $name ) 
+  protected function set_name( $name )
   {
     $this->_name = strtolower((string)$name);
   }
@@ -1691,7 +1769,7 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
     return $this->converter->convert_display( $this->name, $this );
   }
 
-  // }}} 
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $exception )
@@ -1720,7 +1798,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected $_types = array();
 
-  protected function set_types( $types ) 
+  protected function set_types( $types )
   {
     $this->_types = (array)$types;
   }
@@ -1730,7 +1808,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
     return $this->_types;
   }
 
-  protected function set_type( $type ) 
+  protected function set_type( $type )
   {
     if( ! empty($type) )
     {
@@ -1744,7 +1822,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected $_var = '';
 
-  protected function set_var( $var ) 
+  protected function set_var( $var )
   {
     $this->_var = strtolower((string)$var);
   }
@@ -1759,7 +1837,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected $_default = null;
 
-  protected function set_default( $default ) 
+  protected function set_default( $default )
   {
     $this->_default = strtolower((string)$default);
   }
@@ -1785,10 +1863,10 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_display( '$'.$var, $this );
+    return $this->converter->convert_display( '$'.$this->var, $this );
   }
 
-  // }}} 
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $var )
@@ -1832,45 +1910,46 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
   // {{{ $type
 
   private $types = array(
-    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource', 'false', 'true' );
+    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource', 'false', 'true', 'scalar', 'float', 'long', 'double', 'integer' );
 
-  protected $_types = array();
+  protected $_type = null;
 
   protected function set_type( $type )
   {
-    $this->_types[] = strtolower((string)$type);
+    $this->_type = (string)$type;
   }
 
   protected function get_type()
   {
     $types = array();
-    foreach( $this->_types as $key => $value )
+
+    if( ($found = $this->converter->search_element($value)) instanceof DstyleDoc_Element_Function )
     {
-      if( ($found = $this->converter->search_element( $value )) instanceof DstyleDoc_Element_Function )
+      if( ! $found->analysed ) $found->analyse();
+      foreach( $found->returns as $v )
       {
-        if( ! $found->analysed ) $found->analyse();
-        $returns = $found->returns;
-        foreach( $returns as $v )
-          $v->from = $found;
+	$v = clone $v;
+	$v->from = $found;
+      }
+      $types[] = $v;
+    }
+    elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
+      $types[] = $found;
+    elseif( $found instanceof DstyleDoc_Element_Member )
+    {
+      if( ! $found->analysed ) $found->analyse();
+      $tmp = $found->types;
+      foreach( $tmp as $v )
+      {
+        $v->from = $found;
         $types[] = $v;
       }
-      elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
-        $types[] = $found;
-      elseif( $found instanceof DstyleDoc_Element_Member )
-      {
-        if( ! $found->analysed ) $found->analyse();
-        $tmp = $found->types;
-        foreach( $tmp as $v )
-        {
-          $v->from = $found;
-          $types[] = $v;
-        }
-      }
-      elseif( ! in_array(strtolower($value), $this->types) )
-        unset($this->_types[$key]);
-      else
-        $types[] = $value;
     }
+    elseif( ! in_array(strtolower($value), $this->types) )
+      unset($this->_types[$key]);
+    else
+      $types[] = $value;
+
     if( count($types)===1 )
       return $types[0];
 

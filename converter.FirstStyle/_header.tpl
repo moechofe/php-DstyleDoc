@@ -1,3 +1,3 @@
   <div class="header-content"><div class="frame"><div class="content">
-    <h2 class="logo"><span>{#logo#}</span></h2>
+    <h2 class="logo"><a href="?"><span>{#logo#}</span></a></h2>
   </div></div></div>

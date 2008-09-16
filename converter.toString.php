@@ -22,8 +22,8 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
 {$this->either($file->functions,'<dt>functions</dt><dd><ul>'.$this->forall($file->functions,'<li>$value->link</li>').'</ul></dd>')}
 </dl>
 HTML;
-      
-      
+
+
       (string)$file->file;
   }
 
@@ -432,5 +432,4 @@ HTML;
   // }}}
 }
 
-// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary
 ?>

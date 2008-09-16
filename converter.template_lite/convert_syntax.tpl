@@ -1,1 +1,1 @@
-{$_syntax.function.class.name}{if $_syntax.function.static}::{else}-&gt;{/if}{$_syntax.function.name}( {section name=index loop=$_syntax.param}{if ! $templatelite.section.index.first},{/if}{$_syntax.param[$index].var}{/section}
+{$_syntax.function.class.name}{if $_syntax.function.static}::{else}-&gt;{/if}{$_syntax.function.name}( {section name=param loop=$_syntax.params}{if ! $templatelite.section.param.first}, {/if}{$_syntax.params[param]}{/section} )

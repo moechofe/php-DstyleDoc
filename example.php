@@ -20,56 +20,37 @@ DstyleDoc::hie()
   ->source( 'example.php' )
   ->convert_with( new DstyleDoc_Converter_toString() );
 
+/**
+ * Returns:
+ *   resource, null = Une ressource ou pas.
+ */
+function test_multiple_type()
+{
+}
 
 /**
- * Classe de prise en charge des surcharges des membres.
- * Permet d'utiliser facilement des getter, setter, issetter, unsetter et caller.
+ * Returns:
+ *   array = Retourne un tableau
  */
-class DstyleDoc_Propertiesa
+function test_indirect_return()
 {
-  protected function __get( $property )
-  {
-    if( $property === '__class' )
-      return get_class( $this );
-
-    elseif( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
-      throw new BadPropertyException($this, (string)$property);
-
-    return call_user_func( array($this,'get_'.(string)$property) );
-  }
-
-  protected function __set( $property, $value )
-  {
-    if( ! method_exists($this,'set_'.(string)$property) or ! is_callable( array($this,'set_'.(string)$property) ) )
-      throw new BadPropertyException($this, (string)$property);
-
-    call_user_func( array($this,'set_'.(string)$property), $value );
-  }
-
-  protected function __isset( $property )
-  {
-    if( ! method_exists($this,'isset_'.(string)$property) or ! is_callable( array($this,'isset_'.(string)$property) ) )
-      throw new BadPropertyException($this, (string)$property);
-
-    return call_user_func( array($this,'isset_'.(string)$property) );
-  }
-
-  protected function __unset( $property )
-  {
-    if( ! method_exists($this,'unset_'.(string)$property) or ! is_callable( array($this,'unset_'.(string)$property) ) )
-      throw new BadPropertyException($this, (string)$property);
-
-    call_user_func( array($this,'unset_'.(string)$property) );
-  }
-
-  protected function __call( $method, $arguments )
-  {
-    if( ! method_exists($this,'call_'.(string)$method) or ! is_callable( array($this,'call_'.(string)$method) ) )
-      throw new BadMethodCallException;
-
-    return call_user_func_array( array($this,'call_'.(string)$method), $arguments );
-  }
 }
+
+function test_direct_return()
+{
+  return 123;
+}
+
+function test_return()
+{
+  return 'string'.'string';
+  return false;
+  return test_direct_return();
+  return test_indirect_return();
+  return test_multiple_type();
+}
+
+__halt_compiler();
 
 class a
 {
@@ -101,7 +82,7 @@ class b extends a
 /**
  * documentation pour aa()
  * Syntax:
- *    integer $a, [$b] = Call with an integer
+ *    false, string = (integer $a, [$b]) = Call with an integer
  *    and with a documentation on two line
  *    or more
  *    string $a = Call with a string
@@ -140,8 +121,6 @@ $a = null;
 $a = " string {$a} string ${a} ";
 
 
-__halt_compiler();
-
 /**
  * Template de donnée de type <b>squelette tamsuft</b>.
  *
@@ -173,13 +152,13 @@ __halt_compiler();
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * }}} //-->
- * 
+ *
  * @author Martin Mauchauff&eacute;e <tamsuft@moechofe.com>
  * @copyright Copyright (c) 2005-2008, martin mauchauff&eacute;e <tamsuft@moechofe.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD
  * @package tamsuft
  * @subpackage template
- * @version 0.1.395 
+ * @version 0.1.395
  */
 
 /**
@@ -240,7 +219,7 @@ interface tag_compiled_interface
    * @version 0.1.5
    */
   static function hie( $tag, $start, $offset, $end, $tamsuft );
- 
+
   // }}}
 }
 
@@ -416,11 +395,11 @@ class tamsuft_template
 
   /**
    * Expression rationel qui valide les tags d'inclusions.
-   * 
+   *
    * <code>
    * ==+# +include +(?:([-\@\?:\.\w_\/]+)|"(.*?(?<!\\))"|<\[CDATA\[((?s).*)\]\]>) +#+=+=
    * </code>
-   * 
+   *
    * @var string
    */
   const pcre_tag = '/%s#+ include +(?:([-\\@\\?\\:\\.\\w_\\/]+)|"(.*?(?<!\\\\))"|<\\[CDATA\\[((?s).*)\\]\\]>) +#+%s/';
@@ -432,10 +411,10 @@ class tamsuft_template
    * Le nom de la classe.
    *
    * @var string
-   * @version 0.1.1 
+   * @version 0.1.1
    */
   static private $_hie = __CLASS__;
-  
+
   // }}}
   // {{{ get_hie()
 
@@ -529,7 +508,7 @@ class tamsuft_template
     return $a or $b;
     return $a xor $b;
   }
-  
+
   // }}}
   // {{{ set_hie()
 
@@ -550,7 +529,7 @@ class tamsuft_template
 
     $this->_hie = (string) $class_name;
   }
-  
+
   // }}}
   // {{{ hie()
 
@@ -582,7 +561,7 @@ class tamsuft_template
       throw $e->back(1);
     }
   }
-  
+
   // }}}
   // {{{ __construct()
 
@@ -613,10 +592,10 @@ class tamsuft_template
     $tamsuft->template = $this;
     }
   }
-  
+
   // }}}
   // {{{ $_untransformed
-  
+
   /**
    * Liste des balises non transformées.
    *
@@ -677,7 +656,7 @@ class tamsuft_template
 
   // }}}
   // {{{ $_transformed
-  
+
   /**
    * Liste des balises transformées.
    *
@@ -768,7 +747,7 @@ class tamsuft_template
       unset( $this->_untransformed[$tag->offset] );
 
     if( isset($e) )
-      throw $e; 
+      throw $e;
   }
 
   // }}}
@@ -886,14 +865,14 @@ class tamsuft_template
 
   /**
    * Le cache des sources de la donnée
-   * 
+   *
    * @var source_memory
    */
   protected $_cache = null;
 
   // }}}
   // {{{ compile_to()
-  
+
   /**
    * Compile le squelette .
    *
@@ -1107,8 +1086,8 @@ class tamsuft_template
             restore_exception_handler();
           }
 
-          // on compile la balise avec une chaine vide 
-          $compile->add_child( $offset, 0, null, null, $this, $this->tamsuft ); 
+          // on compile la balise avec une chaine vide
+          $compile->add_child( $offset, 0, null, null, $this, $this->tamsuft );
           $this->transformed = $tag;
         }
       }
@@ -1133,7 +1112,7 @@ class tamsuft_template
         $index += 1;
     }
   }
-  
+
   // }}}
   // {{{ get_code()
 
@@ -1141,7 +1120,7 @@ class tamsuft_template
    * Retourne la source complète du squelette.
    *
    * {{important}} Ne pas appeler cette méthode directement. Utiliser la propriété {@link $code} à la place.
-   * 
+   *
    * Si des squelettes inclus ont été trouvés pendant la phase d'analyse, ils seront ajouter physiquement dans le resultat de cette méthode.
    *
    * @return string
@@ -1157,7 +1136,7 @@ class tamsuft_template
       // si les données sont déjà dans le cache
       if( ! is_null($this->_cache) )
         return $this->_cache;
-      
+
       $source = parent::get_data();
       krsort( $this->_childs );
 
@@ -1251,7 +1230,7 @@ class tamsuft_template
   {
     if( ! is_integer($offset) )
       throw new error_arguments('i');
-    
+
     // construit la liste des offsets inferieurs a l'offset donnee.
     $offsets = array();
     foreach( $this->untransformed_tags as $key => $tag )
@@ -1277,9 +1256,9 @@ class tamsuft_template
     if( count($tag_loop) > 0 )
       return $this->untransformed_tags[ end($tag_loop)->get_offset() ];
 
-    return null;    
+    return null;
   }
-  
+
   // }}}
   // {{{ search_near()
 
@@ -1305,7 +1284,7 @@ class tamsuft_template
       throw new error_arguments('i');
 
     $class_name = tag_loop::get_hie();
-    
+
     for(
       $max = max(array_keys($this->untransformed_tags)),
       $index = 0;
@@ -1318,10 +1297,10 @@ class tamsuft_template
       elseif( isset($this->untransformed_tags[$offset+$index])
         and is_subclass_of($this->untransformed_tags[$offset+$index], $class_name ) )
         return $this->untransformed_tags[$offset+$index];
-  
+
     return null;
   }
-  
+
   // }}}
   // {{{ search_childs()
 
@@ -1432,7 +1411,7 @@ class tamsuft_template
    *   template_tamsuft::make_source( 'dir/dir/file.tpl', null, $tamsuft );
    * ?>
    * </code>
-   *   
+   *
    * <h3>Instancier une source à partir d'une donnée directe :</h3>
    * <code>
    * <?php
@@ -1453,7 +1432,7 @@ class tamsuft_template
     if( ( ! is_string($address) and ! is_null($address) )
       or ( ! is_string($address) and ! is_null($adress) )
       or ! $tamsuft instanceof tamsuft )
-        throw new error_arguments('s/es/e(tamsuft)'); 
+        throw new error_arguments('s/es/e(tamsuft)');
 
     if( is_string($address) )
     {
@@ -1467,7 +1446,7 @@ class tamsuft_template
     }
 
     if( is_string($source) )
-    { 
+    {
       $class_name = self::return_source_class( $tamsuft->config['tamsuft_template']['default_scheme'], $tamsuft );
       $source = call_user_func( array( $class_name, 'hie' ), null, $source, null, $tamsuft );
 
@@ -1485,7 +1464,7 @@ class tamsuft_template
 
   /**
    * Fabrique une adresse pour une instance de {@link template_tamsuft}.
-   * 
+   *
    * Retourne une chaine de caractère contenant un chemin vers la source de la donnée.
    *
    * @param string,tamsuft_template Une chaine de caratère contenant une adress ou un instance de {@link tamsuft_template}.
@@ -1597,7 +1576,7 @@ abstract class tamsuft_reference_template extends tamsuft_template
  *
  * @version 0.1.18
  */
-class template_searched implements template_searched_interface  
+class template_searched implements template_searched_interface
 {
   // {{{ $_template
 
@@ -1719,26 +1698,26 @@ class template_searched implements template_searched_interface
    * Le nom de la classe.
    *
    * @var string
-   * @version 0.1.1 
+   * @version 0.1.1
    */
   static private $_hie = __CLASS__;
-  
+
   // }}}
   // {{{ get_hie()
 
   /**
-   * @version 0.1.1 
+   * @version 0.1.1
    */
   static public function get_hie()
   {
     return self::$_hie;
   }
-  
+
   // }}}
   // {{{ set_hie()
 
   /**
-   * @version 0.1.1 
+   * @version 0.1.1
    */
   static public function set_hie( $class_name )
   {
@@ -1747,7 +1726,7 @@ class template_searched implements template_searched_interface
 
     $this->_hie = (string) $class_name;
   }
-  
+
   // }}}
   // {{{ hie()
 
@@ -1765,9 +1744,9 @@ class template_searched implements template_searched_interface
       throw new error_arguments('(template_include)i');
 
     $class_name = self::get_hie();
-    return new $class_name( $template, $offset ); 
+    return new $class_name( $template, $offset );
   }
-  
+
   // }}}
   // {{{ __construct()
 
@@ -1811,7 +1790,7 @@ class template_searched implements template_searched_interface
 class tag_compiled implements tag_compiled_interface
 {
   // {{{ $_hie
-   
+
   /**
    * Le nom de la classe.
    *
@@ -1882,7 +1861,7 @@ class tag_compiled implements tag_compiled_interface
       throw $e->back(1);
     }
   }
- 
+
   // }}}
   // {{{ $_tag
 
@@ -2230,8 +2209,8 @@ class error_tamsuft_template_uncompiled_tag extends RuntimeException
     parent::__construct( $template, $offset );
   }
 
-  // }}} 
-} 
+  // }}}
+}
 
 /**
  * Exception de plugin d'application inexistant.
@@ -2287,11 +2266,11 @@ class error_template_tamsuft_unexists_plugin extends RuntimeException
     }
   }
 
-  // }}} 
+  // }}}
 }
 
 /**
- * Exception 
+ * Exception
 
 /**
  * Exception de fichier de squelette inexistant.
@@ -2516,7 +2495,7 @@ class error_tamsuft_template_analyse_unclosed extends UnexpectedValueException
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * }}} //-->
- * 
+ *
  * @author Martin Mauchauff&eacute;e <tamsuft@moechofe.com>
  * @copyright Copyright (c) 2005-2008, martin mauchauff&eacute;e <tamsuft@moechofe.com>
  * @license http://www.opensource.org/licenses/bsd-license.php BSD
@@ -2541,7 +2520,7 @@ function folderization( $thing )
 
 /**
  * Supprime les './' en trops
- * 
+ *
  * @param string
  * @return string
  * @version 0.1.1
@@ -2581,7 +2560,7 @@ function relativation( $base, $thing, $length = null )
   if( strpos( unixization($thing), $base = unixization($base) ) === 0 )
   {
     if( is_null($length) )
-      $length = strlen($base); 
+      $length = strlen($base);
     $result = substr( unixization($thing), (integer)$length );
     if( $result[0] <> '/' )
       return './'.$result;
@@ -2670,7 +2649,7 @@ abstract class application extends error_tamsuft_template_analyse_unclosed imple
 
     parent::register( __CLASS__, $name, $tamsuft );
   }
-  
+
   // }}}
   // {{{ load()
 
@@ -2737,7 +2716,7 @@ abstract class application extends error_tamsuft_template_analyse_unclosed imple
 
 /**
  * Par à la recherche des chemins d'accès.
- * 
+ *
  * @ignore
  */
 $tamsuft_dir = dirname(realpath(__FILE__)).'/';

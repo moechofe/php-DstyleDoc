@@ -55,7 +55,6 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   public function convert_syntax( DstyleDoc_Element_Syntax $syntax )
   {
-    d( $syntax );
     $this->tpl->assign( '_syntax', $syntax );
     return $this->tpl->fetch( __CLASS__.':convert_syntax.tpl' );
   }
@@ -142,7 +141,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ convert_display()
 
-  public function convert_display( $name, DstyleDoc_Element $element )
+  public function convert_display( $name, DstyleDoc_Custom_Element $element )
   {
     $this->tpl->assign( array(
       '_name' => parent::convert_display( $name, $element ),
@@ -189,7 +188,6 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   static public function print_methods_index( $params, $tpl )
   {
-    d( $params['class']->methods[0] );
     if( isset($params['class']) and $params['class'] instanceof DstyleDoc_Element_Class )
       $tpl->assign( array(
         '_class' => $params['class'],
@@ -210,7 +208,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   static public function template_get_source( $template, &$source, $tpl )
   {
-    if( ! is_readable( $file = realpath( pathinfo(__FILE__,PATHINFO_FILENAME).'/'.$template ) ) or 
+    if( ! is_readable( $file = realpath( pathinfo(__FILE__,PATHINFO_FILENAME).'/'.$template ) ) or
       ! is_file( $file ) )
       throw new RuntimeException( "template: $template don't exists" );
     else
@@ -328,16 +326,16 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // todo: trouver un moyen pour le charset
   protected function write( $template )
   {
-    set_error_handler( array($this,'error_config_or_not') );
+    //set_error_handler( array($this,'error_config_or_not') );
     if( isset($this->destination_dir) )
     {
     }
     else
     {
-      header( 'Content-type: text/html; charset=utf-8' );
+      if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
       $this->tpl->display( $template );
     }
-    restore_error_handler();
+    //restore_error_handler();
   }
 
   // }}}
@@ -347,7 +345,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   {
     if( $errno == 8 and substr($errstr,0,15)=='Undefined index' )
       echo '#'.substr($errstr,18).'#';
-    else      
+    else
       return false;
   }
 

@@ -161,8 +161,13 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 
   protected function set_documentation( $documentation )
   {
-    if( $documentation instanceof DstyleDoc_Token_Doc_Comment or $documentation instanceof DstyleDoc_Token )
+    if( $documentation instanceof DstyleDoc_Token_Class ) 
+    {
+    }
+    elseif( $documentation instanceof DstyleDoc_Token_Doc_Comment or $documentation instanceof DstyleDoc_Token )
+    {
       $this->set_documentation( $documentation->documentation );
+    }
     elseif( trim((string)$documentation) )
     {
       if( $this->_documentation )

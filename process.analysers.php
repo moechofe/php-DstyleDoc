@@ -215,7 +215,7 @@ class DstyleDoc_Analyser_Version extends DstyleDoc_Analyser
 
   protected $_version = '';
 
-  protected function set_version( $version ) 
+  protected function set_version( $version )
   {
     $this->_version = $version;
   }
@@ -333,7 +333,7 @@ class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser impleme
 
   protected $_version = '';
 
-  protected function set_version( $version ) 
+  protected function set_version( $version )
   {
     $this->_version = $version;
   }
@@ -376,15 +376,15 @@ class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser impleme
 
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    // ^(?:[-+*]\s+)?(?:v|version:?\s*)?(\d.*?)\s*[:=]\s*(?:\s+(.*))$
+    // ^(?:v|version:?\s*)?(\d.*?)\s*[:=]\s*(?:\s+(.*))$
     if( $dsd->dstyledoc and $dsd->history and ($current instanceof DstyleDoc_Analyser_History or $current instanceof DstyleDoc_Analyser_Element_History_List)
-      and preg_match( '/^(?:[-+*]\\s+)?(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]\\s*(?:\\s+(.*))$/', $source, $matches ) )
+      and preg_match( '/^(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]\\s*(?:\\s+(.*))$/', $source, $matches ) )
     {
       $instance = new self( $matches[1], $matches[2] );
       $priority = self::priority;
       return true;
     }
-  
+
     // ^(?:[-+*]\s+)(?:v|version:?\s*)?(\d.*?)\s*[:=]?\s*(?:\s+(.*))$
     elseif( $dsd->dstyledoc and $dsd->history and ($current instanceof DstyleDoc_Analyser_History or $current instanceof DstyleDoc_Analyser_Element_History_List)
       and preg_match( '/^(?:[-+*]\\s+)(?:v|version:?\\s*)?(\\d.*?)\\s*[:=]?\\s*(?:\\s+(.*))$/i', $source, $matches ) )
@@ -482,7 +482,7 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
   protected $_types = '';
 
-  protected function set_types( $types ) 
+  protected function set_types( $types )
   {
     $this->_types = (array)$types;
   }
@@ -502,7 +502,7 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
   protected $_var = '';
 
-  protected function set_var( $var ) 
+  protected function set_var( $var )
   {
     $this->_var = $var;
   }
@@ -546,9 +546,9 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    // ^(?:[-+*]\s+)?(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]\s*(.*)$
+    // ^(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]\s*(.*)$
     if( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-      and preg_match( '/^(?:[-+*]\\s+)?(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+      and preg_match( '/^(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
     {
       $instance = new self( $matches[1], $matches[2], $matches[3] );
       $priority = self::priority;
@@ -664,7 +664,7 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 
   protected $_type = '';
 
-  protected function set_type( $type ) 
+  protected function set_type( $type )
   {
     $this->_type = (string)$type;
   }
@@ -708,26 +708,26 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    // ^(?:[-+*]\s+)?([-_\pLpN]+)\s*[:=]\s*(.*)$
+    // ^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$
     if( $dsd->dstyledoc and $dsd->returns and ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^(?:[-+*]\\s+)?([-_\\pLpN]+)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+      and preg_match( '/^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$/u', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
         return true;
       }
 
-    // ^(?:[-+*]\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
+    // ^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$
     elseif( $dsd->dstyledoc and $dsd->returns and ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^(?:[-+*]\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$/u', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
         return true;
       }
 
-    // ^(?:@returns?\s+)([-_\pLpN]+)\s*[:=]?\s*(.*)$
-    elseif( $dsd->javadoc and $dsd->javadoc_returns and preg_match( '/^(?:@returns?\\s+)([-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    // ^(?:@returns?\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$
+    elseif( $dsd->javadoc and $dsd->javadoc_returns and preg_match( '/^(?:@returns?\\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
@@ -749,8 +749,15 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
   {
     if( $element instanceof DstyleDoc_Element_Function )
     {
-      $element->return = $this->type;
-      $element->return->description = $this->description;
+      foreach( explode(',',$this->type) as $type )
+      {
+	$element->return = trim($type);
+	if( $this->description )
+	{
+	  unset($element->return->descriptions);
+          $element->return->description = $this->description;
+	}
+      }
     }
     return $this;
   }
@@ -777,7 +784,7 @@ class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
 
   protected $_packages = '';
 
-  protected function set_packages( $packages ) 
+  protected function set_packages( $packages )
   {
     $this->_packages = (array)$packages;
   }
@@ -886,7 +893,7 @@ class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implement
 
   protected $_exception = '';
 
-  protected function set_exception( $exception ) 
+  protected function set_exception( $exception )
   {
     $this->_exception = (string)$exception;
   }
@@ -1038,7 +1045,7 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
 
   protected $_syntax = array();
 
-  protected function set_syntax( $syntax ) 
+  protected function set_syntax( $syntax )
   {
     $optional = false;
     foreach( explode(',', $syntax) as $var )
@@ -1226,7 +1233,7 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 
   protected $_type = '';
 
-  protected function set_type( $type ) 
+  protected function set_type( $type )
   {
     $this->_type = (string)$type;
   }
@@ -1385,7 +1392,7 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 
   protected $_code = '';
 
-  protected function set_code( $code ) 
+  protected function set_code( $code )
   {
     $this->_code = (string)$code;
   }
@@ -1459,7 +1466,7 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
 
   protected $_code = '';
 
-  protected function set_code( $code ) 
+  protected function set_code( $code )
   {
     $this->_code = (string)$code;
   }

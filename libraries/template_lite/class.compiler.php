@@ -119,7 +119,7 @@ class Template_Lite_Compiler extends Template_Lite {
 		// |foo:$bar
 		// |foo:"bar":$foobar
 		// |foo|bar
-		$this->_mod_regexp = '(?:\|@?[0-9a-zA-Z_]+(?::(?>-?\w+|' . $this->_dvar_regexp . '|' . $this->_qstr_regexp .'))*)';		
+		$this->_mod_regexp = '(?:\|@?[0-9a-zA-Z_]+(?::(?>-?\w+|' . $this->_dvar_regexp . '|' . $this->_qstr_regexp .'))*)';
 
 		// matches valid function name:
 		// foo123
@@ -136,7 +136,7 @@ class Template_Lite_Compiler extends Template_Lite {
 		$_match		= array();		// a temp variable for the current regex match
 		$tags		= array();		// all original tags
 		$text		= array();		// all original text
-		$compiled_text	= '<?php /* '.$this->_version.' '.strftime("%Y-%m-%d %H:%M:%S %Z").' */ ?>'."\n\n"; // stores the compiled result
+		$compiled_text	= '<?php /* '.$this->_version.' '.strftime("%Y-%m-%d %H:%M:%S %Z").' */ ?>'; // stores the compiled result
 		$compiled_tags	= array();		// all tags and stuff
 
 		$this->_require_stack = array();
@@ -688,7 +688,7 @@ class Template_Lite_Compiler extends Template_Lite {
 			//   just get everything from the $ to the ending space and parse it
 			// if the $ is escaped, then we won't expand it
 			$_result = "";
-			preg_match_all('/(?:[^\\\]' . $this->_dvar_regexp . ')/', substr($variable, 1, -1), $_expand);  // old match 
+			preg_match_all('/(?:[^\\\]' . $this->_dvar_regexp . ')/', substr($variable, 1, -1), $_expand);  // old match
 //			preg_match_all('/(?:[^\\\]' . $this->_dvar_regexp . '[^\\\])/', $variable, $_expand);
 			$_expand = array_unique($_expand[0]);
 			foreach($_expand as $key => $value)
