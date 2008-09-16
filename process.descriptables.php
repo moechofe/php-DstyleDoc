@@ -256,9 +256,8 @@ class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 
     // search for a class
     // (?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)
-    if( preg_match_all( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/', $content, $matches, PREG_OFFSET_CAPTURE ) )
+    if( preg_match_all( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/', $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER ) )
     {
-      d( $matches );
       foreach( $matches as $match )
       {
         if( $found = $element->converter->class_exists( $match[1][0] ) )

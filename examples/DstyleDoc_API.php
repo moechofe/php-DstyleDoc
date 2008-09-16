@@ -17,17 +17,24 @@ DstyleDoc::hie()
     DstyleDoc_Converter_FirstStyle::hie()
       ->template_dir( 'converter.FirstStyle' )
       ->config( array(
-        'skin' => 'rosy',
-        'logo' => 'DstyleDoc API documentation',
 
-        'page_class' => 'Cette page traite de la classe %2$s déclarée dans le fichier %4$s. <a href="#page-browser">Accédez à la navigation</a>.',
-        'page_method' => 'Cette page traite de la méthode %2$s de la classe %4$s déclarée dans le fichier %6$s. <a href="#page-browser">Accédez à la navigation</a>.',
+'skin' => 'rosy',
+'charset' => 'utf-8',
 
-        'files_index_list_header' => 'Liste des fichiers',
-        'classes_index_list_header' => 'Liste des classes déclarées dans le fichier <span class="file">%s</span>',
-        'methods_index_list_header' => 'Liste des méthodes de la classe <span class="class">%s</span>',
+// Texts declarations
+
+'logo' => 'DstyleDoc API documentation',
+
+'page_class' => 'Cette page traite de la classe %2$s dÃ©clarÃ©e dans le fichier %4$s. <a href="#page-browser">AccÃ©dez Ã  la navigation</a>.',
+'page_method' => 'Cette page traite de la mÃ©thode %2$s de la classe %4$s dÃ©clarÃ©e dans le fichier %6$s. <a href="#page-browser">AccÃ©dez Ã  la navigation</a>.',
+
+'files_index_list_header' => 'Liste des fichiers',
+'classes_index_list_header' => 'Liste des classes dÃ©clarÃ©es dans le fichier <span class="file">%s</span>',
+'methods_index_list_header' => 'Liste des mÃ©thodes de la classe <span class="class">%s</span>',
+
       ) )
   
   );
 
+// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary
 ?>

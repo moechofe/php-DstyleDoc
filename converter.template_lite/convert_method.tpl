@@ -11,4 +11,4 @@
   </div>
   <div class="content-description">{$_method.description}</div>
   
-</div></div></div>{* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary *}
+</div></div></div>

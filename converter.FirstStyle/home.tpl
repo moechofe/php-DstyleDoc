@@ -2,8 +2,8 @@
 {include file="_head.tpl"}
 <body id="page-home">
 <div id="page-content">
-{if isset(#page_home#)}{#page_home#}{else}#page_home#{/if}
-{files_index}
+<div class="page-annotation"><p>{if isset(#page_home#)}{#page_home#}{else}#page_home#{/if}</p></div>
+<div class="page-content">{files_index}</div>
 </div>
 <div id="page-footer">
 {include file="_footer.tpl"}

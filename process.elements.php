@@ -181,6 +181,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected function set_documentation( $documentation )
   {
+    d( $documentation )->c3->d2->s->label( "class: {$this->__class}, name: {$this->name}" );
     $this->_documentation = (string)$documentation;
   }
 
@@ -1760,8 +1761,6 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function set_default( $default ) 
   {
-    var_dump( __FUNCTION__ );
-    var_dump( $default );
     $this->_default = strtolower((string)$default);
   }
 
@@ -1777,7 +1776,6 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function set_optional( $optional )
   {
-    d( $optional )->s;
     if( ! $this->_default and $optional )
       $this->_default = true;
   }

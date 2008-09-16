@@ -1,1 +1,1 @@
-{if $_title}<span class="title-{$_type}">{$_title}</span>{/if}{* vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary *}
+{if $_title}<span class="title-{$_type}">{$_title}</span>{/if}

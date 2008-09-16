@@ -2,8 +2,8 @@
 {include file="_head.tpl"}
 <body id="page-class">
 <div id="page-content">
-{if isset(#page_class#)}{#page_class#|string_format:$class.display:$class.link:$class.file.display:$class.file.link}{else}#page_class#{/if}
-{$class}
+<div class="page-annotation"><p>{#page_class#|string_format:$class.display:$class.link:$class.file.display:$class.file.link}</p></div>
+<div class="page-content">{$class}</div>
 <div id="page-footer">
 {include file="_footer.tpl"}
 </div>

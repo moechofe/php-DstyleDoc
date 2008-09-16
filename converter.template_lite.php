@@ -121,7 +121,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ convert_description()
 
-  public function convert_description( $description, DstyleDoc_Element $element )
+  public function convert_description( $description, DstyleDoc_Custom_Element $element )
   {
     $this->tpl->assign( '_description', $description );
     $this->tpl->assign( '_type', strtolower(substr(get_class($element),18)) );
@@ -131,7 +131,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ convert_id()
 
-  public function convert_id( $id )
+  public function convert_id( $id, DstyleDoc_Element $element )
   {
     if( is_array($id) )
       $id = implode(',', $id);
@@ -168,9 +168,12 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   static public function print_classes_index( $params, $tpl )
   {
     if( isset($params['file']) and $params['file'] instanceof DstyleDoc_Element_File )
+    {
       $tpl->assign( array(
         '_file' => $params['file'],
         '_classes' => $params['file']->classes ) );
+      unset($params['file']);
+    }
     elseif( isset($tpl->_vars['file']) and $tpl->_vars['file'] instanceof DstyleDoc_Element_File )
       $tpl->assign( array(
         '_file' => $tpl->_vars['file'],
@@ -186,6 +189,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   static public function print_methods_index( $params, $tpl )
   {
+    d( $params['class']->methods[0] );
     if( isset($params['class']) and $params['class'] instanceof DstyleDoc_Element_Class )
       $tpl->assign( array(
         '_class' => $params['class'],
@@ -321,17 +325,19 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ do()
 
+  // todo: trouver un moyen pour le charset
   protected function write( $template )
   {
-    //set_error_handler( array($this,'error_config_or_not') );
+    set_error_handler( array($this,'error_config_or_not') );
     if( isset($this->destination_dir) )
     {
     }
     else
     {
+      header( 'Content-type: text/html; charset=utf-8' );
       $this->tpl->display( $template );
     }
-    //restore_error_handler();
+    restore_error_handler();
   }
 
   // }}}

@@ -20,6 +20,57 @@ DstyleDoc::hie()
   ->source( 'example.php' )
   ->convert_with( new DstyleDoc_Converter_toString() );
 
+
+/**
+ * Classe de prise en charge des surcharges des membres.
+ * Permet d'utiliser facilement des getter, setter, issetter, unsetter et caller.
+ */
+class DstyleDoc_Propertiesa
+{
+  protected function __get( $property )
+  {
+    if( $property === '__class' )
+      return get_class( $this );
+
+    elseif( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
+      throw new BadPropertyException($this, (string)$property);
+
+    return call_user_func( array($this,'get_'.(string)$property) );
+  }
+
+  protected function __set( $property, $value )
+  {
+    if( ! method_exists($this,'set_'.(string)$property) or ! is_callable( array($this,'set_'.(string)$property) ) )
+      throw new BadPropertyException($this, (string)$property);
+
+    call_user_func( array($this,'set_'.(string)$property), $value );
+  }
+
+  protected function __isset( $property )
+  {
+    if( ! method_exists($this,'isset_'.(string)$property) or ! is_callable( array($this,'isset_'.(string)$property) ) )
+      throw new BadPropertyException($this, (string)$property);
+
+    return call_user_func( array($this,'isset_'.(string)$property) );
+  }
+
+  protected function __unset( $property )
+  {
+    if( ! method_exists($this,'unset_'.(string)$property) or ! is_callable( array($this,'unset_'.(string)$property) ) )
+      throw new BadPropertyException($this, (string)$property);
+
+    call_user_func( array($this,'unset_'.(string)$property) );
+  }
+
+  protected function __call( $method, $arguments )
+  {
+    if( ! method_exists($this,'call_'.(string)$method) or ! is_callable( array($this,'call_'.(string)$method) ) )
+      throw new BadMethodCallException;
+
+    return call_user_func_array( array($this,'call_'.(string)$method), $arguments );
+  }
+}
+
 class a
 {
   /**

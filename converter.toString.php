@@ -35,9 +35,6 @@ HTML;
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
       DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert class: <strong>{$class->display}</strong></span>", true );
 
-    if( $class->name == 'b' )
-      d( $class )->d3;
-
     if( $class->parent )
       $super = $class->parent->link;
     else
@@ -99,8 +96,6 @@ HTML;
   {
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
       DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert function: <strong>{$function->display}</strong></span>", true );
-
-    d( $function )->p3->d3;
 
     return <<<HTML
 <hr /><h1 id="{$function->id}">Function: {$function->display}</h1>

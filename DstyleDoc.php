@@ -308,45 +308,6 @@ HTML;
  */
 interface DstyleDoc_Converter_Convert
 {
-  // {{{ file_exists()
-
-  /**
-   * Renvoie une fonction si elle existe.
-   * Params:
-   *    string $file = Le nom de la fonction à chercher.
-   * Returns:
-   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
-   *    false = En cas d'échèc.
-   */
-  function file_exists( $file );
-
-  // }}}
-  // {{{ class_exists()
-
-  /**
-   * Renvoie une classe si elle existe.
-   * Params:
-   *    string $class = Le nom de la classe à chercher.
-   * Returns:
-   *    DstyleDoc_Element_Class = L'instance de la classe en cas de succès.
-   *    false = En cas d'échèc.
-   */
-  function class_exists( $class );
-
-  // }}}
-  // {{{ interface_exists()
-
-  /**
-   * Renvoie une interface si elle existe.
-   * Params:
-   *    string $interface = Le nom de la interface à chercher.
-   * Returns:
-   *    DstyleDoc_Element_Interface= L'instance de la interface en cas de succès.
-   *    false = En cas d'échèc.
-   */
-  function interface_exists( $interface );
-
-  // }}}
   // {{{ method_exists()
 
   /**
@@ -404,6 +365,19 @@ interface DstyleDoc_Converter_Convert
    *    false = En cas d'èchec.
    */
   function constant_exists( $class, $constant );
+
+  // }}}
+  // {{{ get_classes()
+
+  // }}}
+  // {{{ get_all_classes()
+
+  /**
+   * Renvoie la liste de toutes les classes.
+   * Returns:
+   *   array(DstyleDoc_Element_Class) = Un tableau de classe.
+   */
+  function get_all_classes();
 
   // }}}
   // {{{ get_file_classes()
@@ -722,7 +696,7 @@ interface DstyleDoc_Converter_Convert
  *    - reporter set_method() dans les autres methode de ce genre.
  * Todo: gérer les constantes
  */
-abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements DstyleDoc_Converter_Convert, ArrayAccess
+abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements ArrayAccess
 {
   // {{{ $dsd
 
@@ -1020,6 +994,14 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   // }}}
   // {{{ file_exists()
 
+  /**
+   * Renvoie une fonction si elle existe.
+   * Params:
+   *    string $file = Le nom de la fonction à chercher.
+   * Returns:
+   *    DstyleDoc_Element_Function = L'instance de la fonction en cas de succès.
+   *    false = En cas d'échèc.
+   */
   public function file_exists( $file )
   {
     foreach( $this->_files as $value )
@@ -1033,6 +1015,14 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   // }}}
   // {{{ class_exists()
 
+  /**
+   * Renvoie une classe si elle existe.
+   * Params:
+   *    string $class = Le nom de la classe à chercher.
+   * Returns:
+   *    DstyleDoc_Element_Class = L'instance de la classe en cas de succès.
+   *    false = En cas d'échèc.
+   */
   public function class_exists( $class )
   {
     foreach( $this->_classes as $value )
@@ -1046,7 +1036,15 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   // }}}
   // {{{ interface_exists()
 
-  // Todo: propager la vérif strtolower
+  // Todo: propager la vérif strtolower sur les autres fonction de ce type
+  /**
+   * Renvoie une interface si elle existe.
+   * Params:
+   *    string $interface = Le nom de la interface à chercher.
+   * Returns:
+   *    DstyleDoc_Element_Interface= L'instance de la interface en cas de succès.
+   *    false = En cas d'échèc.
+   */
   public function interface_exists( $interface )
   {
     foreach( $this->_interfaces as $value )
@@ -1269,63 +1267,6 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Dstyl
   }
 
   // }}}
-  // {{{ come_accross_elements()
-
-  function come_accross_elements( $string, DstyleDoc_Custom_Element $element )
-  {
-    $replacements = array();
-
-    // search for function or method without the object, class or interface reference
-    // (?<!::|->)\b[-_\pLpN]+\(\)\B
-    if( preg_match_all( '/(?<!::|->)\b([-_\pLpN]+)\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
-      foreach( $matches as $match )
-        if( $found = $this->function_exists( $match[1][0] ) )
-          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
-        elseif( $found = $this->method_exists( $element, $match[1][0] ) )
-          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
-
-    // search for method with object, class or interface reference
-    // \b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B
-    if( preg_match_all( '/\b([-_\pLpN]+)(?:::|->)([-_\pLpN]+)\(\)\B/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
-      foreach( $matches as $match )
-        if( $found = $this->method_exists( $match[1][0], $match[2][0] ) )
-          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
-    
-    // search for a member
-    // (?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b
-    if( preg_match_all( '/(?:([-_\pLpN]+)(?:::|->))?\B\$([-_\pLpN]+)\b/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
-      foreach( $matches as $match )
-      {
-        if( $found = $this->member_exists( $match[1][0], $match[2][0] ) )
-          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
-        elseif( $found = $this->member_exists( $element, $match[2][0] ) )
-          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
-      }
-
-    // search for a class
-    // (?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)
-    if( preg_match_all( '/(?<!\)|::|->|\$)\b([-_\pLpN]+)\b(?!\(|::|->|\$)/u', $string, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) and count($matches) )
-      foreach( $matches as $match )
-        if( $found = $this->class_exists( $match[1][0] ) )
-          $replacements[$match[0][1]] = array($found,strlen($match[0][0]));
-
-    ksort( $replacements );
-
-    if( $replacements )
-    {
-      $add = 0;
-      foreach( $replacements as $offset => $replacement )
-      {
-        $string = substr_replace( $string, $link = $replacement[0]->link, $offset+$add, $replacement[1] );
-        $add += strlen($link) - $replacement[1];
-      }
-    }
-var_dump($string);
-    return $string;
-  }
-
-  // }}}
-
   // {{{ offsetExists()
 
   final public function offsetExists( $offset )
