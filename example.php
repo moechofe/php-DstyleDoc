@@ -20,6 +20,31 @@ DstyleDoc::hie()
   ->source( 'example.php' )
   ->convert_with( new DstyleDoc_Converter_toString() );
 
+
+class test_float
+{
+}
+
+/**
+ * Returns:
+ *   test_float = Doc ref
+ */
+function test_doc_ref()
+{
+  return new test_float;
+}
+
+__halt_compiler();
+
+/**
+ * Returns:
+ *   long = Sa marche ?
+ *   number = Ecrasement indirect d'un return indirect
+ */
+function test_doublon()
+{
+}
+
 /**
  * Returns:
  *   resource, null = Une ressource ou pas.
@@ -31,6 +56,7 @@ function test_multiple_type()
 /**
  * Returns:
  *   array = Retourne un tableau
+ *   false = Ecrasement indirect
  */
 function test_indirect_return()
 {
@@ -41,6 +67,10 @@ function test_direct_return()
   return 123;
 }
 
+/**
+ * Returns:
+ *   string = Auto ecrasement de string
+ */
 function test_return()
 {
   return 'string'.'string';
@@ -48,9 +78,10 @@ function test_return()
   return test_direct_return();
   return test_indirect_return();
   return test_multiple_type();
+  return test_doublon();
+  return test_doc_ref();
 }
 
-__halt_compiler();
 
 class a
 {
@@ -1071,19 +1102,16 @@ class tamsuft_template
         // la limit d'essaye de transformation à été atteinte
         if( $limit-- <= 0 )
         {
-          $save_handler = set_exception_handler( array($this,'fake_exception_handler') );
 
           // si il n'y avait aucun gestionnaire d'exception avant, on lance l'exception qui arretera le programme.
           if( is_null($save_handler) )
           {
-            restore_exception_handler();
             throw new error_tamsuft_template_uncompiled_tag( $tag );
           }
           // si il y en avait un, on l'appel manuellement, sans arrete le programme.
           else
           {
             call_user_func( $save_handler, new error_tamsuft_template_uncompiled_tag( $tag ) );
-            restore_exception_handler();
           }
 
           // on compile la balise avec une chaine vide
@@ -1482,19 +1510,6 @@ class tamsuft_template
       return $address->address;
     else
       return $address;
-  }
-
-  // }}}
-  // {{{ fake_exception_handler()
-
-  /**
-   * Fause gestionnaire d'exception.
-   *
-   * @param exception
-   * @version 0.1.1
-   */
-  public function fake_exception_handler( $exception )
-  {
   }
 
   // }}}

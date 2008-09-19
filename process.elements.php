@@ -93,13 +93,6 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
   }
 
   // }}}
-  // {{{ __clone()
-
-  private function __clone()
-  {
-  }
-
-  // }}}
   // {{{ $convert
 
   /**
@@ -1096,9 +1089,47 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
       return current($this->_returns);
   }
 
+  private function returns_types( $returns )
+  {
+    $result = array();
+    foreach( $returns as $return )
+    {
+      $types = $return->type;
+      if( is_array($types) )
+      {
+        foreach( $this->returns_types($types) as $type => $return )
+          $this->smart_add_return_type( $result, $type, $return );
+      }
+      else
+        $this->smart_add_return_type( $result, $types, $return );
+    }
+    return $result;
+  }
+
+  private function smart_add_return_type( &$array, $type, DstyleDoc_Element_Type $return )
+  {
+    if( $type instanceof DstyleDoc_Element_Class )
+      $key = $type->name;
+    else
+      $key = $type;
+    d( isset($array[$key]) )->label( $key );
+    d( isset($array[$key]->descriptions) );
+    if( ! isset($array[$key]) or isset($array[$key]->descriptions) )
+      $array[$key] = $return;
+  }
+
   protected function get_returns()
   {
-    return $this->_returns;
+    d( $this->_returns )->d3;
+    $returns = $this->returns_types( $this->_returns );
+
+    d( $returns )->d3;
+
+    return $returns;
+
+
+      //d( $returns )->d2;
+    return array_values($returns);
   }
 
   // }}}
@@ -1916,45 +1947,49 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 
   protected function set_type( $type )
   {
-    $this->_type = (string)$type;
+    if( $type instanceof DstyleDoc_Element_Class )
+      $this->_type = $type;
+    else
+      $this->_type = (string)$type;
   }
 
+  // todo: virer le $from, il existe dans $fonction
   protected function get_type()
   {
-    $types = array();
-
-    if( ($found = $this->converter->search_element($value)) instanceof DstyleDoc_Element_Function )
+    if( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
     {
       if( ! $found->analysed ) $found->analyse();
+      $types = array();
       foreach( $found->returns as $v )
       {
 	$v = clone $v;
 	$v->from = $found;
+        $types[] = $v;
       }
-      $types[] = $v;
+      return $types;
     }
     elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
-      $types[] = $found;
+    {
+      // on met en cache le type trouvé
+      $this->type = $found;
+      return $found;
+    }
     elseif( $found instanceof DstyleDoc_Element_Member )
     {
       if( ! $found->analysed ) $found->analyse();
-      $tmp = $found->types;
-      foreach( $tmp as $v )
+      $types = array();
+      foreach( $found->types as $v )
       {
+        $v = clone $v;
         $v->from = $found;
         $types[] = $v;
       }
-    }
-    elseif( ! in_array(strtolower($value), $this->types) )
-      unset($this->_types[$key]);
-    else
-      $types[] = $value;
-
-    if( count($types)===1 )
-      return $types[0];
-
-    else
       return $types;
+    }
+    elseif( in_array(strtolower($this->_type), $this->types) )
+      return strtolower($this->_type);
+    else
+      return $this->_type;
   }
 
   // }}}
