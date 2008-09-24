@@ -10,6 +10,7 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 
   public function convert_all()
   {
+    /*
     if( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
       $this->page_file( $found );
     elseif( ! empty($_GET['class']) and @list($file,$class) = explode(',',$_GET['class']) and $found = $this->class_exists($class) )
@@ -18,6 +19,7 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
       $this->page_method( $found );
     else
       $this->page_home();
+     */
   }
 
   // }}}

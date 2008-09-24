@@ -39,9 +39,9 @@ html div.xdebug_front_end { text-align: left !important; }
 div.xdebug_front_end * { font: 10px/12px lucida console, monospace !important; margin: 0px !important; padding: 0px !important; border: none !important; width: auto !important; }
 div.xdebug_front_end a { color: white !important; }
 div.xdebug_front_end b { color: #f66 !important; font-weight: normal !important; }
-div.xdebug_front_end a b { text-decoration: underline !important; } 
+div.xdebug_front_end a b { text-decoration: underline !important; }
 div.xdebug_front_end i { color: #ccc !important; font-style: normal !important; }
-div.xdebug_front_end a i { text-decoration: underline !important; } 
+div.xdebug_front_end a i { text-decoration: underline !important; }
 div.xdebug_front_end u { text-decoration: none !important; color: gold !important; }
 div.xdebug_front_end h1 { background: #666 !important; color: yellow !important; }
 div.xdebug_front_end h2 { background: #333 !important; }
@@ -74,9 +74,9 @@ div.xdebug_front_end div.config a { color: black !important; text-decoration: no
 div.xdebug_front_end div.config a:hover { background: #c00 !important; color: white !important; text-decoration: none !important; }
 </style>
 <script type="text/javascript">
-function xdebug_swap(d1)
+function xdebug_swap( d1 )
 {
-  item = document.getElementById(d1);
+  item = document.getElementById( d1 );
   if( item )
   {
     if( item.style.display=='none' )
@@ -84,6 +84,37 @@ function xdebug_swap(d1)
     else
       item.style.display='none';
   }
+}
+function set_cookie( name, value, expires, path, domain, secure )
+{
+  var today = new Date(); today.setTime( today.getTime() );
+  if( expires ) expires = expires * 1000*60*60*24;
+  var expires_date = new Date( today.getTime() + (expires) );
+  document.cookie = name + "=" + escape(value) + ((expires)?";expires="+expires_date.toGMTString():"") + ((path)?";path="+path:"") + ((domain)?";domain="+domain:"") + ((secure)?";secure":"");
+}
+function delete_cookie( name, path, domain ) {
+  if( get_cookie(name) )
+    document.cookie = name + "=" + ((path)?";path="+path:"") + ((domain)?";domain="+domain:"" ) + ";expires=Thu, 01-Jan-1970 00:00:01 GMT";
+}
+function get_cookie( check_name )
+{
+  var a_all_cookies = document.cookie.split( ';' );
+  var a_temp_cookie = null;
+  var cookie_name = '';
+  for( i = 0; i < a_all_cookies.length; i++ )
+  {
+    a_temp_cookie = a_all_cookies[i].split( '=' );
+    cookie_name = a_temp_cookie[0].replace(/^\s+|\s+$/g, '');
+    if( cookie_name == check_name )
+    {
+      if( a_temp_cookie.length > 1 )
+        return cookie_value = unescape( a_temp_cookie[1].replace(/^\s+|\s+$/g, '') );
+      break;
+    }
+    a_temp_cookie = null;
+    cookie_name = '';
+  }
+  return null;
 }
 </script>
 
@@ -129,12 +160,12 @@ HTML;
     var_dump( $var->var );
     $dump = substr(ob_get_clean(),strlen('<pre>'),-strlen('</pre>'));
 
-    for( $i=0; $i< abs(min((integer)$var->depth,(integer)$var->pass)); $i++ )
+    for( $i=0; $i < abs(min((integer)$var->depth,(integer)$var->pass)); $i++ )
       $dump =
         preg_replace_callback(
-          '%((?:  )*  )(<b>(?:object|array)</b>(?:\(<i>(?:.*?)</i>\)\[<i>(?:\d+)</i>\])?)(\r?\n?)(\r?\n?(?:(?<!  )\1.*\r?\n?)*)%',
+          '%((?:  )*  )(<b>(?:object|array)</b>(?:\(<i>(?:.*?)</i>\)\[<i>(?:\d+)</i>\])?)(\r?\n?)(\r?\n?(?:(?<!  )\1.*\r?\n?)*)%u',
           'xdebug_front_end::dump_object',
-        $dump );
+          $dump );
 
     $dump =
     preg_replace_callback(
@@ -192,7 +223,7 @@ HTML;
     $line = $var->line;
 
     $class = $before = '';
-    
+
     if( (string)$var->label )
       $label = (string)$var->label;
     else
@@ -366,7 +397,7 @@ HTML;
   {
     if( $property[0] == 'd' and (integer)substr($property,1)>0 )
       $this->depth = (integer)substr($property,1);
-    elseif( $property[0] == 'p' and (integer)substr($property,1)>0 )
+    elseif( $property[0] == 'p' and (integer)substr($property,1)>=0 )
       $this->pass = (integer)substr($property,1);
     elseif( $property == 'x' )
       $this->exit = true;
@@ -379,7 +410,7 @@ HTML;
         $this->call .= $calls[1]['function'].'()';
     }
     elseif( $property == 'o' )
-      $this->ordered = true;    
+      $this->ordered = true;
     elseif( $property == 's' and extension_loaded('xdebug') )
       $this->stack = xdebug_get_function_stack();
     elseif( $property == 'n' )

@@ -710,7 +710,7 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
   {
     // ^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$
     if( $dsd->dstyledoc and $dsd->returns and ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$/u', $source, $matches ) )
+      and preg_match( '/^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
@@ -719,7 +719,7 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 
     // ^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$
     elseif( $dsd->dstyledoc and $dsd->returns and ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-      and preg_match( '/^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$/u', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2] );
         $priority = self::priority;
@@ -753,9 +753,10 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
       {
 	$element->return = trim($type);
 	if( $this->description )
-	{
-	  unset($element->return->descriptions);
+        {
+	  unset($element->return->description);
           $element->return->description = $this->description;
+          $element->return->from = $element;
 	}
       }
     }

@@ -132,6 +132,7 @@ class DstyleDoc extends DstyleDoc_Properties
     $line = 1;
     $current = new DstyleDoc_Token_Fake;
     $doc = '';
+$cccc = 0;
     foreach( token_get_all(file_get_contents($file)) as $token )
     {
       if( is_array($token) )
@@ -188,13 +189,13 @@ HTML;
 <div style='clear:both'></div>
 HTML;
       }
-
+//if( $cccc == 1596 ) {var_dump('wesh'); exit;}
       if( ! $current instanceof DstyleDoc_Token_Custom )
       {
-        var_dump($save);
         throw new UnexpectedValueException;
       }
-
+echo memory_get_usage(),'<br>';
+//if($cccc++ > 1595 )exit;
     }
   }
 
@@ -217,11 +218,13 @@ HTML;
     //    d( $converter )->d6;
     $converter->dsd = $this;
     $this->analyse_all( $converter );
+    d('wesh');exit;
     $converter->convert_all();
     return $this;
   }
 
-  // }}}  // {{{ hie()
+  // }}}
+  // {{{ hie()
 
   static public function hie()
   {

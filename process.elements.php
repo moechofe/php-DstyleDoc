@@ -44,12 +44,12 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
     return $this->converter->convert_description( $this->_descriptions, $this );
   }
 
-  protected function isset_descriptions()
+  protected function isset_description()
   {
     return (boolean)$this->_descriptions;
   }
 
-  protected function unset_descriptions()
+  protected function unset_description()
   {
     $this->_descriptions = array();
   }
@@ -1112,24 +1112,13 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
       $key = $type->name;
     else
       $key = $type;
-    d( isset($array[$key]) )->label( $key );
-    d( isset($array[$key]->descriptions) );
-    if( ! isset($array[$key]) or isset($array[$key]->descriptions) )
+    if( ! isset($array[$key]) or ! isset($array[$key]->description) or ($return->from === $this and isset($return->description)) )
       $array[$key] = $return;
   }
 
   protected function get_returns()
   {
-    d( $this->_returns )->d3;
-    $returns = $this->returns_types( $this->_returns );
-
-    d( $returns )->d3;
-
-    return $returns;
-
-
-      //d( $returns )->d2;
-    return array_values($returns);
+    return array_values( $this->returns_types($this->_returns) );
   }
 
   // }}}

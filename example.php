@@ -23,7 +23,14 @@ DstyleDoc::hie()
 
 class test_float
 {
+  var $a = null;
 }
+
+$a = new test_float;
+$a->a = 'BEUA';
+
+$class = new ReflectionClass($a);
+printf("---> Properties: %s\n", var_export($class->getProperties(), 1));
 
 /**
  * Returns:
@@ -33,8 +40,6 @@ function test_doc_ref()
 {
   return new test_float;
 }
-
-__halt_compiler();
 
 /**
  * Returns:
@@ -57,6 +62,7 @@ function test_multiple_type()
  * Returns:
  *   array = Retourne un tableau
  *   false = Ecrasement indirect
+ *   true = Ne devrait pas écraser
  */
 function test_indirect_return()
 {
@@ -70,6 +76,7 @@ function test_direct_return()
 /**
  * Returns:
  *   string = Auto ecrasement de string
+ *   true = Se fait-il écrasé ?
  */
 function test_return()
 {
@@ -81,6 +88,8 @@ function test_return()
   return test_doublon();
   return test_doc_ref();
 }
+
+__halt_compiler();
 
 
 class a

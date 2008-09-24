@@ -173,14 +173,7 @@ HTML;
   public function convert_type( DstyleDoc_Element_Type $type )
   {
     $types = $type->type;
-
-    if( is_array($types) and count($types) )
-      return <<<HTML
-from {$types[0]->from->link}: {$type->description}
-<ul>{$this->forall($types,'<li>$value</li>')}</ul>
-HTML;
-
-    elseif( $types instanceof DstyleDoc_Element )
+    if( $types instanceof DstyleDoc_Element )
       return <<<HTML
 {$types->link}: {$type->description}
 HTML;
@@ -197,14 +190,7 @@ HTML;
   public function convert_return( DstyleDoc_Element_Return $return )
   {
     $types = $return->type;
-
-    if( is_array($types) and count($types) )
-      return <<<HTML
-from {$types[0]->from->link}: {$return->description}
-<ul>{$this->forall($types,'<li>$value</li>')}</ul>
-HTML;
-
-    elseif( $types instanceof DstyleDoc_Element )
+    if( $types instanceof DstyleDoc_Element )
       return <<<HTML
 {$types->link}: {$return->description}
 HTML;
