@@ -21,6 +21,8 @@ DstyleDoc::hie()
 'skin' => 'rosy',
 'charset' => 'utf-8',
 
+'database_pass' => 'SeveuSe',
+
 // Texts declarations
 
 'logo' => 'DstyleDoc API documentation',

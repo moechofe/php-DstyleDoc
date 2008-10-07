@@ -47,7 +47,7 @@ class DstyleDoc_State_Saver
 //    self::$cnx->query( 'create database `!`', $dsd->database_base );
 //    self::$cnx->query( 'use `!`', $dsd->database_base );
     self::$cnx->query( 'drop table if exists elements' );
-    self::$cnx->query("CREATE TABLE `elements` ( `class` varchar(128) character set armscii8 collate armscii8_bin NOT NULL default '', `name` varchar(128) character set armscii8 collate armscii8_bin NOT NULL default '', `state` blob, PRIMARY KEY  (`class`,`name`)) ENGINE=MyISAM DEFAULT CHARSET=armscii8; " );
+    self::$cnx->query( "CREATE TABLE `elements` ( `class` varchar(128) character set armscii8 collate armscii8_bin NOT NULL default '', `name` varchar(128) character set armscii8 collate armscii8_bin NOT NULL default '', `state` blob, PRIMARY KEY  (`class`,`name`)) ENGINE=MyISAM DEFAULT CHARSET=armscii8;" );
 
   }
 
@@ -56,7 +56,8 @@ class DstyleDoc_State_Saver
 
   static public function put_element( DstyleDoc_Custom_Element $element )
   {
-    self::$cnx->query( 'insert into elements set class = ?, name = ?, state = ?',
+    d( $element );
+    self::$cnx->query( 'replace into `elements` set `class` = ?, `name` = ?, `state` = ?',
       (string)get_class($element),
       (string)$element->name,
       serialize( $element )
@@ -66,15 +67,25 @@ class DstyleDoc_State_Saver
   // }}}
   // {{{ get_element()
 
-  static public function get_element( $class, $name, $converter )
+  static public function get_element( $class, $name, DstyleDoc_Converter $converter )
   {
-    if( $state = self::$cnx->field->query( 'select state from elements where class = ?, name = ?', (string)$class, (string)$name ) )
+    if( $state = self::$cnx->field->query( 'select `state` from `elements` where `class` = ? and `name` = ?', (string)$class, (string)$name ) )
     {
       $element = unserialize( $state );
       $element->converter = $converter;
+      d( $element );
+      return $element;
     }
     else
       return false;
+  }
+
+  // }}}
+  // {{{ get_elements()
+
+  static public function get_elements( $class )
+  {
+    return self::$cnx->col->query( 'select `name` from `elements` where `class` = ?', (string)$class );
   }
 
   // }}}
@@ -82,15 +93,27 @@ class DstyleDoc_State_Saver
 
 class DstyleDoc_State_Saver_Iterator implements Iterator
 {
+  // {{{ $converter
+
+  private $converter = null;
+
+  // }}}
+  // {{{ $class
+
+  private $class = null;
+
+  // }}}
   // {{{ $states
 
-  protected $states = array();
+  private $states = array();
 
   // }}}
   // {{{ __construct()
 
-  public function __construct( $class )
+  public function __construct( $class, DstyleDoc_Converter $converter )
   {
+    $this->converter = $converter;
+    $this->class = $class;
     $this->states = DstyleDoc_State_Saver::get_elements( $class );
   }
 
@@ -99,6 +122,39 @@ class DstyleDoc_State_Saver_Iterator implements Iterator
 
   public function current()
   {
+    return DstyleDoc_State_Saver::get_element( $this->class, current($this->states), $this->converter );
+  }
+
+  // }}}
+  // {{{ next()
+
+  public function next()
+  {
+    next($this->states);
+  }
+
+  // }}}
+  // {{{ valid()
+
+  public function valid()
+  {
+    return (boolean)current($this->states);
+  }
+
+  // }}}
+  // {{{ key()
+
+  public function key()
+  {
+    return current($this->states);
+  }
+
+  // }}}
+  // {{{ rewind()
+
+  public function rewind()
+  {
+    reset($this->states);
   }
 
   // }}}

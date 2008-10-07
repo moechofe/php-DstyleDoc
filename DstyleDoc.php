@@ -66,7 +66,7 @@ require_once 'extension.state_saver.php';
 
 /**
  * Classe de control de DstyleDoc.
- * La classe DstyleDoc permet de configurer et de lancer un processus de génération de documentation.
+ * La classe DstyleDoc permet de configurer et de lancer un processus de gÃ©nÃ©ration de documentation.
  */
 class DstyleDoc extends DstyleDoc_Properties
 {
@@ -306,9 +306,9 @@ HTML;
 
   public function __call( $method, $params )
   {
-    if( substr($method,0,7)==='enable_')
+    if( substr($method,0,7)==='config_')
     {
-      $this->_config[ substr($property,7) ] = $params;
+      $this->_config[ substr($method,7) ] = array_shift($params);
       return $this;
     }
    else
@@ -783,7 +783,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // {{{ $functions
 
   /**
-   * La listes des instances des fonctions définies.
+   * La listes des instances des fonctions dÃ©finies.
    * Types:
    *    array(DstyleDoc_Element_Function) = Un tableau d'instance de DstyleDoc_Element_Function.
    */
@@ -791,14 +791,13 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected function set_function( $function )
   {
-    if( $this->dsd->use_temporary_sqlite_database and count($this->_functions) )
+    if( $this->dsd->use_temporary_sqlite_database and current($this->_functions) )
       DstyleDoc_State_Saver::put_element( current($this->_functions) );
 
     $found = false;
-    if( ! empty($function) and $this->dsd->use_temporary_sqlite_database )
-    {
-      return DstyleDoc_State_Saver::get_element( 'DstyleDoc_Element_Function', $function, $this );
-    }
+    if( ! empty($function) and $this->dsd->use_temporary_sqlite_database
+      and $element = DstyleDoc_State_Saver::get_element( 'DstyleDoc_Element_Function', $function, $this ) )
+      return $element;
     elseif( ! empty($function) and count($this->_functions) )
     {
       reset($this->_functions);
@@ -823,6 +822,9 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected function get_function()
   {
+    if( $this->dsd->use_temporary_sqlite_database and current($this->_functions) )
+      DstyleDoc_State_Saver::put_element( current($this->_functions) );
+
     if( ! count($this->_functions) )
     {
       $this->_functions[] = new DstyleDoc_Element_Function( $this, null );
@@ -835,7 +837,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   protected function get_functions()
   {
     if( $this->dsd->use_temporary_sqlite_database )
-      return new DstyleDoc_State_Saver_Iterator( 'DstyleDoc_Element_Function' );
+      return new DstyleDoc_State_Saver_Iterator( 'DstyleDoc_Element_Function', $this );
     else
       return $this->_functions;
   }

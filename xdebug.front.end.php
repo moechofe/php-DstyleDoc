@@ -39,9 +39,9 @@ html div.xdebug_front_end { text-align: left !important; }
 div.xdebug_front_end * { font: 10px/12px lucida console, monospace !important; margin: 0px !important; padding: 0px !important; border: none !important; width: auto !important; }
 div.xdebug_front_end a { color: white !important; }
 div.xdebug_front_end b { color: #f66 !important; font-weight: normal !important; }
-div.xdebug_front_end a b { text-decoration: underline !important; } 
+div.xdebug_front_end a b { text-decoration: underline !important; }
 div.xdebug_front_end i { color: #ccc !important; font-style: normal !important; }
-div.xdebug_front_end a i { text-decoration: underline !important; } 
+div.xdebug_front_end a i { text-decoration: underline !important; }
 div.xdebug_front_end u { text-decoration: none !important; color: gold !important; }
 div.xdebug_front_end h1 { background: #666 !important; color: yellow !important; }
 div.xdebug_front_end h2 { background: #333 !important; }
@@ -127,7 +127,9 @@ HTML;
 
     ob_start();
     var_dump( $var->var );
-    $dump = substr(ob_get_clean(),strlen('<pre>'),-strlen('</pre>'));
+    $dump = ob_get_clean();
+    if( substr($dump,0,15)=='<pre dir="ltr">' ) $dump = substr($dump,15,-strlen('</pre>'));
+    else $dump = substr($dump,strlen('<pre>'),-strlen('</pre>'));
 
     for( $i=0; $i< abs((integer)$var->pass); $i++ )
       $dump =

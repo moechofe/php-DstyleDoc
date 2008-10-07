@@ -8,10 +8,10 @@
  */
 
 /**
- * Couche d'abstraction simple pour requête vers serveur mysql.
+ * Couche d'abstraction simple pour requÃªte vers serveur mysql.
  *
- * Utilise les extensions mysql ou mysqli si cette dernière est disponible pour effectuer
- * les requêtes.
+ * Utilise les extensions mysql ou mysqli si cette derniÃ¨re est disponible pour effectuer
+ * les requÃªtes.
  *
  * @package connexion
  */
@@ -245,6 +245,7 @@ abstract class mysql_connexion_driver
       break;
 
     case 'field':
+      $this->fetch_mode |= self::one_row;
       $this->fetch_mode |= self::one_field;
       break;
 
@@ -384,7 +385,7 @@ abstract class mysql_connexion_driver
   // {{{ first_field_for_key
 
   /**
-   * Indique de prendre la valeur du premier champ de chaque ligne et de l'utiliser en temps que clef du tableau représentant les données de chaques lignes du résutat.
+   * Indique de prendre la valeur du premier champ de chaque ligne et de l'utiliser en temps que clef du tableau reprÃ©sentant les donnÃ©es de chaques lignes du rÃ©sutat.
    *
    * @var integer
    */
@@ -394,7 +395,7 @@ abstract class mysql_connexion_driver
   // {{{ keep_open
 
   /**
-   * Indique de ne pas refermer la connexion à chaque requête. Pratique pour les transactions.
+   * Indique de ne pas refermer la connexion Ã  chaque requÃªte. Pratique pour les transactions.
    *
    * @var integer
    */
@@ -404,7 +405,7 @@ abstract class mysql_connexion_driver
   // {{{ one_field
 
   /**
-   * Retourne la première colonne de la première ligne de résultat.
+   * Retourne la premiÃ¨re colonne de la premiÃ¨re ligne de rÃ©sultat.
    * @var integer
    */
   const one_field = 0x20;
@@ -583,9 +584,9 @@ class mysql_connexion_mysqli extends mysql_connexion_driver
       }
       elseif( $this->fetch_mode & self::numerical_key )
       {
-        while( $row = mysqli_fetch_row($this->result) )
+	while( $row = mysqli_fetch_row($this->result) )
           if( ! $this->fill( $data, $row, $this->fetch_mode ) )
-            break;
+	    break;
       }
       else
       {

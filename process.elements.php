@@ -1,6 +1,6 @@
 <?php
 
-// todo: ajouter $element à tout les appels de des méthode convert_xxxx()
+// todo: ajouter $element Ã  tout les appels de des mÃ©thodes convert_xxxx()
 // todo: ajouter les analyse() a tous les getters
 
 abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements ArrayAccess
@@ -63,9 +63,9 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
   // {{{ $display
 
   /**
-   * Renvoie la version affichable du nom de l'élément.
+   * Renvoie la version affichable du nom de l'Ã©lÃ©ment.
    * Returns:
-   *    mixed = Dépends du convertisseur.
+   *    mixed = DÃ©pends du convertisseur.
    */
   abstract protected function get_display();
 
@@ -92,9 +92,7 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 
   public function __wakeup()
   {
-    return array(
-      '_descriptions',
-    );
+    return $this->__sleep();
   }
 
   // }}}
@@ -120,9 +118,9 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
   // {{{ $convert
 
   /**
-   * Renvoie la documentation de l'élément.
+   * Renvoie la documentation de l'Ã©lÃ©ment.
    * Returns:
-   *    mixed = La documentation de l'élément ou pas.
+   *    mixed = La documentation de l'Ã©lÃ©ment ou pas.
    */
   abstract protected function get_convert();
 
@@ -185,6 +183,16 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
  */
 abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 {
+    // {{{ __sleep()
+
+  public function __sleep()
+  {
+    return array_merge( parent::__sleep(), array(
+      '_historys', '_packages', '_analysed', '_documentation', '_since', '_version',
+    ) );
+  }
+
+  // }}}
   // {{{ $version
 
   protected $_version = '';
@@ -294,9 +302,9 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
   // {{{ $id
 
   /**
-   * Renvoie l'identifiant unique de l'élément basé sur ces décendants.
+   * Renvoie l'identifiant unique de l'Ã©lÃ©ment basÃ© sur ces dÃ©cendants.
    * Returns:
-   *    string = L'ID de l'élément.
+   *    string = L'ID de l'Ã©lÃ©ment.
    */
   abstract protected function get_id();
 
@@ -304,9 +312,9 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
   // {{{ $link
 
   /**
-   * Renvoie un lien vers l'élément.
+   * Renvoie un lien vers l'Ã©lÃ©ment.
    * Returns:
-   *    mixed = Dépends du convertisseur.
+   *    mixed = DÃ©pends du convertisseur.
    */
   protected function get_link()
   {
@@ -317,11 +325,11 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
   // {{{ link()
 
   /**
-   * Renvoie un lien vers l'élément avec un texte donnée en paramètre.
+   * Renvoie un lien vers l'Ã©lÃ©ment avec un texte donnÃ© en paramÃ¨tre.
    * Params:
    *    string $text = Le texte du lien.
    * Returns:
-   *    mixed = Dépends du convertisseur.
+   *    mixed = DÃ©pends du convertisseur.
    */
   protected function call_link( $text )
   {
@@ -429,10 +437,20 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 }
 
 /**
- * Classe abstraite d'un Element possèdant un lien dans un fichier.
+ * Classe abstraite d'un Element possÃ©dant un lien dans un fichier.
  */
 abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 {
+    // {{{ __sleep()
+
+  public function __sleep()
+  {
+    return array_merge( parent::__sleep(), array(
+      '_file', '_line',
+    ) );
+  }
+
+  // }}}
   // {{{ $file
 
   protected $_file = null;
@@ -467,10 +485,20 @@ abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 }
 
 /**
- * Classe abstraite d'un Element possèdant un lien dans un fichier et un nom.
+ * Classe abstraite d'un Element possÃ©dant un lien dans un fichier et un nom.
  */
 abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
 {
+    // {{{ __sleep()
+
+  public function __sleep()
+  {
+    return array_merge( parent::__sleep(), array(
+      '_name',
+    ) );
+  }
+
+  // }}}
   // {{{ $name
 
   protected $_name = '';
@@ -503,6 +531,16 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
  */
 class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 {
+  // {{{ __sleep()
+
+  public function __sleep()
+  {
+    return array_merge( parent::__sleep(), array(
+      '_file',
+    ) );
+  }
+
+  // }}}
   // {{{ $file
 
   protected $_file = '';
@@ -609,18 +647,18 @@ abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_
   // {{{ $methods
 
   /**
-   * Contient la listes des méthodes déclarées par la classe.
+   * Contient la listes des mÃ©thodes dÃ©clarÃ©es par la classe.
    * Type:
-   *    array(DstyleDoc_Element_Method) = Tableau à clefs numériques contentant des instances de DstyleDoc_Element_Method.
+   *    array(DstyleDoc_Element_Method) = Tableau a lalefs numÃ©riques contentant des instances de DstyleDoc_Element_Method.
    */
   protected $_methods = array();
 
   /**
-   * Ajoute une méthode à la classe ou selectionne une méthode existante.
-   * Si la méthode à déjà été ajoutée, elle sera sélectionnée. La méthode sera alors renvoyé par la propriété $method.
+   * Ajoute une mÃ©thode a la classe ou selectionne une mÃ©thode existante.
+   * Si la mÃ©thode a Ã©tÃ© ajoutÃ©e elle sera sÃ©lectionnÃ©e La mÃ©thode sera alors renvoyÃ© par la propriÃ©tÃ© $method.
    * Params:
-   *    string = Le nom du membre à ajouter ou à sélectionner.
-   *    DstyleDoc_Element_Member = L'instance du membre à ajouter ou à sélectionner.
+   *    string = Le nom du membre a lajouter ou a laÃ©lectionner.
+   *    DstyleDoc_Element_Member = L'instance du membre a lajouter ou a laÃ©lectionner.
    */
   protected function set_method( $name )
   {
@@ -699,10 +737,10 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   // {{{ $heritable_methods
 
   /**
-   * Retourne la liste des méthodes héritables de la classe.
-   * Retourne la liste des méthodes de la classe et des méthodes héritées qui ont un accès publiques ou protégées.
+   * Retourne la liste des mÃ©thodes hÃ©ritables de la classe.
+   * Retourne la liste des mÃ©thodes de la classe et des mÃ©thodes hÃ©ritÃ©es qui ont un accÃ¨s publiques ou protÃ©tÃ©ges.
    * Returns:
-   *    array(DstyleDoc_Element_Method) = La liste des méthodes héritables de la classe.
+   *    array(DstyleDoc_Element_Method) = La liste des mÃ©thodes hÃ©ritables de la classe.
    */
   protected function get_heritable_methods()
   {
@@ -796,18 +834,18 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   // {{{ $members
 
   /**
-   * Contient la listes des membres déclarés par la classe.
+   * Contient la listes des membres dÃ©clarÃ© ppar la classe.
    * Type:
-   *    array(DstyleDoc_Element_Member) = Tableau à clefs numériques contentant des instances de DstyleDoc_Element_Member.
+   *    array(DstyleDoc_Element_Member) = Tableau a lalefs numÃ©riques contentant des instances de DstyleDoc_Element_Member.
    */
   protected $_members = array();
 
   /**
-   * Ajoute un membre à la classe ou selectionne un membre existant.
-   * Si le membre à déjà été ajouté, il sera sélectionné. Le membre sera alors renvoyé par la propriété $membre.
+   * Ajoute un membre a laa classe ou selectionne un membre existant.
+   * Si le membre Ã  Ã©tÃ© ajoutÃ©, il sera sÃ©lectionnÃ©. Le membre sera alors renvoyÃ© par la propriÃ©tÃ© $membre.
    * Params:
-   *    string = Le nom du membre à ajouter ou à sélectionner.
-   *    DstyleDoc_Element_Member = L'instance du membre à ajouter ou à sélectionner.
+   *    string = Le nom du membre a lajouter ou a laÃ©lectionner.
+   *    DstyleDoc_Element_Member = L'instance du membre a lajouter ou a laÃ©lectionner.
    */
   protected function set_member( $name )
   {
@@ -834,9 +872,9 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   }
 
   /**
-   * Retourne le dernier membre ajouté.
+   * Retourne le dernier membre ajoutÃ©.
    * Returns:
-   *    DstyleDoc_Element_Member = Le dernière membre ajouté.
+   *    DstyleDoc_Element_Member = Le dernier membre ajoutÃ©.
    */
   protected function get_member()
   {
@@ -850,9 +888,9 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   }
 
   /**
-   * Retourne la liste des membres de la classe et des membres hérités.
+   * Retourne la liste des membres de la classe et des membres hÃ©ritÃ©s.
    * Returns:
-   *    array(DstyleDoc_Element_Member) = La liste des membres de la classe et des membres hérités.
+   *    array(DstyleDoc_Element_Member) = La liste des membres de la classe et des membres hÃ©ritÃ©s.
    */
   protected function get_members()
   {
@@ -867,10 +905,10 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
   }
 
   /**
-   * Retourne la liste des membres héritables de la classe.
-   * Retourne la liste des membres de la classe et des membres hérités qui ont un accès publique ou protégé.
+   * Retourne la liste des membres hÃ©ritables de la classe.
+   * Retourne la liste des membres de la classe et des membres hÃ©ritÃ© pqui ont un accÃ¨s publique ou protÃ©tÃ©g.
    * Returns:
-   *    array(DstyleDoc_Element_Member) = La liste des membres héritables de la classe.
+   *    array(DstyleDoc_Element_Member) = La liste des membres hÃ©ritables de la classe.
    */
   protected function get_heritable_members()
   {
@@ -1008,6 +1046,16 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
  */
 class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 {
+    // {{{ __sleep()
+
+  public function __sleep()
+  {
+    return array_merge( parent::__sleep(), array(
+      '_params', '_returns', '_exceptions', '_syntax',
+    ) );
+  }
+
+  // }}}
   // {{{ $params
 
   protected $_params = array();
@@ -1023,10 +1071,10 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   }
 
   /**
-   * Séléction un paramètre existant ou en crée un nouveau.
-   * Le paramètre ainsi séléctionné peut être récupérer avec get_param().
+   * SÃ©lÃ©ction un paramÃ¨tre existant ou en crÃ©e un nouveau.
+   * Le paramÃ¨tre ainsi sÃ©lÃ©ctionnÃ© peut Ãªtre rÃ©cupÃ¨rer avec get_param().
    * Params:
-   *  $param = Le nom de la variable existante ou qui sera créer.
+   *  $param = Le nom de la variable existante ou qui sera crÃ©er.
    */
   protected function set_param( $param )
   {
@@ -1076,11 +1124,11 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   protected $_returns = array();
 
   /**
-   * Ajoute un nouvelle ou séléctionne une valeur déjà éxistante.
-   * La valeur ainsi séléctionné peut être récupérer avec get_return().
-   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Ajoute un nouvelle ou sÃ©lÃ©ctionne une valeur dÃ©jÃ  Ã©xistante.
+   * La valeur ainsi sÃ©lÃ©ctionnÃ© peut Ãªtre rÃ©cupÃ¨rer avec get_return().
+   * Ne pas utiliser directement cette mÃ©thode, utiliser la propriÃ©tÃ© $return Ã  la place.
    * Params:
-   *    string $return = Le type de la valeur retourné.
+   *    string $return = Le type de la valeur retournÃ©.
    *    DstyleDoc_Element_Return = Une instance d'une valeur de retour.
    */
   protected function set_return( $return )
@@ -1109,9 +1157,9 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   }
 
   /**
-   * Renvoie l'instance de la valeur de retour précedement séléctionner ou ajouté avec set_return().
-   * Si aucune valeur de retour n'a été ajouté avant, une fausse valeur de retour sera retournée.
-   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Renvoie l'instance de la valeur de retour prÃ©cedement sÃ©lÃ©ctionner ou ajoutÃ© avec set_return().
+   * Si aucune valeur de retour n'a Ã©tÃ© ajoutÃ© avant, une fausse valeur de retour sera retournÃ©e.
+   * Ne pas utiliser directement cette mÃ©thode, utiliser la propriÃ©tÃ© $return Ã  la place.
    * Returns:
    *    DstyleDoc_Element_Return = L'instance de la valeur de retour.
    */
@@ -1162,7 +1210,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   // {{{ $exceptions
 
   /**
-   * La liste des exception lancé par une fonction.
+   * La liste des exception lancÃ© par une fonction.
    * Types:
    *    array(DstyleDoc_Element_Exception) = Un tableau contenant des instances des exceptions.
    */
@@ -1497,9 +1545,9 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
   protected $_types = array();
 
   /**
-   * Ajoute un nouvelle ou séléctionne un type déjà éxistant.
-   * Le type ainsi séléctionné peut être récupérer avec get_type().
-   * Ne pas utiliser directement cette méthode, utiliser la propriété $type à la place.
+   * Ajoute un nouvelle ou sÃ©lÃ©ctionne un type d'un è·©stant.
+   * Le type ainsi sÃ©lÃ©ctionnÃ© peut Ãªtre rÃ©cupÃ©rÃ© avec get_type().
+   * Ne pas utiliser directement cette mÃ©thode, utiliser la propriÃ©tÃ© $type a laa place.
    * Params:
    *    string $type = Le type du membre.
    *    DstyleDoc_Element_Type = Une instance d'un type de membre.
@@ -1530,9 +1578,9 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
   }
 
   /**
-   * Renvoie l'instance d'un type d'un membre précedement séléctionner ou ajouté avec set_type().
-   * Si aucun type de membre n'a été ajouté avant, une faux type de membre sera retourné.
-   * Ne pas utiliser directement cette méthode, utiliser la propriété $type à la place.
+   * Renvoie l'instance d'un type d'un membre prÃ©cÃ©dement sÃ©lÃ©ctionner ou ajoutÃ© avec set_type().
+   * Si aucun type de membre n'a Ã©tÃ© ajoutÃ© avant, une faux type de membre sera retournÃ©.
+   * Ne pas utiliser directement cette mÃ©thode, utiliser la propriÃ©tÃ© $type a laa place.
    * Returns:
    *    DstyleDoc_Element_Type = L'instance du type d'un membre.
    */
@@ -1719,12 +1767,11 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
   protected $_returns = array();
 
   /**
-   * Ajoute un nouvelle ou séléctionne une valeur déjà éxistante.
-   * La valeur ainsi séléctionné peut être récupérer avec get_return().
-   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Ajoute un nouvelle ou sÃ©lÃ©ctionne une valeur d'un è·©stante.
+   * La valeur ainsi sÃ©lÃ©ctionnÃ© peut Ãªtre rÃ©cupÃ©rÃ© avec get_return().
+   * Ne pas utiliser directement cette mÃ©thode, utiliser la propriÃ©tÃ© $return a laa place.
    * Params:
-   *    string $return = Le type de la valeur retourné.
-   *    DstyleDoc_Element_Return = Une instance d'une valeur de retour.
+   *    string $return = Le type de la valeur retournÃ©.   *    DstyleDoc_Element_Return = Une instance d'une valeur de retour.
    */
   protected function set_return( $return )
   {
@@ -1752,9 +1799,9 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
   }
 
   /**
-   * Renvoie l'instance de la valeur de retour précedement séléctionner ou ajouté avec set_return().
-   * Si aucune valeur de retour n'a été ajouté avant, une fausse valeur de retour sera retournée.
-   * Ne pas utiliser directement cette méthode, utiliser la propriété $return à la place.
+   * Renvoie l'instance de la valeur de retour prÃ©cÃ©dement sÃ©lÃ©ctionner ou ajoutÃ© avec set_return().
+   * Si aucune valeur de retour n'a Ã©tÃ© ajoutÃ© avant, une fausse valeur de retour sera retournÃ©e
+   * Ne pas utiliser directement cette mÃ©thode, utiliser la propriÃ©tÃ© $return a laa place.
    * Returns:
    *    DstyleDoc_Element_Return = L'instance de la valeur de retour.
    */
@@ -1800,7 +1847,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 }
 
 /**
- * Classe d'un element de type paramètre.
+ * Classe d'un element de type paramÃ¨tre.
  */
 class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 {
@@ -1847,7 +1894,7 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 }
 
 /**
- * Classe d'un element de type paramètre.
+ * Classe d'un element de type paramÃ¨tre.
  */
 class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 {
@@ -1996,8 +2043,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
     }
     elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
     {
-      // on met en cache le type trouvé
-      $this->type = $found;
+      // on met en cache le type trouvçˆ      $this->type = $found;
       return $found;
     }
     elseif( $found instanceof DstyleDoc_Element_Member )

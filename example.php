@@ -12,6 +12,7 @@ set_time_limit( 90 );
 
 $d =
 DstyleDoc::hie()
+  ->config_database_pass( 'SeveuSe' )
   ->enable_dstyledoc
   ->enable_javadoc
   ->enable_come_across_element
