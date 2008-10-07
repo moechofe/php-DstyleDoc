@@ -23,14 +23,7 @@ DstyleDoc::hie()
 
 class test_float
 {
-  var $a = null;
 }
-
-$a = new test_float;
-$a->a = 'BEUA';
-
-$class = new ReflectionClass($a);
-printf("---> Properties: %s\n", var_export($class->getProperties(), 1));
 
 /**
  * Returns:
@@ -90,6 +83,7 @@ function test_return()
 }
 
 __halt_compiler();
+
 
 
 class a

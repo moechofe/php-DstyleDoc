@@ -34,9 +34,14 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
     $this->_descriptions = (array)$descriptions;
   }
 
+  /**
+   * Todo:
+   *   apparement on passe toujours des strings.
+   */
   protected function set_description( $description )
   {
-    $this->_descriptions[] = $description;
+    //d( gettype( $description ) );
+    $this->_descriptions[] = (string)$description;
   }
 
   protected function get_description()
@@ -72,6 +77,25 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
     $this->converter = $converter;
   }
 
+  // }}}
+  // {{{ __sleep()
+
+  public function __sleep()
+  {
+    return array(
+      '_descriptions',
+    );
+  }
+
+  // }}}
+  // {{{ __wakeup()
+
+  public function __wakeup()
+  {
+    return array(
+      '_descriptions',
+    );
+  }
 
   // }}}
   // {{{ __toString()
@@ -138,6 +162,19 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 
   final public function offsetUnset( $offset )
   {
+  }
+
+  // }}}
+  // {{{ put()
+
+  final static public function put( DstyleDoc_Custom_Element $element )
+  {
+    if( $element->converter->dsd->use_temporary_sqlite_database )
+    {
+      return $element->converter->dsd->put_element( $element );
+    }
+    else
+      return false;
   }
 
   // }}}

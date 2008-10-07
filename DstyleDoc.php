@@ -62,6 +62,7 @@ require_once 'process.tokens.php';
 require_once 'process.elements.php';
 require_once 'process.analysers.php';
 require_once 'process.descriptables.php';
+require_once 'extension.state_saver.php';
 
 /**
  * Classe de control de DstyleDoc.
@@ -116,6 +117,11 @@ class DstyleDoc extends DstyleDoc_Properties
 
   protected function analyse_all( DstyleDoc_Converter $converter )
   {
+    if( $this->use_temporary_sqlite_database )
+    {
+      DstyleDoc_State_Saver::start( $this );
+    }
+
     foreach( $this->sources as $file )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
@@ -194,7 +200,7 @@ HTML;
       {
         throw new UnexpectedValueException;
       }
-echo memory_get_usage(),'<br>';
+//echo memory_get_usage(),'<br>';
 //if($cccc++ > 1595 )exit;
     }
   }
@@ -218,7 +224,6 @@ echo memory_get_usage(),'<br>';
     //    d( $converter )->d6;
     $converter->dsd = $this;
     $this->analyse_all( $converter );
-    d('wesh');exit;
     $converter->convert_all();
     return $this;
   }
@@ -235,6 +240,13 @@ echo memory_get_usage(),'<br>';
   // {{{ $config
 
   protected $_config = array(
+
+    'use_temporary_sqlite_database' => true,
+
+    'database_host' => 'localhost',
+    'database_user' => 'root',
+    'database_pass' => '',
+    'database_base' => 'dstyledoc_saved_state',
 
     'dstyledoc' => true,
     'version' => true,
@@ -779,8 +791,15 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected function set_function( $function )
   {
+    if( $this->dsd->use_temporary_sqlite_database and count($this->_functions) )
+      DstyleDoc_State_Saver::put_element( current($this->_functions) );
+
     $found = false;
-    if( ! empty($function) and count($this->_functions) )
+    if( ! empty($function) and $this->dsd->use_temporary_sqlite_database )
+    {
+      return DstyleDoc_State_Saver::get_element( 'DstyleDoc_Element_Function', $function, $this );
+    }
+    elseif( ! empty($function) and count($this->_functions) )
     {
       reset($this->_functions);
       while( true)
@@ -815,7 +834,10 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected function get_functions()
   {
-    return $this->_functions;
+    if( $this->dsd->use_temporary_sqlite_database )
+      return new DstyleDoc_State_Saver_Iterator( 'DstyleDoc_Element_Function' );
+    else
+      return $this->_functions;
   }
 
   // }}}

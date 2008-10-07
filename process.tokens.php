@@ -161,7 +161,7 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 
   protected function set_documentation( $documentation )
   {
-    if( $documentation instanceof DstyleDoc_Token_Class ) 
+    if( $documentation instanceof DstyleDoc_Token_Class )
     {
     }
     elseif( $documentation instanceof DstyleDoc_Token_Doc_Comment or $documentation instanceof DstyleDoc_Token )
@@ -647,7 +647,7 @@ HTML;
 
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
 
-    if( $r) 
+    if( $r)
     {
       $token->rollback( $current );
     }
@@ -742,7 +742,7 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
       elseif( $current instanceof DstyleDoc_Token_Context )
       {
         $save = $current->object;
-        $return = $current->down; 
+        $return = $current->down;
         if( $return !== $save and $save instanceof DstyleDoc_Token_Elementable )
           $save->to( $converter );
         return $return;
@@ -982,7 +982,7 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
     if( ! $return->object instanceof DstyleDoc_Token_Fake )
       $return->object->method = $return;
 
-    return $return;      
+    return $return;
   }
 
   public function set_value( $value )
@@ -1082,7 +1082,7 @@ class DstyleDoc_Token_Variable extends DstyleDoc_Token implements DstyleDoc_Toke
     }
     else
       return $current;
-    
+
     $return->name = $source;
 
     return $return;
@@ -1110,7 +1110,7 @@ HTML;
     $current = $this->object;
 
     if( $this->expression )
-      $this->expression->analyse( $this, $current, $value ); 
+      $this->expression->analyse( $this, $current, $value );
     else
       $this->default = $value;
   }
@@ -1471,7 +1471,7 @@ class DstyleDoc_Token_Class_C extends DstyleDoc_Token_Light
       $current->default = $current->object->name;
 
     return $current;
-  }  
+  }
 }
 
 // }}}
@@ -1891,7 +1891,7 @@ class DstyleDoc_Token_While extends DstyleDoc_Token_None
 }
 
 // }}}
-// {{{ Endwhile 
+// {{{ Endwhile
 
 class DstyleDoc_Token_Endwhile extends DstyleDoc_Token_None
 {
