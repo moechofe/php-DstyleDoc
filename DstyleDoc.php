@@ -621,6 +621,93 @@ interface DstyleDoc_Converter_Convert
   // }}}
 }
 
+class DstyleDoc_Element_Container
+{
+  // {{{ $class
+
+  protected $class = '';
+
+  // }}}
+  // {{{ $data
+
+  protected $data = array();
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( $class )
+  {
+    $this->class = (string)$class;
+  }
+
+  // }}}
+  // {{{ put()
+
+  public function put( $data, DstyleDoc_Converter $converter )
+  {
+    if( $converter->dsd->use_temporary_sqlite_database and current($this->data) )
+      DstyleDoc_State_Saver::put_element( current($this->data) );
+
+    $found = false;
+    if( ! empty($data) and $converter->dsd->use_temporary_sqlite_database
+      and $element = DstyleDoc_State_Saver::get_element( $this->class, $data, $converter ) )
+      return $element;
+    elseif( ! empty($data) and count($this->data) )
+    {
+      reset($this->data);
+      while( true)
+      {
+        $current = current($this->data);
+        if( $found = ( (is_object($data) and $current === $data)
+          or (is_string($data) and $current->name === $data) ) or false === next($this->data) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( is_object($data) and ( get_class($data) == $this->class or is_subclass_of($data, $this->class) ) )
+        $this->data[] = $data;
+      else
+      {
+	$class_name = $this->class;
+	$this->data[] = new $class_name( $converter, $data );
+      }
+      end($this->data);
+    }
+  }
+
+  // }}}
+  // {{{ get()
+
+  public function get( DstyleDoc_Converter $converter )
+  {
+    if( $converter->dsd->use_temporary_sqlite_database and current($this->data) )
+      DstyleDoc_State_Saver::put_element( current($this->data) );
+
+    if( ! count($this->data) )
+    {
+      $class_name = $this->class;
+      return new $class_name( $converter, null );
+    }
+    else
+      return current($this->data);
+  }
+
+  // }}}
+  // {{{ get_all()
+
+  public function get_all( DstyleDoc_Converter $converter )
+  {
+    if( $converter->dsd->use_temporary_sqlite_database )
+      return new DstyleDoc_State_Saver_Iterator( 'DstyleDoc_Element_Function', $converter );
+    else
+      return $this->data;
+  }
+
+  // }}}
+}
+
 /**
  * Convertisseur abstrait
  * Todo:
@@ -653,43 +740,28 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected $_files = array();
 
-  protected function set_file( $file )
+  protected function init_file()
   {
-    $found = false;
-    if( ! empty($file) and count($this->_files) )
-    {
-      reset($this->_files);
-      while( true)
-      {
-        $current = current($this->_files);
-        if( $found = ( (is_object($file) and $current === $file)
-          or (is_string($file) and $current->file === strtolower($file)) ) or false === next($this->_files) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $file instanceof DstyleDoc_Element_File )
-        $this->_files[] = $file;
-      else
-        $this->_files[] = new DstyleDoc_Element_File( $this, $file );
-      end($this->_files);
-    }
+    if( ! $this->_files instanceof DstyleDoc_Element_Container )
+      $this->_files = new DstyleDoc_Element_Container( 'DstyleDoc_Element_File' );
   }
 
-  // Todo: copier sur ce model = pas d'ajout de DstyleDoc_Element_File dans $_files[]
+  protected function set_file( $file )
+  {
+    $this->init_file();
+    $this->_files->put( $file, $this );
+  }
+
   protected function get_file()
   {
-    if( ! count($this->_files) )
-      return new DstyleDoc_Element_File( $this, null );
-    else
-      return current($this->_files);
+    $this->init_file();
+    return $this->_files->get( $this );
   }
 
   protected function get_files()
   {
-    return $this->_files;
+    $this->init_file();
+    return $this->_files->get_all( $this );
   }
 
   // }}}
@@ -697,44 +769,28 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected $_classes = array();
 
-  protected function set_class( $name )
+  protected function init_class()
   {
-    $found = false;
-    if( ! empty($name) and count($this->_classes) )
-    {
-      reset($this->_classes);
-      while( true)
-      {
-        $class = current($this->_classes);
-        if( $found = ($class->name == $name or $class === $name) or false === next($this->_classes) )
-          break;
-      }
-    }
+    if( ! $this->_classes instanceof DstyleDoc_Element_Container )
+      $this->_classes = new DstyleDoc_Element_Container( 'DstyleDoc_Element_Class' );
+  }
 
-    if( ! $found )
-    {
-      if( $name instanceof DstyleDoc_Element_Class )
-        $this->_classes[] = $name;
-      else
-        $this->_classes[] = new DstyleDoc_Element_Class( $this, $name );
-      end($this->_classes);
-    }
+  protected function set_class( $class )
+  {
+    $this->init_class();
+    $this->_classes->put( $class, $this );
   }
 
   protected function get_class()
   {
-    if( ! count($this->_classes) )
-    {
-      $this->_classes[] = new DstyleDoc_Element_Class( $this, null );
-      return end($this->_classes);
-    }
-    else
-      return current($this->_classes);
+    $this->init_class();
+    return $this->_classes->get( $this );
   }
 
   protected function get_classes()
   {
-    return $this->_classes;
+    $this->init_class();
+    return $this->_classes->get_all( $this );
   }
 
   // }}}
@@ -742,41 +798,28 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
   protected $_interfaces = array();
 
-  protected function set_interface( $name )
+  protected function init_interface()
   {
-   $found = false;
-    if( ! empty($name) and count($this->_interfaces) )
-    {
-      reset($this->_interfaces);
-      while( true)
-      {
-        $interface = current($this->_interfaces);
-        if( $found = ($interface->name == $name) or false === next($this->_interfaces) )
-          break;
-      }
-    }
+    if( ! $this->_interfaces instanceof DstyleDoc_Element_Container )
+      $this->_interfaces = new DstyleDoc_Element_Container( 'DstyleDoc_Element_Interface' );
+  }
 
-    if( ! $found )
-    {
-      $this->_interfaces[] = new DstyleDoc_Element_Interface( $this, $name );
-      end($this->_interfaces);
-    }
+  protected function set_interface( $interface )
+  {
+    $this->init_interface();
+    $this->_interfaces->put( $interface, $this );
   }
 
   protected function get_interface()
   {
-    if( ! count($this->_interfaces) )
-    {
-      $this->_interfaces[] = new DstyleDoc_Element_Interface( $this, null );
-      return end($this->_interfaces);
-    }
-    else
-      return current($this->_interfaces);
+    $this->init_interface();
+    return $this->_interfaces->get( $this );
   }
 
   protected function get_interfaces()
   {
-    return $this->_interfaces;
+    $this->init_interface();
+    return $this->_interfaces->get_all( $this );
   }
 
   // }}}
@@ -785,66 +828,40 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   /**
    * La listes des instances des fonctions définies.
    * Types:
-   *    array(DstyleDoc_Element_Function) = Un tableau d'instance de DstyleDoc_Element_Function.
+   *    DstyleDoc_Element_Container
    */
-  protected $_functions = array();
+  protected $_functions = null;
+
+  protected function init_function()
+  {
+    if( ! $this->_functions instanceof DstyleDoc_Element_Container )
+      $this->_functions = new DstyleDoc_Element_Container( 'DstyleDoc_Element_Function' );
+  }
 
   protected function set_function( $function )
   {
-    if( $this->dsd->use_temporary_sqlite_database and current($this->_functions) )
-      DstyleDoc_State_Saver::put_element( current($this->_functions) );
-
-    $found = false;
-    if( ! empty($function) and $this->dsd->use_temporary_sqlite_database
-      and $element = DstyleDoc_State_Saver::get_element( 'DstyleDoc_Element_Function', $function, $this ) )
-      return $element;
-    elseif( ! empty($function) and count($this->_functions) )
-    {
-      reset($this->_functions);
-      while( true)
-      {
-        $current = current($this->_functions);
-        if( $found = ( (is_object($function) and $current === $function)
-          or (is_string($function) and $current->name === $function) ) or false === next($this->_functions) )
-          break;
-      }
-    }
-
-    if( ! $found )
-    {
-      if( $function instanceof DstyleDoc_Element_Function )
-        $this->_functions[] = $function;
-      else
-        $this->_functions[] = new DstyleDoc_Element_Function( $this, $function );
-      end($this->_functions);
-    }
+    $this->init_function();
+    $this->_functions->put( $function, $this );
   }
 
   protected function get_function()
   {
-    if( $this->dsd->use_temporary_sqlite_database and current($this->_functions) )
-      DstyleDoc_State_Saver::put_element( current($this->_functions) );
-
-    if( ! count($this->_functions) )
-    {
-      $this->_functions[] = new DstyleDoc_Element_Function( $this, null );
-      return end($this->_functions);
-    }
-    else
-      return current($this->_functions);
+    $this->init_function();
+    return $this->_functions->get( $this );
   }
 
   protected function get_functions()
   {
-    if( $this->dsd->use_temporary_sqlite_database )
-      return new DstyleDoc_State_Saver_Iterator( 'DstyleDoc_Element_Function', $this );
-    else
-      return $this->_functions;
+    $this->init_function();
+    return $this->_functions->get_all( $this );
   }
 
   // }}}
   // {{{ $methods
 
+  /**
+   * fixme Devrait retourner la listes des methodes des classes, ne devrait pas avoir de membre $methods
+   */
   protected $_methods = array();
 
   protected function set_method( $method )

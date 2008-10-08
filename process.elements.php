@@ -649,7 +649,7 @@ abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_
   /**
    * Contient la listes des méthodes déclarées par la classe.
    * Type:
-   *    array(DstyleDoc_Element_Method) = Tableau a lalefs numériques contentant des instances de DstyleDoc_Element_Method.
+   *    array(DstyleDoc_Element_Method) = Tableau a clefs numériques contentant des instances de DstyleDoc_Element_Method.
    */
   protected $_methods = array();
 
@@ -662,6 +662,24 @@ abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_
    */
   protected function set_method( $name )
   {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     $found = false;
     if( ! empty($name) and count($this->_methods) )
     {
