@@ -56,7 +56,6 @@ class DstyleDoc_State_Saver
 
   static public function put_element( DstyleDoc_Custom_Element $element )
   {
-    d( $element );
     self::$cnx->query( 'replace into `elements` set `class` = ?, `name` = ?, `state` = ?',
       (string)get_class($element),
       (string)$element->name,
@@ -73,7 +72,6 @@ class DstyleDoc_State_Saver
     {
       $element = unserialize( $state );
       $element->converter = $converter;
-      d( $element );
       return $element;
     }
     else

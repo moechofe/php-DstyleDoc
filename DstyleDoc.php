@@ -637,7 +637,10 @@ class DstyleDoc_Element_Container
 
   public function __construct( $class )
   {
-    $this->class = (string)$class;
+    if( is_subclass_of( $class, 'DstyleDoc_Element' ) )
+      $this->class = (string)$class;
+    else
+      throw new InvalidArgumentException(sprintf('Excepte a class name child of DstyleDoc_Element.'));
   }
 
   // }}}
@@ -687,11 +690,31 @@ class DstyleDoc_Element_Container
 
     if( ! count($this->data) )
     {
+      throw new RuntimeException(sprintf('The container don\'t contain any entry.'));
       $class_name = $this->class;
       return new $class_name( $converter, null );
     }
     else
       return current($this->data);
+  }
+
+  // }}}
+  // {{{ exists()
+
+  /**
+   * todo: optimiser : si l'object est déjà en current($data) le retourner sans faire d'appel à la base de donnée.
+   */
+  public function exists( $data, DstyleDoc_Converter $converter )
+  {
+    if( $converter->dsd->use_temporary_sqlite_database )
+      return DstyleDoc_State_Saver::get_element( $this->class, $data, $converter );
+
+    foreach( $this->_data as $value )
+    {
+      if( strtolower($value->name) === strtolower((string)$data) )
+        return $value;
+    }
+    return false;
   }
 
   // }}}
@@ -738,7 +761,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ $files
 
-  protected $_files = array();
+  protected $_files = null;
 
   protected function init_file()
   {
@@ -767,7 +790,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ $classes
 
-  protected $_classes = array();
+  protected $_classes = null;
 
   protected function init_class()
   {
@@ -796,7 +819,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ $interfaces
 
-  protected $_interfaces = array();
+  protected $_interfaces = null;
 
   protected function init_interface()
   {
@@ -965,12 +988,8 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
    */
   public function file_exists( $file )
   {
-    foreach( $this->_files as $value )
-    {
-      if( strtolower($value->file) === strtolower($file) )
-        return $value;
-    }
-    return false;
+    $this->init_file();
+    return $this->_files->exists( $file, $this );
   }
 
   // }}}
@@ -979,41 +998,32 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   /**
    * Renvoie une classe si elle existe.
    * Params:
-   *    string $class = Le nom de la classe � chercher.
+   *    string $class = Le nom de la classe à chercher.
    * Returns:
-   *    DstyleDoc_Element_Class = L'instance de la classe en cas de succ�s.
-   *    false = En cas d'�ch�c.
+   *    DstyleDoc_Element_Class = L'instance de la classe en cas de succès.
+   *    false = En cas d'échèc.
    */
   public function class_exists( $class )
   {
-    foreach( $this->_classes as $value )
-    {
-      if( strtolower($value->name) === strtolower((string)$class) )
-        return $value;
-    }
-    return false;
+    $this->init_class();
+    return $this->_classes->exists( $class, $this );
   }
 
   // }}}
   // {{{ interface_exists()
 
-  // Todo: propager la vérif strtolower sur les autres fonction de ce type
   /**
    * Renvoie une interface si elle existe.
    * Params:
    *    string $interface = Le nom de la interface à chercher.
    * Returns:
-   *    DstyleDoc_Element_Interface= L'instance de la interface en cas de succès.
+   *    DstyleDoc_Element_Interface = L'instance de la interface en cas de succès.
    *    false = En cas d'échec.
    */
   public function interface_exists( $interface )
   {
-    foreach( $this->_interfaces as $value )
-    {
-      if( strtolower($value->name) === strtolower((string)$interface) )
-        return $value;
-    }
-    return false;
+    $this->init_interface();
+    return $this->_interfaces->exists( $interface, $this );
   }
 
   // }}}
@@ -1071,12 +1081,8 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
    */
   public function function_exists( $function )
   {
-    foreach( $this->_functions as $value )
-    {
-      if( strtolower($value->name) === strtolower($function) )
-        return $value;
-    }
-    return false;
+    $this->init_function();
+    return $this->_functions->exists( $function, $this );
   }
 
   // }}}

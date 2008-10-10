@@ -2047,6 +2047,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
   // todo: virer le $from, il existe dans $fonction
   protected function get_type()
   {
+    d( $this );
     if( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
     {
       if( ! $found->analysed ) $found->analyse();
