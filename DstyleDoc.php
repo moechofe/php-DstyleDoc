@@ -637,18 +637,18 @@ class DstyleDoc_Element_Container
 
   public function __construct( $class )
   {
-    if( is_subclass_of( $class, 'DstyleDoc_Element' ) )
+    if( is_subclass_of( $class, 'DstyleDoc_Custom_Element' ) )
       $this->class = (string)$class;
     else
-      throw new InvalidArgumentException(sprintf('Excepte a class name child of DstyleDoc_Element.'));
+      throw new InvalidArgumentException(sprintf('Unexcepted (%s), excepted (%s) passed to %s::%s().',(string)$class,'DstyleDoc_Custom_Element',__CLASS__,__FUNCTION__));
   }
 
   // }}}
   // {{{ put()
 
-  public function put( $data, DstyleDoc_Converter $converter )
+  public function put( $data, DstyleDoc_Converter $converter, $cache = true )
   {
-    if( $converter->dsd->use_temporary_sqlite_database and current($this->data) )
+    if( $cache and $converter->dsd->use_temporary_sqlite_database and current($this->data) )
       DstyleDoc_State_Saver::put_element( current($this->data) );
 
     $found = false;
@@ -683,9 +683,9 @@ class DstyleDoc_Element_Container
   // }}}
   // {{{ get()
 
-  public function get( DstyleDoc_Converter $converter )
+  public function get( DstyleDoc_Converter $converter, $cache = true )
   {
-    if( $converter->dsd->use_temporary_sqlite_database and current($this->data) )
+    if( $cache and $converter->dsd->use_temporary_sqlite_database and current($this->data) )
       DstyleDoc_State_Saver::put_element( current($this->data) );
 
     if( ! count($this->data) )
@@ -720,9 +720,9 @@ class DstyleDoc_Element_Container
   // }}}
   // {{{ get_all()
 
-  public function get_all( DstyleDoc_Converter $converter )
+  public function get_all( DstyleDoc_Converter $converter, $cache = true )
   {
-    if( $converter->dsd->use_temporary_sqlite_database )
+    if( $cache and $converter->dsd->use_temporary_sqlite_database )
       return new DstyleDoc_State_Saver_Iterator( 'DstyleDoc_Element_Function', $converter );
     else
       return $this->data;

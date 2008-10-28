@@ -1,12 +1,47 @@
 <?php
-/*
- * Created on 22 sept. 2008
- *
- * To change the template for this generated file go to
- * Window - Preferences - PHPeclipse - PHP - Code Templates
- */
-for ($i =1; $i <= 10; $i++){
-  echo "<br>";
-  echo " we are at ",$i;
+
+require_once( 'xdebug.front.end.php' );
+
+class c
+{
 }
+
+class d
+{
+  function __sleep()
+  {
+    return array('a');
+  }
+  function __wakeup()
+  {
+    $this->a = 'bbb';
+    return $this->__sleep();
+  }
+}
+
+class a extends d
+{
+  protected $a = 'aaa';
+  function __construct( c $c )
+  {
+  }
+}
+
+class b extends d
+{
+  protected $a = null;
+  function __construct( a $a )
+  {
+    $this->a = $a;
+  }
+}
+
+$b = new b( new a( new c ) );
+
+d( $b )->lb;
+echo( $s = serialize($b) );
+
+$bb = unserialize($s);
+d( $bb )->lbb;
+
 ?>

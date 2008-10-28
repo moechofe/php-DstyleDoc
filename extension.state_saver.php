@@ -54,12 +54,12 @@ class DstyleDoc_State_Saver
   // }}}
   // {{{ put_element()
 
-  static public function put_element( DstyleDoc_Custom_Element $element )
+  static public function put_element( DstyleDoc_Element $element )
   {
     self::$cnx->query( 'replace into `elements` set `class` = ?, `name` = ?, `state` = ?',
       (string)get_class($element),
       (string)$element->name,
-      serialize( $element )
+      serialize($element)
     );
   }
 
@@ -71,7 +71,7 @@ class DstyleDoc_State_Saver
     if( $state = self::$cnx->field->query( 'select `state` from `elements` where `class` = ? and `name` = ?', (string)$class, (string)$name ) )
     {
       $element = unserialize( $state );
-      $element->converter = $converter;
+      $element->wake_up( $converter );
       return $element;
     }
     else
