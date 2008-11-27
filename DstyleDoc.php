@@ -9,9 +9,21 @@
 /**
  * Classe de prise en charge des surcharges des membres.
  * Permet d'utiliser facilement des getter, setter, issetter, unsetter et caller.
+ * Cette classe doit être étendu.
  */
 class DstyleDoc_Properties
 {
+  /**
+   * Permet d'utiliser des getter.
+   * __get() est appelé automatiquement par PHP lorsque la lecture de donnée d'un membre est inaccessible.
+   * __get() vérifiera au préalable que la fonction "get_"+<nom_du_membre> existe et quelle est appelable. Dans le cas contraire, une exception BadPropertyException sera lancé.
+   * Params:
+   *   string $property = Le nom du membre.
+   * Returns:
+   *   mixed = Retournera la valeur retournée par la fonction "get_"+<nom_du_membre>.
+   * Throws:
+   *   BadPropertyException = Lancé si la fonction "get_"+<nom_du_membre> n'est pas disponible.
+   */
   protected function __get( $property )
   {
     if( $property === '__class' )
@@ -241,7 +253,7 @@ HTML;
 
   protected $_config = array(
 
-    'use_temporary_sqlite_database' => true,
+    'use_temporary_sqlite_database' => false,
 
     'database_host' => 'localhost',
     'database_user' => 'root',
@@ -350,9 +362,9 @@ interface DstyleDoc_Converter_Convert
   // {{{ get_file_functions()
 
   /**
-   * Renvoie la liste des functions appartenant � un fichier donn�e.
+   * Renvoie la liste des functions appartenant à un fichier donnée.
    * Params:
-   *    $file = L'instance d'un �l�ment de fichier.
+   *    $file = L'instance d'un élément de fichier.
    * Returns:
    *    array(DstyleDoc_Element_Function) = Un tableau de fonctions.
    */
@@ -660,9 +672,9 @@ class DstyleDoc_Element_Container
       reset($this->data);
       while( true)
       {
-        $current = current($this->data);
+	$current = current($this->data);
         if( $found = ( (is_object($data) and $current === $data)
-          or (is_string($data) and $current->name === $data) ) or false === next($this->data) )
+          or (is_string($data) and strtolower($current->name) === strtolower($data)) ) or false === next($this->data) )
           break;
       }
     }
@@ -709,7 +721,7 @@ class DstyleDoc_Element_Container
     if( $converter->dsd->use_temporary_sqlite_database )
       return DstyleDoc_State_Saver::get_element( $this->class, $data, $converter );
 
-    foreach( $this->_data as $value )
+    foreach( $this->data as $value )
     {
       if( strtolower($value->name) === strtolower((string)$data) )
         return $value;

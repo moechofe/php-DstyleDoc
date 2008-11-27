@@ -85,6 +85,16 @@ function xdebug_swap(d1)
       item.style.display='none';
   }
 }
+function setCookie( name, value, expires, path, domain, secure )
+{
+  var today = new Date();
+  today.setTime( today.getTime() );
+  if( expires )
+    expires = expires * 1000 * 60 * 60 * 24;
+  var expires_date = new Date( today.getTime() + (expires) );
+  document.cookie = name+"="+escape(value)+((expires)?";expires="+expires_date.toGMTString():"");
+}
+
 </script>
 
 HTML;
@@ -128,7 +138,9 @@ HTML;
     ob_start();
     var_dump( $var->var );
     $dump = ob_get_clean();
-    if( substr($dump,0,15)=='<pre dir="ltr">' ) $dump = substr($dump,15,-strlen('</pre>'));
+
+    if( substr($dump,0,39)=="<pre class='xdebug-var-dump' dir='ltr'>" ) $dump = substr($dump,39,-strlen('</pre>'));
+    elseif( substr($dump,0,15)=='<pre dir="ltr">' ) $dump = substr($dump,15,-strlen('</pre>'));
     else $dump = substr($dump,strlen('<pre>'),-strlen('</pre>'));
 
     for( $i=0; $i< abs((integer)$var->pass); $i++ )
@@ -274,7 +286,7 @@ HTML;
     echo '<!-- "]]> --></a><br clear="both"/>',"\r\n",
 <<<HTML
 <div class="xdebug_front_end">
-<div class="config"><a href="javascript:void(0);">L</a></div>
+<div class="config"><a href="javascript:void(0);">L</a><br/><a href="javascript:void(0);">F</a><br/><a href="javascript:void(0);">U</a></div>
 <ul>
 HTML;
 

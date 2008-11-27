@@ -6,7 +6,7 @@ require_once( 'converter.HTML.php' );
 require_once( 'libraries/template_lite/class.template.php' );
 
 /**
- * Convertisseur qui utilise le moteur de template Template_Lite pour g�n�rer les pages de la documentation.
+ * Convertisseur qui utilise le moteur de template Template_Lite pour générer les pages de la documentation.
  */
 abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 {
@@ -39,6 +39,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   public function convert_function( DstyleDoc_Element_Function $function )
   {
+    $this->tpl->assign( '_function', $function );
+    return $this->tpl->fetch( __CLASS__.':convert_function.tpl' );
   }
 
   // }}}
@@ -164,21 +166,18 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ print_classes_index()
 
-  static public function print_classes_index( $params, $tpl )
+  static public function print_classes_index( $params, Template_Lite $tpl )
   {
     if( isset($params['file']) and $params['file'] instanceof DstyleDoc_Element_File )
-    {
       $tpl->assign( array(
         '_file' => $params['file'],
         '_classes' => $params['file']->classes ) );
-      unset($params['file']);
-    }
     elseif( isset($tpl->_vars['file']) and $tpl->_vars['file'] instanceof DstyleDoc_Element_File )
       $tpl->assign( array(
         '_file' => $tpl->_vars['file'],
         '_classes' => $tpl->_vars['file']->classes ) );
     else
-      $tpl->trigger_error( 'invalid DstyleDoc_Element_File for first parameter send to '.__FUNCTION__, E_USER_ERROR );
+      $tpl->trigger_error( 'unexists or non DstyleDoc_Element_Class "file" parameter send to {classes_index}' );
 
     return $tpl->fetch( __CLASS__.':print_classes_index.tpl' );
   }
@@ -186,7 +185,19 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ print_methods_index()
 
-  static public function print_methods_index( $params, $tpl )
+  /**
+   * Plug-in Template_Lite pour afficher la listes des méthodes d'une classes.
+   * Affiche la liste des classes de la méthode passé en paramètre en utilisant le template "print_methods_index.tpl".
+   * Cette fonction ne doit pas être appelé directement, elle doit être enregistrée en temps que plug-in Template_Lite grâce à la méthode Template_Lite::register_function().
+   * Si le paramètre "class" n'est pas renseigné il sera determinté automatiquement.
+   * Deux variables Template_Lite seront créer et pourront être utilisé dans le template "print_methods_index.tpl" : {$_class} et {$_methods}.
+   * Params:
+   *   array = Les paramètres envoyés par Template_Lite.
+   *     [DstyleDoc_Element_Class "class"] = L'instance de la classe.
+   * Returns:
+   *   string = Le résultat du template "print_methods_index.tpl".
+   */
+  static public function print_methods_index( $params, Template_Lite $tpl )
   {
     if( isset($params['class']) and $params['class'] instanceof DstyleDoc_Element_Class )
       $tpl->assign( array(
@@ -197,9 +208,40 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
         '_class' => $tpl->_vars['class'],
         '_methods' => $tpl->_vars['class']->methods ) );
     else
-      $tpl->trigger_error( 'unexists or invalid "class" parameter send to {methods_index}' );
+      $tpl->trigger_error( 'unexists or non DstyleDoc_Element_Class "class" parameter send to {methods_index}' );
 
     return $tpl->fetch( __CLASS__.':print_methods_index.tpl' );
+  }
+
+  // }}}
+  // {{{ print_functions_index()
+
+  /**
+   * Plug-in Template_Lite pour afficher la listes des function d'un fichier.
+   * Affiche la liste des fonctions déclaré dans le ficher passé en paramètre en utilisant le template "print_functions_index.tpl".
+   * Cette fonction ne doit pas être appelé directement, elle doit être enregistrée en temps que plug-in Template_Lite grâce à la méthode Template_Lite::register_function().
+   * Si le paramètre "file" n'est pas renseigné il sera determinté automatiquement.
+   * Deux variables Template_Lite seront créer et pourront être utilisé dans le template "print_methods_index.tpl" : {$_file} et {$_fonctions}.
+   * Params:
+   *   array = Les paramètres envoyés par Template_Lite.
+   *     [DstyleDoc_Element_Class "class"] = L'instance de la classe.
+   * Returns:
+   *   string = Le résultat du template "print_methods_index.tpl".
+   */
+  static public function print_functions_index( $params, Template_Lite $tpl )
+  {
+    if( isset($params['file']) and $params['file'] instanceof DstyleDoc_Element_File )
+      $tpl->assign( array(
+        '_file' => $params['file'],
+        '_functions' => $params['file']->functions ) );
+    elseif( isset($tpl->_vars['file']) and $tpl->_vars['file'] instanceof DstyleDoc_Element_File )
+      $tpl->assign( array(
+        '_file' => $tpl->_vars['file'],
+        '_functions' => $tpl->_vars['file']->functions ) );
+    else
+      $tpl->trigger_error( 'unexists or non DstyleDoc_Element_Class "file" parameter send to {functions_index}' );
+
+    return $tpl->fetch( __CLASS__.':print_functions_index.tpl' );
   }
 
   // }}}
@@ -262,6 +304,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     $this->tpl->register_function( 'files_index', array($this,'print_files_index') );
     $this->tpl->register_function( 'classes_index', array($this,'print_classes_index') );
     $this->tpl->register_function( 'methods_index', array($this,'print_methods_index') );
+    $this->tpl->register_function( 'functions_index', array($this,'print_functions_index') );
   }
 
   // }}}
@@ -326,7 +369,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // todo: trouver un moyen pour le charset
   protected function write( $template )
   {
-    //set_error_handler( array($this,'error_config_or_not') );
+    set_error_handler( array($this,'error_config_or_not') );
     if( isset($this->destination_dir) )
     {
     }
@@ -335,15 +378,15 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
       if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
       $this->tpl->display( $template );
     }
-    //restore_error_handler();
+    restore_error_handler();
   }
 
   // }}}
   // {{{ error_config_or_not()
 
-  static public function error_config_or_not( $errno, $errstr, $errfile, $errline )
+  static public function error_config_or_not( $errno, $errstr, $errfile, $errline, $errcontext )
   {
-    if( $errno == 8 and substr($errstr,0,15)=='Undefined index' )
+    if( $errno == 8 and substr($errstr,0,15)=='Undefined index' and isset($errcontext['this']) and $errcontext['this'] instanceof Template_Lite and strpos($errfile,$errcontext['this']->compile_dir) !== false )
       echo '#'.substr($errstr,18).'#';
     else
       return false;

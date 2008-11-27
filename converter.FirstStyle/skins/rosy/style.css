@@ -3,8 +3,8 @@
 body { margin: 0px; padding: 0px; position: relative; font-size: 15px; }
 
 h1 { font-family: georgia, serif; font-size: 29px; }
-h2 { font-family: georgia, serif; font-size: 21px; }
-p, li { font-family: arial, "sans serif"; font-size: 13px; line-height: 20px; }
+h2 { font-family: georgia, serif; font-size: 19px; }
+p, li { font-family: arial, "sans serif"; font-size: 15px; line-height: 20px; }
 
 #page-header { position: absolute; top: 0px; left: 0px; width: 100%; height: 40px; }
 
@@ -17,7 +17,7 @@ p, li { font-family: arial, "sans serif"; font-size: 13px; line-height: 20px; }
 div.content-display h1 { font-weight: normal; }
 
 /**
- * Les elements générique de la documentation.
+ * Les elements gÃ©nÃ©rique de la documentation.
  */
 span.display-method { background-repeat: no-repeat; background-position: left; padding-left: 18px; line-height: 18px; }
 span.display-method.method-public { background-image: url("Icon_method_public.png"); }
@@ -30,7 +30,13 @@ span.display-class.class { background-image: url("Icon_class.png"); }
 span.display-class.class-abstract { background-image: url("Icon_class_abstract.png"); }
 span.display-class.class-final { background-image: url("Icon_class_final.png"); }
 
+span.display-function { background: url("Icon_function.png") no-repeat left; padding-left: 18px; line-height: 18px; }
+
+span.display-file { background: url("Icon_file.png") no-repeat left; padding-left: 18px; line-height: 18px; }
+
 h1 span.display { background: inherit !important; padding-left: 0px !important; }
+
+a { color: MediumBlue; }
 
 /**
  * Le design pour l'entete
@@ -39,13 +45,15 @@ h1 span.display { background: inherit !important; padding-left: 0px !important; 
 #page-header h2.logo { font-weight: normal; color: white; margin: 0px; line-height: 38px; padding: 0px 10px; }
 #page-header h2.logo a { text-decoration: none; color: white; }
 
-/*********************************************** sandybrown */
+/**
+ * sandybrown, rosybrown, burlywood, antiquewhite, palegoldenrod, tan, beige
+ */
 
 /**
  * Le design de la partie contenu
  */
 #page-content div.page-annotation { padding-left: 30px; }
-#page-content div.page-annotation p { font-size: 11px; line-height: 13px; float: left; background: maroon; color: burlywood; margin: 0px; padding: 1px 3px; font-style: italic; }
+#page-content div.page-annotation p { font-size: 11px; line-height: 18px; float: left; background: maroon; color: burlywood; margin: 0px; padding: 1px 4px 2px 4px; font-style: italic; }
 #page-content div.page-annotation a { color: burlywood; }
 #page-content div.page-annotation span.display { background: inherit !important; padding-left: 0px !important; }
 #page-content div.page-content { clear: left; padding: 10px 20px 40px 30px; }
@@ -53,6 +61,8 @@ h1 span.display { background: inherit !important; padding-left: 0px !important; 
 #page-content h3.list-header { margin: 10px 10px 0px 10px; font-weight: normal; }
 #page-content ul.list { list-style: none; padding: 0px; margin: 0px 10px 10px 10px; }
 #page-content div.content-index { background: antiquewhite; float: left; }
+#page-content h1.content-title { font-weight: normal; }
+#page-content div.content-index li { font-size: 13px; }
 
 /**
  * Le design de la partie navigation
@@ -60,4 +70,6 @@ h1 span.display { background: inherit !important; padding-left: 0px !important; 
 #page-browser { background: palegoldenrod; }
 #page-browser h3.list-header { margin: 10px 10px 0px 10px; font-weight: normal; padding: 3px 1px; }
 #page-browser ul.list { list-style: none; padding: 0px; margin: 0px 10px 10px 10px; border-top: solid 1px tan; }
-#page-browser ul.list li { padding: 1px 3px; border-bottom: solid 1px tan; background: beige; }
+#page-browser ul.list li { font-size: 13px; padding: 2px 3px 1px 3px; border-bottom: solid 1px tan; background: beige; }
+#page-browser ul.list li a:visited { text-decoration: none; }
+

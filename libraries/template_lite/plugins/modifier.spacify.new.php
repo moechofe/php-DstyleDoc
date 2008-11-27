@@ -21,6 +21,9 @@
  */
 function tpl_modifier_spacify($string, $spacify_char = ' ')
 {
+  if( is_array($string) )
+    return implode($spacify_char, $string);
+  else
     return implode($spacify_char, preg_split('//', $string, -1, PREG_SPLIT_NO_EMPTY));
 }
 

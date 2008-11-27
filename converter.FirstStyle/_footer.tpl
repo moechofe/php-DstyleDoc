@@ -1,6 +1,6 @@
   <div class="footer-content"><div class="frame"><div class="content">
     <ul>
-      <li>link</li>
+      <li>footer link</li>
     </ul>
   </div></div></div>
 

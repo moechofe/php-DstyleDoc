@@ -1097,13 +1097,16 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
   protected function set_param( $param )
   {
     $found = false;
+
+    if( $param{0} == '$' ) $param = substr($param,1);
+
     if( ! empty($param) and count($this->_params) )
     {
       reset($this->_params);
       while( true)
       {
-        $value = current($this->_params);
-        if( $value->var == strtolower($param) )
+	$value = current($this->_params);
+        if( strtolower($value->var) == strtolower($param) )
         {
           $found = true;
           break;
@@ -1157,9 +1160,10 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
       reset($this->_returns);
       while( true)
       {
-        $current = current($this->_returns);
+	$current = current($this->_returns);
+	// ajouter d'autre verif ici ?
         if( $found = ( (is_object($return) and $current === $return)
-          or (is_string($return) and $current->type === strtolower($return)) ) or false === next($this->_returns) )
+          or (is_string($return) and is_string($current->type) and strtolower($current->type) === strtolower($return)) ) or false === next($this->_returns) )
           break;
       }
     }
@@ -1204,17 +1208,20 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
           $this->smart_add_return_type( $result, $type, $return );
       }
       else
-        $this->smart_add_return_type( $result, $types, $return );
+      {
+      $this->smart_add_return_type( $result, $types, $return );
+      }
     }
     return $result;
   }
 
-  private function smart_add_return_type( &$array, $type, DstyleDoc_Element_Type $return )
+  private function smart_add_return_type( &$array, $type, DstyleDoc_Element_Return $return )
   {
-    if( $type instanceof DstyleDoc_Element_Class )
+    if( $type instanceof DstyleDoc_Element_Class or $type instanceof DstyleDoc_Element_Interface )
       $key = $type->name;
     else
       $key = $type;
+
     if( ! isset($array[$key]) or ! isset($array[$key]->description) or ($return->from === $this and isset($return->description)) )
       $array[$key] = $return;
   }
@@ -1946,7 +1953,8 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 
   protected function set_var( $var )
   {
-    $this->_var = strtolower((string)$var);
+    if( substr((string)$var,0,1)=='$') $var = substr((string)$var,1);
+    $this->_var = (string)$var;
   }
 
   protected function get_var()
@@ -1991,9 +1999,16 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
   // }}}
   // {{{ __construct()
 
+  /**
+   * Construit une instance de DstyleDoc_Element_Param.
+   * Params:
+   *   $converter = L'instance du convertisseur courant.
+   *   string $var = Le nom du paramètre.
+   */
   public function __construct( DstyleDoc_Converter $converter, $var )
   {
     parent::__construct( $converter );
+
     if( $var )
       $this->var = $var;
   }
@@ -2038,7 +2053,8 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 
   protected function set_type( $type )
   {
-    if( $type instanceof DstyleDoc_Element_Class )
+    //d($type);
+    if( $type instanceof DstyleDoc_Element_Interface or $type instanceof DstyleDoc_Element_Class )
       $this->_type = $type;
     else
       $this->_type = (string)$type;
@@ -2047,8 +2063,10 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
   // todo: virer le $from, il existe dans $fonction
   protected function get_type()
   {
-    d( $this );
-    if( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
+    if( $this->_type instanceof DstyleDoc_Element_Interface or $this->_type instanceof DstyleDoc_Element_Class )
+      return $this->_type;
+
+    elseif( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
     {
       if( ! $found->analysed ) $found->analyse();
       $types = array();
@@ -2060,11 +2078,14 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
       }
       return $types;
     }
+
     elseif( $found instanceof DstyleDoc_Element_Interface or $found instanceof DstyleDoc_Element_Class )
     {
-      // on met en cache le type trouv爠     $this->type = $found;
+      // on met en cache ce qu'on a trouvé
+      $this->_type = $found;
       return $found;
     }
+
     elseif( $found instanceof DstyleDoc_Element_Member )
     {
       if( ! $found->analysed ) $found->analyse();
@@ -2077,8 +2098,10 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
       }
       return $types;
     }
+
     elseif( in_array(strtolower($this->_type), $this->types) )
       return strtolower($this->_type);
+
     else
       return $this->_type;
   }

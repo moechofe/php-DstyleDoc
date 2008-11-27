@@ -2,7 +2,8 @@
   <div class="content-display"><h1>{$_method.display}</h1></div>
   <div class="content-title"><p>{$_method.title}</p></div>
   <div class="content-syntax">
-    {if !empty(#method_syntax#)}<h2>{#method_syntax#}</h2>{elseif isset(#method_syntax#)}{else}<h2>#method_syntax#</h2>{/if}
+  {php}d( $this->_vars['_element']->params ){/php}
+    <h2>{#method_syntax#}</h2>
     <ul>
     {foreach item=syntax from=$_method.syntaxs}
       <li>{$syntax}</li>

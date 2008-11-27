@@ -2,48 +2,38 @@
 
 /**
  * Couche d'abstraction simple pour mysql.
- *
- * @package connexion
- * @TODO faire en sorte que les requetes accept le parametre ! en plus mais pas \!
+ * Todo:
+ *   - GÃ©rer les query( 'insert', array( 1, 2 ) ) et les query( 'select', array( 1, 2 ) )
  */
 
-/**
- * Couche d'abstraction simple pour requÃªte vers serveur mysql.
+/** Couche d'abstraction simple pour requÃªte vers serveur mysql.
  *
- * Utilise les extensions mysql ou mysqli si cette derniÃ¨re est disponible pour effectuer
- * les requÃªtes.
- *
- * @package connexion
+ * Utilise les extensions PDO, MySQL ou MySQLi si elles sont disponibles.
  */
 class mysql_connexion
 {
-  // {{{ $mailto
-
-  /**
-   * Liste de adresse de destination des alertes email.
-   * @var string
-   */
-  static public $mailto = 'mm@orbus.fr';
-
-  // }}}
   // {{{ $driver
 
   /**
-   * Le nom de la classe du driver utilisé.
-   * @var string
+   * Le nom de la classe du driver utilisÃ©.
    */
-  static public $driver = null;
+  static public $driver = '';
 
   // }}}
   // {{{ get_driver()
 
+  /**
+   * Retourne l'instance d'un driver PDO, MySQL ou MySQLi.
+   * Returns:
+   *   mysql_connexion_driver = L'instance du driver.
+   */
   static public function get_driver( $host, $user, $pass, $base )
   {
-    if( is_null( self::$driver ) )
+    if( ! self::$driver )
     {
-      if( isset($_REQUEST['enable_pdo']) and extension_loaded('pdo') and in_array( 'mysql', PDO::getAvailableDrivers() ) )
+      if( extension_loaded('pdo') and in_array( 'mysql', PDO::getAvailableDrivers() ) )
         self::$driver = 'mysql_connexion_pdo';
-      if( extension_loaded('mysqli') )
+      elseif( extension_loaded('mysqli') )
         self::$driver = 'mysql_connexion_mysqli';
       elseif( extension_loaded('mysql') )
         self::$driver = 'mysql_connexion_mysql';
@@ -60,25 +50,21 @@ class mysql_connexion
 // {{{ mysql_connexion_no_driver
 
 /**
- * Exception lancé si aucun driver n'est disponible pour ouvrir la connexion.
- * @package connexion
- * @subpackage exception
+ * Exception lancÃ© si aucun driver n'est disponible pour ouvrir la connexion.
  */
 class mysql_connexion_no_driver extends RuntimeException
 {
   public function __construct( $message )
   {
-    parent::__construct( 'N\'a pas pu trouvé de driver pour la connexion à mysql.' );
+    parent::__construct( 'N\'a pas pu trouver de driver pour la connexion au server mysql.' );
   }
 }
 
 // }}}
-// {{{ mysql_connexion_connection_error
+// {{{ mysql_connexion_connect_error
 
 /**
- * Exception lancé si la connexion vers le serveur de base de donnée
- * @package connexion
- * @subpackage exception
+ * Exception lancÃ© si la connexion vers le serveur de base de donnÃ©e Ã  Ã©chouÃ©e.
  */
 class mysql_connexion_connect_error extends Exception
 {
@@ -92,15 +78,13 @@ class mysql_connexion_connect_error extends Exception
 // {{{ mysql_connexion_query
 
 /**
- * Exception lancé si une requête vers la base de donnée à provoqué une erreur
- * @package connexion
- * @subpackage exception
+ * Exception lancÃ© si une requÃªte vers la base de donnÃ©e a provoquÃ© une erreur.
  */
 class mysql_connexion_query extends Exception
 {
   public function __construct( $query, $message )
   {
-    parent::__construct( 'Erreur avec la requ&ecirc;te : '.$query." \n".$message );
+    parent::__construct( 'Erreur avec la requete : '.$query." \n".$message );
   }
 }
 
@@ -108,31 +92,13 @@ class mysql_connexion_query extends Exception
 // {{{ mysql_connexion_argument
 
 /**
- * Exception lancé si les arguments passé au script sont mauvais
- * @package connexion
- * @subpackage exception
+ * Exception lancÃ© si les arguments passÃ©s sont mauvais.
  */
 class mysql_connexion_argument extends InvalidArgumentException
 {
   public function __construct( $method )
   {
-    parent::__construct( 'Les arguments passés à la méthode : '.(string)$method.' ne sont pas correct.' );
-  }
-}
-
-// }}}
-// {{{ mysql_connexion_bad_driver
-
-/**
- * Exception lancé si le driver n'est pas conforme.
- * @package connexion
- * @subpackage exception
- */
-class mysql_connexion_bad_driver extends RuntimeException
-{
-  public function __construct( $driver )
-  {
-    parent::__construct( 'Le driver '.(string)$driver.' n\'est pas un driver valide.' );
+    parent::__construct( 'Les arguments passÃ©s Ã  la mÃ©thode : '.(string)$method.' ne sont pas correct.' );
   }
 }
 
@@ -141,68 +107,18 @@ class mysql_connexion_bad_driver extends RuntimeException
 /**
  * Classe de driver.
  *
- * Permet à partir d'une unique méthode d'envoyer des requêtes et de traiter les résultats.
- * En utilisant les jokers "?" et "!", les paramètres passés à la fonction seront ajouter dans la requête à l'endroit approprié.
- * Avec le joker "?", les paramètres seront echapé si ils sagit de chaîne de caractères.
- * Le joker "!" permet de ne jamais échaper les paramètres.
- *
- * <code>
- * <?php
- *   $mysql->query( 'SELECT 1' );
- * ?>
- * </code>
- *
- * <code>
- * <?php
- *   $mysql->query( 'SELECT * FROM table WHERE id = ?', (integer)$_GET['id'] );
- * ?>
- * </code>
- *
- * <code>
- * <?php
- *   $mysql->query( 'INSERT !table (name) VALUES(?),(?)', $prefix, (string)$value[1], (string)$value[2] );
- * ?>
- * </code>
- *
- * Récupérer les résultats :
- *
- * <code>
- * <?php
- *   $last_insert_id = $mysql->query( 'INSERT...' ... );
- * ?>
- * </code>
- *
- * <code>
- * <?php
- *   $data = $mysql->query( 'SELECT * FROM table' );
- * ?>
- * </code>
- *
- * Changer le mode de récupération des résultats :
- *
- * <code>
- * <?php
- *   $mysql->row->query( 'SELECT * FROM table LIMIT 1' );
- * ?>
- * </code>
- *
- * <code>
- * <?php
- *   $mysql->asso->multi->query( 'SELECT id, name FROM table' );
- * ?>
- * </code>
- *
- * <code>
- * <?php
- *   while( $row = $mysql->one->query( 'SELECT * FROM table' ) )
- *   null;
- * ?>
- * </code>
+ * Permet Ã  partir d'une unique mÃ©thode d'envoyer des requÃªtes et de traiter les rÃ©sultats.
+ * En utilisant les jokers "?" et "!", les paramÃ¨tres passÃ©s a la fonction seront ajouter dans la requÃªte a l'endroit appropriÃ©.
+ * Avec le joker "?", les paramÃ¨tres seront echapÃ© si ils sagit de chaÃ®ne de caractÃ©res.
+ * Le joker "!" permet de ne jamais Ã©chaper les paramÃ¨tres.
  */
 abstract class mysql_connexion_driver
 {
   // {{{ __get()
 
+  /**
+   * Configure le mode de rÃ©cupÃ©ration des rÃ©sultats.
+   */
   public function __get( $property )
   {
     switch( $property )
@@ -215,12 +131,24 @@ abstract class mysql_connexion_driver
       $this->fetch_mode |= self::numerical_key;
       break;
 
+    case 'field':
+      $this->fetch_mode |= self::one_row;
+      $this->fetch_mode |= self::one_field;
+      break;
+
     case 'row':
       $this->fetch_mode |= self::one_row;
+      $this->fetch_mode = ~( ~$this->fetch_mode | self::one_field );
+      break;
+
+    case 'col':
+      $this->fetch_mode = ~( ~$this->fetch_mode | self::one_row );
+      $this->fetch_mode |= self::one_field;
       break;
 
     case 'multi':
       $this->fetch_mode = ~( ~$this->fetch_mode | self::one_row );
+      $this->fetch_mode = ~( ~$this->fetch_mode | self::one_field );
       break;
 
     case 'one':
@@ -237,20 +165,6 @@ abstract class mysql_connexion_driver
 
     case 'inc':
       $this->fetch_mode = ~( ~$this->fetch_mode | self::first_field_for_key );
-      break;
-
-    case 'col':
-      $this->fetch_mode = ~( ~$this->fetch_mode | self::one_row );
-      $this->fetch_mode |= self::one_field;
-      break;
-
-    case 'field':
-      $this->fetch_mode |= self::one_row;
-      $this->fetch_mode |= self::one_field;
-      break;
-
-    case 'fields':
-      $this->fetch_mode = ~( ~$this->fetch_mode | self::one_field );
       break;
 
     case 'keep':
@@ -274,33 +188,13 @@ abstract class mysql_connexion_driver
   // {{{ query()
 
   /**
-   * Execute une requete et retourne les resultats ou last_insert_id
-   * Se connect au serveur, contruit la requête avec les arguments, execute la requête, retourne les résultat.
-   *
-   * Deux syntaxes sont possible :
-   * <code>
-   *   self::query( $statement );
-   *   self::query( $prepare, $arg1, $arg2, ... );
-   * </code>
-   *
-   * La deuxième syntaxe s'assure d'echapper les chaines de caractère des paramètres et de les entourer par des guillemets. Pour cela, la requête doit contenir des '?' qui seront remplacés par les valeurs des arguments.
-   *
-   * Effectue une requête sans résultat :
-   * <code>
-   * <?php
-   *   self::query( 'INSERT table SET field = ?', (integer) $value );
-   *   // executera <pre>INSERT table SET field = 3</pre>
-   *
-   *   self::query( 'INSERT table SET field = ?', (string) $value );
-   *   // executera <pre>INSERT table SET field = '3'</pre>
-   * ?>
-   * </code>
-   *
-   * Si une requête de type insert ou update est envoyé, le last_insert_id sera retourné. Si aucun id à été modifier, true sera retourné.
-   *
-   * @param string La requête avec des "?"
-   * @param mixed,... Les paramètres a binder avec les "?" de la requête.
-   * @return array,boolean,string,integer
+   * Execute une requete et retourne les resultats ou le last_insert_id.
+   * Se connecte au serveur, contruit la requÃ¨te avec les arguments, execute la requÃ¨te, retourne les rÃ©sultat et ferme la connexion.
+   * Params:
+   *   string $query = La requÃ¨te avec des jokers "?" ou "!".
+   *   mixed,... Les paramÃ¨tres a binder avec les jokers de la requÃ¨te.
+   * Returns:
+   *   array,boolean,string,integer = Le rÃ©sultat de la requÃ¨te.
    */
   abstract public function query();
 
@@ -308,9 +202,7 @@ abstract class mysql_connexion_driver
   // {{{ $defaut_fetch_mode
 
   /**
-   * Sauvegarde le fetch_mode par défaut.
-   *
-   * @var integer
+   * Sauvegarde le fetch_mode par dÃ©faut.
    */
   protected $defaut_fetch_mode = 0x0;
 
@@ -318,10 +210,10 @@ abstract class mysql_connexion_driver
   // {{{ set_fetch_mode()
 
   /**
-   * Change le mode de recupération des résultats par défaut.
+   * Change le mode de recupÃ¨ration des rÃ©sultats par dÃ©faut.
    *
-   * @param integer
-   * @return mysql_connexion_driver
+   * Params:
+   *   integer $mode = Le mode par dÃ©faut.
    */
   public function set_fetch_mode( $mode = null )
   {
@@ -488,8 +380,8 @@ abstract class mysql_connexion_driver
       $data = $row;
     elseif( $mode & self::one_field and $mode & self::first_field_for_key )
     {
-      list($key) = array_slice(array_values($row),0,1);
-      $data[$key] = $key;
+      list($key,$value) = array_slice(array_values($row),0,2);
+      $data[$key] = $value;
     }
     elseif( $mode & self::first_field_for_key )
     {
@@ -512,11 +404,17 @@ abstract class mysql_connexion_driver
 
 /**
  * Driver de connexion pour mysqli.
- * @package connexion
- * @subpackage driver
  */
 class mysql_connexion_mysqli extends mysql_connexion_driver
 {
+  // {{{ $link
+
+  /**
+   * L'instance de connexion MySQLi
+   */
+  protected $link = null;
+
+  // }}}
   // {{{ $result
 
   /**
@@ -564,12 +462,14 @@ class mysql_connexion_mysqli extends mysql_connexion_driver
         throw new mysql_connexion_argument( __FUNCTION__ );
       $query = array_shift( $args );
 
-      if( ! $link = @mysqli_connect( $this->host, $this->user, $this->pass, $this->base ) )
-        throw new mysql_connexion_connect_error(mysqli_connect_error());
+      if( ! $this->link )
+        if( ! $this->link = @mysqli_connect( $this->host, $this->user, $this->pass, $this->base ) )
+          throw new mysql_connexion_connect_error(mysqli_connect_error());
 
+      $link = $this->link;
       $query = preg_replace( '/((?<!\w)\?(?!\w)|(?<!\w)!(?!\w)|\b!(?!\w)|(?<!\w)!\b)/e', "self::bind_param('\\1', \$args, \$link)", $query );
 
-      $this->result = @mysqli_query($link, $query);
+      $this->result = @mysqli_query($this->link, $query);
     }
 
     $data = false;
@@ -579,7 +479,7 @@ class mysql_connexion_mysqli extends mysql_connexion_driver
       $data = array();
       if( is_bool($this->result) )
       {
-        if( ! $data = mysqli_insert_id($link) )
+        if( ! $data = mysqli_insert_id($this->link) )
           $data = true;
       }
       elseif( $this->fetch_mode & self::numerical_key )
@@ -598,7 +498,7 @@ class mysql_connexion_mysqli extends mysql_connexion_driver
     elseif( ++$attempt > (integer)$this->query_attempt )
     {
       $attempt = 1;
-      throw new mysql_connexion_query($query, mysqli_error($link));
+      throw new mysql_connexion_query($query, mysqli_error($this->link));
     }
     else
     {
@@ -608,14 +508,28 @@ class mysql_connexion_mysqli extends mysql_connexion_driver
     }
 
     if( $this->fetch_mode & self::one_by_one )
-      return $data;
+    {
+      if( $this->link )
+      {
+	mysqli_close($this->link);
+	$this->link = null;
+      }
+      if( ! $data )
+      {
+        $this->result = null;
+	$this->fetch_mode = $this->defaut_fetch_mode;
+      }
+      return array_shift($data);
+    }
     elseif( $this->fetch_mode & self::keep_open )
     {
       $this->result = null;
+      $this->fetch_mode = $this->defaut_fetch_mode;
       return $data;
     }
 
-    mysqli_close($link);
+    mysqli_close($this->link);
+    $this->link = null;
     $this->result = null;
     $this->fetch_mode = $this->defaut_fetch_mode;
 
@@ -626,32 +540,42 @@ class mysql_connexion_mysqli extends mysql_connexion_driver
 }
 
 /**
- * Driver de connexion pour mysql
- * @package connexion
- * @subpackage driver
+ * Driver de connexion pour MySQL
  */
 class mysql_connexion_mysql extends mysql_connexion_driver
 {
-  // {{{ $resource
+  // {{{ $link
 
   /**
-   * Une référence vers la ressource mysql
-   *
-   * @var resource
+   * La resource de connexion MySQL.
+   * Type:
+   *   resource
    */
-  protected $resource = null;
+  protected $link = null;
+
+  // }}}
+  // {{{ $result
+
+  /**
+   * La resource des rÃ©sultats MySQL.
+   * Type:
+   *   resource
+   */
+  protected $result = null;
 
   // }}}
   // {{{ bind_param()
 
   /**
-   * Assigne un ? de la requete au paramètre suivant dans la liste.
-   * @param array La valeur trouvé par preg_replace()
-   * @param array La liste des paramètres
-   * @param resource Un lien de connection mysql
-   * @return string,numeric Le paramètre suivant dans la liste
+   * Assigne le prochain joker de la requÃ¨te au paramÃ¨tre suivant dans la liste.
+   * Params:
+   *   array $match = La valeur trouvÃ© par preg_replace().
+   *   array $args = La liste des paramÃ¨tres.
+   *   resource $link = Le lien de la connexion MySQL.
+   * Returns:
+   *   string,numeric = Le paramÃ¨tre suivant dans la liste Ã  remplacer.
    */
-  static protected function bind_param( $match, &$args, $link )
+  static protected function bind_param( $match, &$args, &$link )
   {
     if( count($args) < 1 )
       return 'NULL';
@@ -672,44 +596,46 @@ class mysql_connexion_mysql extends mysql_connexion_driver
   {
     static $attempt = 1;
 
-    if( ! $this->resource )
+    if( ! $this->result )
     {
-
       $args = func_get_args();
       if( count($args) < 1 )
         throw new mysql_connexion_argument( __FUNCTION__ );
       $query = array_shift( $args );
 
-      if( ! $link = @mysql_connect( $this->host, $this->user, $this->pass ) )
-        throw new mysql_connexion_connect_error(mysql_error());
-      if( ! @mysql_select_db( $this->base, $link ) )
-        throw new mysql_connexion_connect_error(mysql_error());
+      if( ! $this->link )
+      {
+        if( ! $this->link = @mysql_connect( $this->host, $this->user, $this->pass ) )
+          throw new mysql_connexion_connect_error(mysql_error());
+        if( ! @mysql_select_db( $this->base, $this->link ) )
+	  throw new mysql_connexion_connect_error(mysql_error());
+      }
 
+      $link = $this->link;
       $query = preg_replace( '/((?<!\w)\?(?!\w)|(?<!\w)!(?!\w)|\b!(?!\w)|(?<!\w)!\b)/e', "self::bind_param('\\1', \$args, \$link)", $query );
 
-      $this->resource = @mysql_query($query, $link);
-
+      $this->result = @mysql_query($query, $this->link);
     }
 
     $data = false;
 
-    if( $this->resource )
+    if( $this->result )
     {
       $data = array();
-      if( is_bool($this->resource) )
+      if( is_bool($this->result) )
       {
-        if( ! $data = @mysql_insert_id($link) )
+        if( ! $data = @mysql_insert_id($this->link) )
           $data = true;
       }
       elseif( $this->fetch_mode & self::numerical_key )
       {
-        while( $row = mysql_fetch_row($this->resource) )
+        while( $row = mysql_fetch_row($this->result) )
           if( ! $this->fill( $data, $row, $this->fetch_mode ) )
             break;
       }
       else
       {
-        while( $row = mysql_fetch_assoc($this->resource) )
+        while( $row = mysql_fetch_assoc($this->result) )
           if( ! $this->fill( $data, $row, $this->fetch_mode ) )
             break;
       }
@@ -717,7 +643,7 @@ class mysql_connexion_mysql extends mysql_connexion_driver
     elseif( ++$attempt > (integer)$this->query_attempt )
     {
       $attempt = 1;
-      throw new mysql_connexion_query($query, mysql_error($link));
+      throw new mysql_connexion_query($query, mysql_error($this->link));
     }
     else
     {
@@ -727,15 +653,29 @@ class mysql_connexion_mysql extends mysql_connexion_driver
     }
 
     if( $this->fetch_mode & self::one_by_one )
-      return $data;
+    {
+      if( $this->link )
+      {
+	mysql_close($this->link);
+	$this->link = null;
+      }
+      if( ! $data )
+      {
+        $this->result = null;
+	$this->fetch_mode = $this->defaut_fetch_mode;
+      }
+      return array_shift($data);
+    }
     elseif( $this->fetch_mode & self::keep_open )
     {
+      $this->fetch_mode = $this->defaut_fetch_mode;
       $this->result = null;
       return $data;
     }
 
-    mysql_close($link);
-    $this->resource = null;
+    mysql_close($this->link);
+    $this->link = null;
+    $this->result = null;
     $this->fetch_mode = $this->defaut_fetch_mode;
 
     return $data;
@@ -745,16 +685,50 @@ class mysql_connexion_mysql extends mysql_connexion_driver
 }
 
 /**
- * Driver de connexion pour pdo
- * @package connexion
- * @subpackage driver
+ * Driver de connexion pour PDO.
  */
 class mysql_connexion_pdo extends mysql_connexion_driver
 {
+  // {{{ bind_param()
+
+  /**
+   * Assigne le prochain joker de la requÃ¨te au paramÃ¨tre suivant dans la liste.
+   * Params:
+   *   array $match = La valeur trouvÃ© par preg_replace().
+   *   array $args = La liste des paramÃ¨tres.
+   * Returns:
+   *   string,numeric = Le paramÃ¨tre suivant dans la liste Ã  remplacer.
+   */
+  static protected function bind_param( $match, &$args, &$newargs )
+  {
+    if( $match != '!' )
+    {
+      array_push($newargs, array_shift($args));
+      return '?';
+    }
+    elseif( count($args) < 1 )
+      return 'NULL';
+    elseif( is_numeric( $arg = array_shift($args) ) )
+      return $arg;
+    elseif( is_null($arg) )
+      return 'NULL';
+    else
+      return $arg;
+  }
+
+  // }}}
+  // {{{ $statement
+
+  /**
+   * Une référence vers l'objet de la requête PDO.
+   */
+  protected $statement = null;
+
+  // }}}
   // {{{ $result
 
   /**
-   * Une référence vers l'obejct des résultats PDO.
+   * Une référence vers l'objet des résultats PDO.
    *
    * @var PDOStatement
    */
@@ -770,7 +744,7 @@ class mysql_connexion_pdo extends mysql_connexion_driver
     try
     {
 
-    if( ! $this->resource )
+    if( ! $this->result )
     {
 
       $args = func_get_args();
@@ -778,12 +752,21 @@ class mysql_connexion_pdo extends mysql_connexion_driver
         throw new mysql_connexion_argument( __FUNCTION__ );
       $query = array_shift( $args );
 
-      $link = new PDO( 'mysql:dbname='.$this->base.';host='+$this->host, $this->user, $this->pass );
-      $link->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT );
+      if( ! $this->statement )
+      {
+        $this->statement = new PDO( 'mysql:dbname='.$this->base.';host='.$this->host, $this->user, $this->pass );
+	$this->statement->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT );
+	$this->statement->setAttribute( PDO::ATTR_STRINGIFY_FETCHES, false );
+      }
 
-      if( $this->result = $link->prepare($query) )
-        $this->result->execute($args);
+      $newargs = array();
+      $query = preg_replace( '/((?<!\w)\?(?!\w)|(?<!\w)!(?!\w)|\b!(?!\w)|(?<!\w)!\b)/e', "self::bind_param('\\1', \$args, \$newargs)", $query );
 
+      if( $this->result = $this->statement->prepare($query) )
+      {
+	if( ! $this->result->execute($newargs) )
+	  $this->result = false;
+      }
     }
 
     $data = false;
@@ -793,7 +776,7 @@ class mysql_connexion_pdo extends mysql_connexion_driver
       $data = array();
       if( is_bool($this->result) )
       {
-        if(  ! $data = $link->lastInsertId() )
+        if(  ! $data = $this->statement->lastInsertId() )
           $data = true;
       }
       elseif( $this->fetch_mode & self::numerical_key )
@@ -812,7 +795,7 @@ class mysql_connexion_pdo extends mysql_connexion_driver
     elseif( ++$attempt > (integer)$this->query_attempt )
     {
       $attempt = 1;
-      throw new mysql_connexion_query($query, join("\n",$link->errorInfo));
+      throw new mysql_connexion_query($query, join("\n",$this->statement->errorInfo()));
     }
     else
     {
@@ -822,14 +805,23 @@ class mysql_connexion_pdo extends mysql_connexion_driver
     }
 
     if( $this->fetch_mode & self::one_by_one )
-      return $data;
+    {
+      if( $this->statement ) $this->statement = null;
+      if( ! $data )
+      {
+	$this->result = null;
+	$this->fetch_mode = $this->defaut_fetch_mode;
+      }
+      return array_shift($data);
+    }
     elseif( $this->fetch_mode & self::keep_open )
     {
+      $this->fetch_mode = $this->defaut_fetch_mode;
       $this->result = null;
       return $data;
     }
 
-    mysql_close($link);
+    $this->statement = null;
     $this->result = null;
     $this->fetch_mode = $this->defaut_fetch_mode;
 

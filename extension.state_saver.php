@@ -27,6 +27,7 @@ class DstyleDoc_State_Saver
 
   static public function start( DstyleDoc $dsd )
   {
+    var_dump( $dsd->database_host, $dsd->database_user, $dsd->database_pass, $dsd->database_base );
     self::$cnx = mysql_connexion::get_driver( $dsd->database_host, $dsd->database_user, $dsd->database_pass, $dsd->database_base );
 /*
     try

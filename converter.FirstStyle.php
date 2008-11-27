@@ -10,16 +10,16 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 
   public function convert_all()
   {
-    /*
     if( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
       $this->page_file( $found );
     elseif( ! empty($_GET['class']) and @list($file,$class) = explode(',',$_GET['class']) and $found = $this->class_exists($class) )
       $this->page_class( $found );
     elseif( ! empty($_GET['method']) and @list($file,$class,$method) = explode(',',$_GET['method']) and $found = $this->method_exists($class,$method) )
       $this->page_method( $found );
+    elseif( ! empty($_GET['function']) and @list($file,$function) = explode(',',$_GET['function']) and $found = $this->function_exists($function) )
+      $this->page_function( $found );
     else
       $this->page_home();
-     */
   }
 
   // }}}
@@ -56,6 +56,15 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
   {
     $this->tpl->assign( 'method', $method );
     $this->write( 'method.tpl' );
+  }
+
+  // }}}
+  // {{{ page_function()
+
+  protected function page_function( DstyleDoc_Element_Function $function )
+  {
+    $this->tpl->assign( 'function', $function );
+    $this->write( 'function.tpl' );
   }
 
   // }}}

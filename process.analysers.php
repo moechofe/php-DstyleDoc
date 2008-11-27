@@ -145,7 +145,7 @@ class DstyleDoc_Analyser_Description extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un séparateur de paragraphe la description
+ * Classe d'analyse d'un sÃ©parateur de paragraphe la description
  */
 class DstyleDoc_Analyser_Description_Paragraphe extends DstyleDoc_Analyser
 {
@@ -325,7 +325,7 @@ class DstyleDoc_Analyser_History extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un élément de liste d'historique.
+ * Classe d'analyse d'un Ã©lÃ©ment de liste d'historique.
  */
 class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -433,7 +433,7 @@ class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser impleme
 }
 
 /**
- * Classe d'analyse d'une balise de paramètre.
+ * Classe d'analyse d'une balise de paramÃ¨tre.
  */
 class DstyleDoc_Analyser_Param extends DstyleDoc_Analyser
 {
@@ -474,7 +474,7 @@ class DstyleDoc_Analyser_Param extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un élément de liste de paramètre.
+ * Classe d'analyse d'un Ã©lÃ©ment de liste de paramÃ¨tre.
  */
 class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -504,6 +504,7 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
   protected function set_var( $var )
   {
+    if( $var{0}=='$' ) $var = substr($var,1);
     $this->_var = $var;
   }
 
@@ -585,7 +586,7 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
     {
       $element->param = $this->var;
 
-      if( $this->var )
+      if( $this->var and ! $element->param->var )
         $element->param->var = $this->var;
 
       foreach( $this->types as $type )

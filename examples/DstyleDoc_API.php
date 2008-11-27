@@ -6,8 +6,8 @@ require_once( 'xdebug.front.end.php' );
 
 require_once( 'DstyleDoc.php' );
 require_once( 'converter.FirstStyle.php' );
-ini_set( 'memory_limit', -1 );
-set_time_limit( 90 );
+//ini_set( 'memory_limit', -1 );
+//set_time_limit( 90 );
 error_reporting( E_ALL | E_STRICT );
 
 DstyleDoc::hie()
@@ -34,8 +34,11 @@ DstyleDoc::hie()
 'classes_index_list_header' => 'Liste des classes déclarées dans le fichier <span class="file">%s</span>',
 'methods_index_list_header' => 'Liste des méthodes de la classe <span class="class">%s</span>',
 
+'method_syntax' => 'syntaxe',
+'method_description' => 'déscription',
+
       ) )
 
     );
-d( 'wesh' );
+
 ?>
