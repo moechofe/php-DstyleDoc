@@ -2121,7 +2121,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_display( implode(', ', $this->_types), $this );
+    return $this->converter->convert_type( $this->type, $this );
   }
 
   // }}}

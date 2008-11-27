@@ -78,8 +78,11 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ convert_type()
 
-  public function convert_type( DstyleDoc_Element_Type $type )
+  public function convert_type( $type, DstyleDoc_Element_Type $element )
   {
+    $this->tpl->assign( '_type', $type );
+    $this->tpl->assign( '_element', $element );
+    return $this->tpl->fetch( __CLASS__.':convert_type.tpl' );
   }
 
   // }}}
@@ -369,7 +372,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // todo: trouver un moyen pour le charset
   protected function write( $template )
   {
-    set_error_handler( array($this,'error_config_or_not') );
+    //set_error_handler( array($this,'error_config_or_not') );
     if( isset($this->destination_dir) )
     {
     }
@@ -378,14 +381,17 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
       if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
       $this->tpl->display( $template );
     }
-    restore_error_handler();
+    //restore_error_handler();
   }
 
   // }}}
   // {{{ error_config_or_not()
 
+  // virer cette merde
   static public function error_config_or_not( $errno, $errstr, $errfile, $errline, $errcontext )
   {
+    $trace = debug_backtrace();
+    d( $trace )->label( $errstr )->d5;
     if( $errno == 8 and substr($errstr,0,15)=='Undefined index' and isset($errcontext['this']) and $errcontext['this'] instanceof Template_Lite and strpos($errfile,$errcontext['this']->compile_dir) !== false )
       echo '#'.substr($errstr,18).'#';
     else

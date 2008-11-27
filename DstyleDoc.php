@@ -559,11 +559,12 @@ interface DstyleDoc_Converter_Convert
   /**
    * Génére la documentation d'un type de valeur.
    * Params:
-   *    $type = L'instance du type.
+   *	string $type = Le type.
+   *    $element = L'instance du type.
    * Returns:
    *    mixed = La documentation du type.
    */
-  function convert_type( DstyleDoc_Element_Type $type );
+  function convert_type( $type, DstyleDoc_Element_Type $element );
 
   // }}}
   // {{{ convert_exception()
