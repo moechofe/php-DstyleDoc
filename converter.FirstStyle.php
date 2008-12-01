@@ -6,9 +6,20 @@ require_once( 'converter.template_lite.php' );
  */
 class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 {
-  // {{{ convert_all()
+  // {{{ write_all_files(), display_on_file()
 
-  public function convert_all()
+  protected function write_all_files()
+  {
+    foreach( $this->files as $file )
+    {
+      $this->tpl->assign( 'file', $file );
+      $this->write( 'file.tpl', $tmp = $this->destination_dir.'/'.$file->id.'.html' );
+      DstyleDoc::log( sprintf( 'file: %s write to %s', $file->name, $tmp ) );
+    }
+
+  }
+
+  protected function display_on_file()
   {
     if( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
       $this->page_file( $found );
@@ -20,6 +31,18 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
       $this->page_function( $found );
     else
       $this->page_home();
+  }
+
+  // }}}
+
+  // {{{ convert_all()
+
+  public function convert_all()
+  {
+    if( isset($this->destination_dir) )
+      $this->write_all_files();
+    else
+      $this->display_on_file();
   }
 
   // }}}

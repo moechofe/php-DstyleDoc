@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Classes d'analyse du code PHP.
+ * A partir de la liste des token retourné par la fonction token_get_all()
+ *
+ * Todo:
+ *   Stoker dans des chaines des fonctions des classes et des fichier pour l'analyser plus tard ?
+ */
+
 interface DstyleDoc_Token_Work
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line );

@@ -334,7 +334,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
       $this->tpl->compile_dir = $path.'/compiled';
     }
     else
-      throw new InvalidArgumentException('invalid path fot 1st parameter send to: '.__FUNCTION__);
+      throw new InvalidArgumentException('invalid path for 1st parameter send to: '.__FUNCTION__);
 
     return $this;
   }
@@ -368,7 +368,29 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   protected $_destination_dir = null;
 
+  /**
+   * Todo:
+   *   Prévoir de la création de dossier
+   *   et de la coorection de '/' '\'.
+   */
+  public function destination_dir( $path )
+  {
+    if( is_readable((string)$path) and is_dir((string)$path) )
+    {
+      $this->_destination_dir = (string)$path;
+    }
+    else
+      throw new InvalidArgumentException('invalid path for 1st parameter send to: '.__FUNCTION__);
+
+    return $this;
+  }
+
   protected function isset_destination_dir()
+  {
+    return $this->_destination_dir;
+  }
+
+  protected function get_destination_dir()
   {
     return $this->_destination_dir;
   }
@@ -381,18 +403,23 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   // }}}
   // {{{ write()
 
-  // todo: trouver un moyen pour le charset
-  protected function write( $template )
+  /**
+   * Todo: trouver un moyen pour le charset
+   * Todo: vérifier le fichier et le dossier.
+   */
+  protected function write( $template, $to = null )
   {
     //set_error_handler( array($this,'error_config_or_not') );
-    if( isset($this->destination_dir) )
+    if( ! is_null($to) )
     {
-//      file_put_contents(
+      file_put_contents( $to, $this->tpl->fetch($template) );
+      return true;
     }
     else
     {
       if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
       $this->tpl->display( $template );
+      return true;
     }
     //restore_error_handler();
   }

@@ -87,9 +87,9 @@ class DstyleDoc extends DstyleDoc_Properties
   /**
    * Envoie un message de log sur la sortie standard.
    * Params:
-   *    string,numeric,array ... = Une chaîne de caractère, un nombre ou un tableau de pairs clefs/valeurs à afficher.
+   *    string,numeric,array ... = Une chaÃ®ne de caractÃ¨re, un nombre ou un tableau de pairs clefs/valeurs a afficher.
    * Syntax:
-   *    ... = Un nombre infinie de paramètre à afficher.
+   *    ... = Un nombre infinie de paramÃ¨tre a afficher.
    */
   static public function log()
   {
@@ -338,9 +338,9 @@ interface DstyleDoc_Converter_Convert
   // {{{ get_file_interfaces()
 
   /**
-   * Renvoie la liste des interfaces appartenant à un fichier donnée.
+   * Renvoie la liste des interfaces appartenant a un fichier donnÃ©e.
    * Params:
-   *    $file = L'instance d'un élément de fichier.
+   *    $file = L'instance d'un Ã©lÃ©ment de fichier.
    * Returns:
    *    array(DstyleDoc_Element_Interface) = Un tableau d'interface.
    */
