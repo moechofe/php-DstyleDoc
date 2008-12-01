@@ -79,5 +79,4 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
   // }}}
 }
 
-// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary
 ?>
