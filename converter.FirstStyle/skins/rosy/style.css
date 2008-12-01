@@ -1,10 +1,10 @@
 .xdebug_front_end { position: absolute; top: 400px; }
 
-body { margin: 0px; padding: 0px; position: relative; font-size: 15px; }
+body { margin: 0px; padding: 0px; /*position: relative;*/ font-size: 15px; }
 
 h1 { font-family: georgia, serif; font-size: 29px; }
 h2 { font-family: georgia, serif; font-size: 19px; }
-p, li { font-family: arial, "sans serif"; font-size: 15px; line-height: 20px; }
+p, li, dd, dt { font-family: arial, "sans serif"; font-size: 15px; line-height: 20px; }
 
 #page-header { position: absolute; top: 0px; left: 0px; width: 100%; height: 40px; }
 
@@ -19,20 +19,20 @@ div.content-display h1 { font-weight: normal; }
 /**
  * Les elements générique de la documentation.
  */
-span.display-method { background-repeat: no-repeat; background-position: left; padding-left: 18px; line-height: 18px; }
+span.display-method { background-repeat: no-repeat; background-position: left; padding-left: 20px; line-height: 18px; }
 span.display-method.method-public { background-image: url("Icon_method_public.png"); }
 span.display-method.method-protected { background-image: url("Icon_method_protected.png"); }
 span.display-method.method-private { background-image: url("Icon_method_private.png"); }
 span.display-method.method-public-static { background-image: url("Icon_method_public_static.png"); }
 
-span.display-class { background-repeat: no-repeat; background-position: left; padding-left: 18px; line-height: 18px; }
+span.display-class { background-repeat: no-repeat; background-position: left; padding-left: 20px; line-height: 18px; }
 span.display-class.class { background-image: url("Icon_class.png"); }
 span.display-class.class-abstract { background-image: url("Icon_class_abstract.png"); }
 span.display-class.class-final { background-image: url("Icon_class_final.png"); }
 
-span.display-function { background: url("Icon_function.png") no-repeat left; padding-left: 18px; line-height: 18px; }
+span.display-function { background: url("Icon_function.png") no-repeat left; padding-left: 20px; line-height: 18px; }
 
-span.display-file { background: url("Icon_file.png") no-repeat left; padding-left: 18px; line-height: 18px; }
+span.display-file { background: url("Icon_file.png") no-repeat left; padding-left: 20px; line-height: 18px; }
 
 h1 span.display { background: inherit !important; padding-left: 0px !important; }
 
@@ -62,7 +62,7 @@ a { color: MediumBlue; }
 #page-content ul.list { list-style: none; padding: 0px; margin: 0px 10px 10px 10px; }
 #page-content div.content-index { background: antiquewhite; float: left; }
 #page-content h1.content-title { font-weight: normal; }
-#page-content div.content-index li { font-size: 13px; }
+#page-content div.content-index li { font-size: 13px; line-height: 20px; }
 
 /**
  * Le design de la partie navigation

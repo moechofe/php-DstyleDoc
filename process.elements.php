@@ -1923,7 +1923,88 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
  */
 class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 {
-  // {{{ $types
+
+  /**
+   * La liste des types d'un paramètre.
+   * Types:
+   *    array(DstyleDoc_Element_Type) = Un tableau contenant des instances des types du paramètre.
+   */
+  protected $_types = array();
+
+  /**
+   * Ajoute un nouveau ou séléctionne un type du paramètre.
+   * Le type ainsi séléctionné peut être récupéré avec get_type().
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $type a laa place.
+   * Params:
+   *    string $type = Le type du membre.
+   *    DstyleDoc_Element_Type = Une instance d'un type de paramètre.
+   */
+  protected function set_type( $type )
+  {
+    $found = false;
+    if( ! empty($type) and count($this->_types) )
+    {
+      reset($this->_types);
+      while( true)
+      {
+        $current = current($this->_types);
+        if( $found = ( (is_object($type) and $current === $type)
+          or (is_string($type) and $current->type === strtolower($type)) ) or false === next($this->_types) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $type instanceof DstyleDoc_Element_Type )
+        $this->_types[] = $type;
+      else
+        $this->_types[] = new DstyleDoc_Element_Type( $this->converter, $type );
+      end($this->_types);
+    }
+  }
+
+  /**
+   * Renvoie l'instance d'un type d'un paramètre précédement séléctionner ou ajouté avec set_type().
+   * Si aucun type de paramètre n'a été ajouté avant, un faux type sera retourné.
+   * Ne pas utiliser directement cette méthode, utiliser la propriété $type a laa place.
+   * Returns:
+   *    DstyleDoc_Element_Type = L'instance du type d'un membre.
+   * Todo: Ne pas retourner un FAKE
+   */
+  protected function get_type()
+  {
+    if( ! count($this->_types) )
+    {
+      $this->_types[] = new DstyleDoc_Element_Type( $this->converter, null );
+      return end($this->_types);
+    }
+    else
+      return current($this->_types);
+  }
+
+  protected function get_types()
+  {
+    return $this->_types;
+  }
+
+  // }}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /*/ {{{ $types
 
   protected $_types = array();
 
@@ -1946,7 +2027,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
     }
   }
 
-  // }}}
+  // }}} */
   // {{{ $var
 
   protected $_var = '';
@@ -2121,7 +2202,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_type( $this->type, $this );
+    return $this->converter->convert_display( $this->type, $this );
   }
 
   // }}}

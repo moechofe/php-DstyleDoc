@@ -66,22 +66,25 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
   public function convert_param( DstyleDoc_Element_Param $param )
   {
+    $this->tpl->assign( '_param', $param );
+    return $this->tpl->fetch( __CLASS__.':convert_param.tpl' );
   }
 
   // }}}
   // {{{ convert_return()
 
-  public function convert_return( DstyleDoc_Element_Return $result )
+  public function convert_return( DstyleDoc_Element_Return $return )
   {
+    $this->tpl->assign( '_return', $return );
+    return $this->tpl->fetch( __CLASS__.':convert_return.tpl' );
   }
 
   // }}}
   // {{{ convert_type()
 
-  public function convert_type( $type, DstyleDoc_Element_Type $element )
+  public function convert_type( DstyleDoc_Element_Type $type )
   {
     $this->tpl->assign( '_type', $type );
-    $this->tpl->assign( '_element', $element );
     return $this->tpl->fetch( __CLASS__.':convert_type.tpl' );
   }
 
@@ -248,6 +251,14 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   }
 
   // }}}
+  // {{{ print_home()
+
+  static public function print_home( $params, Template_Lite $tpl )
+  {
+    return $tpl->fetch( __CLASS__.':print_home.tpl' );
+  }
+
+  // }}}
 
   // {{{ template_get_source()
 
@@ -308,6 +319,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     $this->tpl->register_function( 'classes_index', array($this,'print_classes_index') );
     $this->tpl->register_function( 'methods_index', array($this,'print_methods_index') );
     $this->tpl->register_function( 'functions_index', array($this,'print_functions_index') );
+    $this->tpl->register_function( 'home', array($this,'print_home') );
   }
 
   // }}}
@@ -367,7 +379,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   protected $tpl = null;
 
   // }}}
-  // {{{ do()
+  // {{{ write()
 
   // todo: trouver un moyen pour le charset
   protected function write( $template )
@@ -375,6 +387,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     //set_error_handler( array($this,'error_config_or_not') );
     if( isset($this->destination_dir) )
     {
+//      file_put_contents(
     }
     else
     {

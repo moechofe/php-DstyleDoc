@@ -21,6 +21,16 @@ DstyleDoc::hie()
   ->source( 'example.php' )
   ->convert_with( new DstyleDoc_Converter_toString() );
 
+/**
+ * Params:
+ *   string $string = Une chaine de caractère.
+ *   array $array = Un tableau.
+ *   integer,float $integer = Un entier ou un flotant.
+ *   null $null = NULL.
+ */
+function test_param( $string, $array, $integer, $null, test_float $object )
+{
+}
 
 /**
  * Returns:
@@ -60,8 +70,6 @@ function test_return()
   return test_doublon();
   return test_doc_ref();
 }
-
-__halt_compiler();
 
 /**
  * Returns:
@@ -152,5 +160,7 @@ function b( $a = 'test' )
 $a = null;
 
 $a = " string {$a} string ${a} ";
+
+__halt_compiler();
 
 ?>

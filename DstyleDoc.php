@@ -494,13 +494,13 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_id()
 
   /**
-   * Converti et renvoie l'identifiant unique d'un élément.
+   * Converti et renvoie l'identifiant unique d'un Ã©lÃ©ment.
    * Params:
-   *    string $id = L'identifiant unique de l'élément.
-   *    array $id = Un tableau contenant la liste des identifiants de l'élément et celui de ses parents.
-   *    $element = L'élément vers lequel se destine le lien.
+   *    string $id = L'identifiant unique de l'Ã©lÃ©ment.
+   *    array $id = Un tableau contenant la liste des identifiants de l'Ã©lÃ©ment et celui de ses parents.
+   *    $element = L'Ã©lÃ©ment vers lequel se destine le lien.
    * Returns:
-   *    string = L'identifiant convertie de l'élément.
+   *    string = L'identifiant convertie de l'Ã©lÃ©ment.
    */
   function convert_id( $id, DstyleDoc_Element $element );
 
@@ -508,12 +508,12 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_display()
 
   /**
-   * Convertie et renvoie le nom d'affichage d'un élément.
+   * Convertie et renvoie le nom d'affichage d'un Ã©lÃ©ment.
    * Params:
-   *    $name = Le nom de l'élément à afficher.
-   *    $element = L'élément vers lequel se destine le lien.
+   *    $name = Le nom de l'Ã©lÃ©ment a afficher.
+   *    $element = L'Ã©lÃ©ment vers lequel se destine le lien.
    * Returns:
-   *    mixed = Dépends du convertisseur.
+   *    mixed = DÃ©pends du convertisseur.
    */
    function convert_display( $name, DstyleDoc_Element $element );
 
@@ -521,7 +521,7 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_syntax()
 
   /**
-   * Génère la documentation d'une syntaxe d'une fonction.
+   * GÃ©nÃ¨re la documentation d'une syntaxe d'une fonction.
    * Params:
    *    $syntax = L'instance de la syntaxe.
    * Returns:
@@ -533,9 +533,9 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_param()
 
   /**
-   * Génère la documentation d'un paramètre d'une fonction.
+   * GÃ©nÃ¨re la documentation d'un paramÃ¨tre d'une fonction.
    * Params:
-   *    $param = L'instance du paramètre.
+   *    $param = L'instance du paramÃ¨tre.
    * Returns:
    *    mixed = La documentation de la syntaxe ou pas.
    */
@@ -545,7 +545,7 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_return()
 
   /**
-   * Génère la documentation d'une valeur de retour d'une fonction.
+   * GÃ©nÃ¨re la documentation d'une valeur de retour d'une fonction.
    * Params:
    *    $param = L'instance de la valeur de retour.
    * Returns:
@@ -557,14 +557,13 @@ interface DstyleDoc_Converter_Convert
   // {{{ convert_type()
 
   /**
-   * Génére la documentation d'un type de valeur.
+   * GÃ©nÃ¨re la documentation d'un type de valeur.
    * Params:
-   *	string $type = Le type.
-   *    $element = L'instance du type.
+   *    $type = L'instance du type.
    * Returns:
    *    mixed = La documentation du type.
    */
-  function convert_type( $type, DstyleDoc_Element_Type $element );
+  function convert_type( DstyleDoc_Element_Type $type );
 
   // }}}
   // {{{ convert_exception()

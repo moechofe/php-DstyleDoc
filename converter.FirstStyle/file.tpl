@@ -2,7 +2,7 @@
 {include file="_head.tpl"}
 <body id="page-file">
 <div id="page-content">
-<div class="page-annotation"><p>{#page_file#|string_format:$file.display}</p></div>
+<div class="page-annotation"><p>{if isset(#page_file#)}{#page_file#|string_format:$file.display:$file.link}{else}#page_file(file-name,file-link)#{/if}</p></div>
 <div class="page-content">{$file}</div>
 </div>
 <div id="page-footer">
