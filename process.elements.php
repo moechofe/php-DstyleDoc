@@ -1215,7 +1215,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
     return $result;
   }
 
-  private function smart_add_return_type( &$array, $type, DstyleDoc_Element_Return $return )
+  private function smart_add_return_type( &$array, $type, DstyleDoc_Element_Type $return )
   {
     if( $type instanceof DstyleDoc_Element_Class or $type instanceof DstyleDoc_Element_Interface )
       $key = $type->name;

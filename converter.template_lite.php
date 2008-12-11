@@ -330,7 +330,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     if( is_readable($path) and is_dir($path) )
     {
       $this->tpl->template_dir = $path;
-      $this->tpl->assign( '_template_dir', substr(realpath($path),strlen($_SERVER['DOCUMENT_ROOT'])) );
+      $this->tpl->assign( '_template_dir', dirname(dirname($_SERVER['SCRIPT_NAME'])).'/'.$path );
+      // substr(realpath($path),strlen($_SERVER['DOCUMENT_ROOT'])) );
       $this->tpl->compile_dir = $path.'/compiled';
     }
     else
@@ -410,17 +411,23 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   protected function write( $template, $to = null )
   {
     //set_error_handler( array($this,'error_config_or_not') );
-    if( ! is_null($to) )
+/*    if( ! is_null($to) )
     {
-      file_put_contents( $to, $this->tpl->fetch($template) );
-      return true;
+      if( ( file_exists($to) and is_writable($to) )
+	or is_writable(dirname($to)) )
+      {
+	file_put_contents( $to, $this->tpl->fetch($template) );
+	return true;
+      }
+      else
+	return false;
     }
     else
-    {
+    {*/
       if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
       $this->tpl->display( $template );
       return true;
-    }
+      /*    }*/
     //restore_error_handler();
   }
 

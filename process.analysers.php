@@ -657,7 +657,7 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un élément de liste de retour.
+ * Classe d'analyse d'un Ã©lÃ©ment de liste de retour.
  */
 class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -779,7 +779,7 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 /**
  * Classe d'analyse d'une balise de paquetage.
  * todo: compatible javadoc package and subpackage.
- */
+ * /
 class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
 {
   // {{{ $packages
@@ -828,10 +828,6 @@ class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
   // }}}
   // {{{ apply()
 
-  /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
-   */
   public function apply( DstyleDoc_Element $element )
   {
     $element->packages = $this->packages;
@@ -839,7 +835,7 @@ class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
   }
 
   // }}}
-}
+}*/
 
 /**
  * Classe d'analyse d'une balise d'exception.
@@ -887,7 +883,7 @@ class DstyleDoc_Analyser_Throw extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un élément de liste d'exception.
+ * Classe d'analyse d'un Ã©lement de liste d'exception.
  */
 class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -999,7 +995,7 @@ class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implement
 
 /**
  * Classe d'analyse d'une balise de syntaxe.
- * todo: ajouter la positibilité de mettre la syntaxe apres ^syntax\s*:
+ * todo: ajouter la positibilitÃ© de mettre la syntaxe apres ^syntax\s*:
  */
 class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
 {
@@ -1039,7 +1035,7 @@ class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un élément de liste de syntaxe.
+ * Classe d'analyse d'un Ã©lement de liste de syntaxe.
  */
 class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -1227,7 +1223,7 @@ class DstyleDoc_Analyser_Type extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'un élément de type.
+ * Classe d'analyse d'un Ã©lement de type.
  */
 class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -1455,7 +1451,7 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 }
 
 /**
- * Classe d'analyse d'une balise de début de code PHP.
+ * Classe d'analyse d'une balise de dÃ©but de code PHP.
  */
 class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
 {
@@ -1525,6 +1521,127 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
   public function __construct( $code )
   {
     $this->code = $code;
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'analyse d'une balise d'historique.
+ */
+class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
+{
+  // {{{ priority
+
+  const priority = 10;
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
+  {
+    // ^packages?\s*:(?:\s*(.+))?$
+    if( $dsd->dstyledoc and $dsd->history and preg_match( '/^packages?\s*:(?:\s*(.+))?$/i', $source, $matches ) )
+    {
+      $instance = new self();
+      $priority = self::priority;
+      if( ! empty($matches[1]) )
+      {
+        $instance = new DstyleDoc_Analyser_Element_Package_List( $matches[1] );
+        $property = DstyleDoc_Analyser_Element_Package_List::priority;
+      }
+      return true;
+    }
+    else
+      return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  /**
+   * Ajoute un nouveau paragraphe Ã  la description Ã  l'Ã©lÃ©ment.
+   * S'assure que le prÃ©cÃ©dent ajout n'Ã©taient pas dÃ©jÃ  un nouveau paragraphe.
+   */
+  public function apply( DstyleDoc_Element $element )
+  {
+    return $this;
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'analyse d'un Ã©lÃ©ment de liste d'historique.
+ */
+class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
+{
+  // {{{ $package, $packages
+
+  protected $_packages = array();
+
+  protected function set_package( $packages )
+  {
+    // [^-_\pL\pN]+
+    foreach( preg_split( '/[^-_\pL\pN]+/i', (string)$packages ) as $package )
+      if( $package )
+        $this->_packages[] = $package;
+  }
+
+  protected function get_packages()
+  {
+    return $this->_packages;
+  }
+
+  // }}}
+  // {{{ priority
+
+  const priority = 20;
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
+  {
+    // ^-\s*([-_\pL\pN]+)$
+    if( $dsd->dstyledoc and $dsd->package and ($current instanceof DstyleDoc_Analyser_Package or $current instanceof DstyleDoc_Analyser_Element_Package_List)
+      and preg_match( '/^-\s*([-_\pL\pN]+)$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1] );
+      $priority = self::priority;
+      return true;
+    }
+
+    // ^@package\s*([-_\pL\pN]+)$
+    elseif( $dsd->javadoc and $dsd->javadoc_package and preg_match( '/^@package\s*([-_\pL\pN]+)$/i', $source, $matches ) )
+    {
+      $instance = new self( $matches[1] );
+      $priority = self::priority;
+      return true;
+    }
+
+    else
+      return false;
+  }
+
+  // }}}
+  // {{{ apply()
+
+  /**
+   * Ajoute la liste des packages Ã  l'Ã©lement.
+   */
+  public function apply( DstyleDoc_Element $element )
+  {
+    $element->packages = $this->packages;
+    return $this;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( $package )
+  {
+    $this->package = $package;
   }
 
   // }}}

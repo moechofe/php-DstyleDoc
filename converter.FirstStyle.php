@@ -13,8 +13,11 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
     foreach( $this->files as $file )
     {
       $this->tpl->assign( 'file', $file );
-      $this->write( 'file.tpl', $tmp = $this->destination_dir.'/'.$file->id.'.html' );
-      DstyleDoc::log( sprintf( 'file: %s write to %s', $file->name, $tmp ) );
+      $writed = $this->write( 'file.tpl', $tmp = $this->destination_dir.'/'.$file->id.'.html' );
+      if( $writed )
+        DstyleDoc::log( sprintf( 'file: %s write to <strong>%s</strong>', $file->name, $tmp ), true );
+      else
+	DstyleDoc::warning( sprintf( 'cant write documentation file %s to <strong>%s</strong>', $file->name, $tmp ), true );
     }
 
   }

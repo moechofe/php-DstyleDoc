@@ -103,6 +103,22 @@ class DstyleDoc extends DstyleDoc_Properties
     $last = array_pop($args);
     if( is_bool($last) and $last )
       echo "<br />";
+    flush();
+  }
+
+  static public function warning()
+  {
+    $args = func_get_args();
+    foreach( $args as $arg )
+      if( is_string($arg) or is_numeric($arg) )
+        echo '<span style="color:red">',$arg,'</span>';
+      elseif( is_array($arg) )
+        foreach( $arg as $key => $value )
+          echo "<strong>$key: </strong> $value, ";
+    $last = array_pop($args);
+    if( is_bool($last) and $last )
+      echo "<br />";
+    flush();
   }
 
   // }}}

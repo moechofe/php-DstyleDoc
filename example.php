@@ -27,6 +27,8 @@ DstyleDoc::hie()
  *   array $array = Un tableau.
  *   integer,float $integer = Un entier ou un flotant.
  *   null $null = NULL.
+ * Packages:
+ *   - core.return
  */
 function test_param( $string, $array, $integer, $null, test_float $object )
 {
@@ -37,6 +39,9 @@ function test_param( $string, $array, $integer, $null, test_float $object )
  *   array = Retourne un tableau
  *   false = Ecrasement indirect
  *   true = Ne devrait pas écraser
+ * Packages:
+ *   - core
+ *   - return
  */
 function test_indirect_return()
 {
@@ -49,6 +54,7 @@ class test_float
 /**
  * Returns:
  *   test_float = Doc ref
+ * Packages: core.return
  */
 function test_doc_ref()
 {
@@ -59,6 +65,7 @@ function test_doc_ref()
  * Returns:
  *   string = Auto ecrasement de string
  *   true = Se fait-il écrasé ?
+ * Packages: core return
  */
 function test_return()
 {
@@ -75,6 +82,7 @@ function test_return()
  * Returns:
  *   long = Sa marche ?
  *   number = Ecrasement indirect d'un return indirect
+ * Packages: core, return
  */
 function test_doublon()
 {
@@ -83,6 +91,8 @@ function test_doublon()
 /**
  * Returns:
  *   resource, null = Une ressource ou pas.
+ * @package core
+ * @subpackage return
  */
 function test_multiple_type()
 {
