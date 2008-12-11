@@ -2231,5 +2231,68 @@ class DstyleDoc_Element_Return extends DstyleDoc_Element_Type
   // }}}
 }
 
+/**
+ * Classe d'un élement de type package.
+ */
+class Dstyle_Element_Package extends DstyleDoc_Custom_Element
+{
+  // {{{ $name
+
+  protected $_name = '';
+
+  protected function set_name( $name )
+  {
+    $this->_name = (string)$name;
+  }
+
+  protected function get_name()
+  {
+    return $this->_name;
+  }
+
+  // }}}
+  // {{{ $parent
+
+  protected $_parent;
+
+  protected function set_parent( self $parent )
+  {
+    $this->_parent = $parent;
+  }
+
+  protected function get_parent()
+  {
+    return $this->_parent;
+  }
+
+  // }}}
+  // {{{ __construct()
+
+  public function __construct( DstyleDoc_Converter $converter, $name )
+  {
+    parent::__construct( $converter );
+    if( $name )
+      $this->name = $name;
+  }
+
+  // }}}
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_display( $this->name, $this );
+  }
+
+  // }}}
+  // {{{ $convert
+
+  protected function get_convert()
+  {
+    return $this->converter->convert_package( $this );
+  }
+
+  // }}}
+}
+
 // vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=utf8 setlocal noendofline binary
 ?>

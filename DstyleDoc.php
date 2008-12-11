@@ -1003,6 +1003,52 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   }
 
   // }}}
+  // {{{ $packages
+
+  protected $_packages = array();
+
+  protected function set_package( $package )
+  {
+    $found = false;
+    if( ! empty($package) and count($this->_packages) )
+    {
+      reset($this->_packages);
+      while( true)
+      {
+        $current = current($this->_packages);
+        if( $found = ( (is_object($package) and $current === $package)
+          or (is_string($package) and $current->name === $package) ) or false === next($this->_packages) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      if( $package instanceof DstyleDoc_Element_Package )
+        $this->_packages[] = $package;
+      else
+        $this->_packages[] = new DstyleDoc_Element_Package( $this, $package );
+      end($this->_packages);
+    }
+  }
+
+  protected function get_package()
+  {
+    if( ! count($this->_packages) )
+    {
+      $this->_packages[] = new DstyleDoc_Element_Package( $this, null );
+      return end($this->_packages);
+    }
+    else
+      return current($this->_packages);
+  }
+
+  protected function get_packages()
+  {
+    return $this->_packages;
+  }
+
+  // }}}
   // {{{ file_exists()
 
   /**
