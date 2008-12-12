@@ -3,6 +3,7 @@
 require_once( 'converter.template_lite.php' );
 
 /**
+ * Propose une présentation à base de skins CSS
  */
 class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 {
