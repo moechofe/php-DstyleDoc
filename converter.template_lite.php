@@ -251,6 +251,16 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   }
 
   // }}}
+  // {{{ print_packages_index()
+/*
+  static public function print_packages_index( $params, Template_Lite $tpl )
+  {
+    $tpl->assign( '_packages', $tpl->_vars['_converter']->packages );
+
+    return $tpl->fetch( __CLASS__.':print_packages_index.tpl' );
+  }
+ */
+  // }}}
   // {{{ print_home()
 
   static public function print_home( $params, Template_Lite $tpl )
@@ -319,6 +329,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     $this->tpl->register_function( 'classes_index', array($this,'print_classes_index') );
     $this->tpl->register_function( 'methods_index', array($this,'print_methods_index') );
     $this->tpl->register_function( 'functions_index', array($this,'print_functions_index') );
+//    $this->tpl->register_function( 'packages_index', array($this,'print_packages_index') );
     $this->tpl->register_function( 'home', array($this,'print_home') );
   }
 
@@ -362,38 +373,6 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
       $this->tpl->assign_config( $config );
 
     return $this;
-  }
-
-  // }}}
-  // {{{ $destination_dir
-
-  protected $_destination_dir = null;
-
-  /**
-   * Todo:
-   *   Prévoir de la création de dossier
-   *   et de la coorection de '/' '\'.
-   */
-  public function destination_dir( $path )
-  {
-    if( is_readable((string)$path) and is_dir((string)$path) )
-    {
-      $this->_destination_dir = (string)$path;
-    }
-    else
-      throw new InvalidArgumentException('invalid path for 1st parameter send to: '.__FUNCTION__);
-
-    return $this;
-  }
-
-  protected function isset_destination_dir()
-  {
-    return $this->_destination_dir;
-  }
-
-  protected function get_destination_dir()
-  {
-    return $this->_destination_dir;
   }
 
   // }}}

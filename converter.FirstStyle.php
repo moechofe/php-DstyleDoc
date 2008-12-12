@@ -25,19 +25,34 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
   protected function display_on_file()
   {
     if( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
-      $this->page_file( $found );
+    {
+      $this->tpl->assign( 'file', $found );
+      $this->write( 'file.tpl' );
+    }
+
     elseif( ! empty($_GET['class']) and @list($file,$class) = explode(',',$_GET['class']) and $found = $this->class_exists($class) )
-      $this->page_class( $found );
+    {
+      $this->tpl->assign( 'class', $found );
+      $this->write( 'class.tpl' );
+    }
+
     elseif( ! empty($_GET['method']) and @list($file,$class,$method) = explode(',',$_GET['method']) and $found = $this->method_exists($class,$method) )
-      $this->page_method( $found );
+    {
+      $this->tpl->assign( 'method', $found );
+      $this->write( 'method.tpl' );
+    }
+
     elseif( ! empty($_GET['function']) and @list($file,$function) = explode(',',$_GET['function']) and $found = $this->function_exists($function) )
-      $this->page_function( $found );
+    {
+      $this->tpl->assign( 'function', $found );
+      $this->write( 'function.tpl' );
+    }
+
     else
-      $this->page_home();
+      $this->write( 'home.tpl' );
   }
 
   // }}}
-
   // {{{ convert_all()
 
   public function convert_all()
@@ -49,52 +64,66 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
   }
 
   // }}}
+  // {{{ $destination_dir
 
-  // {{{ page_home()
+  protected $_destination_dir = null;
 
-  protected function page_home()
+  /**
+   * Todo:
+   *   Prévoir de la création de dossier
+   *   et de la coorection de '/' '\'.
+   */
+  public function destination_dir( $path )
   {
-    $this->write( 'home.tpl' );
+    if( is_readable((string)$path) and is_dir((string)$path) )
+    {
+      $this->_destination_dir = (string)$path;
+    }
+    else
+      throw new InvalidArgumentException('invalid path for 1st parameter send to: '.__FUNCTION__);
+
+    return $this;
+  }
+
+  protected function isset_destination_dir()
+  {
+    return $this->_destination_dir;
+  }
+
+  protected function get_destination_dir()
+  {
+    return $this->_destination_dir;
   }
 
   // }}}
-  // {{{ page_file()
+  // {{{ write()
 
-  protected function page_file( DstyleDoc_Element_File $file )
+  /**
+   * Todo: trouver un moyen pour le charset
+   * Todo: vérifier le fichier et le dossier.
+   */
+  protected function write( $template, $to = null )
   {
-    $this->tpl->assign( 'file', $file );
-    $this->write( 'file.tpl' );
+    if( ! is_null($to) )
+    {
+      if( ( file_exists($to) and is_writable($to) )
+	or is_writable(dirname($to)) )
+      {
+	file_put_contents( $to, $this->tpl->fetch($template) );
+	return true;
+      }
+      else
+	return false;
+    }
+    else
+    {
+      if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
+      $this->tpl->display( $template );
+      return true;
+    }
   }
 
   // }}}
-  // {{{ page_class()
-
-  protected function page_class( DstyleDoc_Element_Class $class )
-  {
-    $this->tpl->assign( 'class', $class );
-    $this->write( 'class.tpl' );
-  }
-
-  // }}}
-  // {{{ page_method()
-
-  protected function page_method( DstyleDoc_Element_Method $method )
-  {
-    $this->tpl->assign( 'method', $method );
-    $this->write( 'method.tpl' );
-  }
-
-  // }}}
-  // {{{ page_function()
-
-  protected function page_function( DstyleDoc_Element_Function $function )
-  {
-    $this->tpl->assign( 'function', $function );
-    $this->write( 'function.tpl' );
-  }
-
-  // }}}
-
   // {{{ hie()
 
   static function hie()

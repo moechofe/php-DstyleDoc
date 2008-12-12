@@ -70,6 +70,17 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
   abstract protected function get_display();
 
   // }}}
+  // {{{ __get()
+
+  protected function __get( $property )
+  {
+    if( substr((string)$property,0,2)=='is' )
+      return substr((string)$property,2)==substr(get_class($this),2-strlen((string)$property));
+    else
+      return parent::__get( $property );
+  }
+
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter )

@@ -15,7 +15,7 @@
 {include file="_header.tpl"}
 </div>
 <div id="page-browser">
-
+{*packages_index*}
 </div>
 </body>
 </html>
