@@ -1734,7 +1734,7 @@ class DstyleDoc_Analyser_Element_Todo_List extends DstyleDoc_Analyser implements
     if( $dsd->dstyledoc and $dsd->todo and ($current instanceof DstyleDoc_Analyser_Todo or $current instanceof DstyleDoc_Analyser_Element_Todo_List)
       and preg_match( '/^\s*(?:[-+*]\s+)(.*)$/', $source, $matches ) )
       {
-        $instance = new self( $matches[1], $matches[2] );
+        $instance = new self( $matches[1] );
         $priority = self::priority;
         return true;
       }
