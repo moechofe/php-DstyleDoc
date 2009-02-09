@@ -529,9 +529,10 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
 
   protected $_todos = array();
 
-  protected function set_todo( DstyleDoc_Element_Todo $todo )
+  protected function get_todo()
   {
-    $this->_todos[] = $todo;
+    $this->_todos[] = $todo = new DstyleDoc_Element_Todo( $this->converter );
+    return $todo;
   }
 
   protected function get_totos()
