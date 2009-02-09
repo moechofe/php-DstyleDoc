@@ -525,6 +525,21 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
   }
 
   // }}}
+  // {{{ $todo
+
+  protected $_todos = array();
+
+  protected function set_todo( DstyleDoc_Element_Todo $todo )
+  {
+    $this->_todos[] = $todo;
+  }
+
+  protected function get_totos()
+  {
+    return $this->_todos;
+  }
+
+  // }}}
   // {{{ __construct()
 
   public function __construct( DstyleDoc_Converter $converter, $name )
@@ -673,24 +688,6 @@ abstract class DstyleDoc_Element_Methoded_Filed_Named extends DstyleDoc_Element_
    */
   protected function set_method( $name )
   {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     $found = false;
     if( ! empty($name) and count($this->_methods) )
     {
