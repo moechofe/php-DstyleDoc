@@ -10,6 +10,30 @@ require_once( 'libraries/template_lite/class.template.php' );
  */
 abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 {
+    // {{{ copy_dir()
+
+  static public function copy_dir( $source, $dest )
+  {
+    $_source = realpath($source);
+    $_dest = realpath($dest);
+
+    if( ! is_dir($_source) or ! is_readable($_source) )
+      throw new InvalidArgumentException(sprintf('source path: "%s" isn\'t a directory or is unreadable',$source));
+    if( ! is_dir($_dest) or ! is_writable($_dest) )
+      throw new InvalidArgumentException(sprintf('destination path: "%s" isn\'t a directory or is unwritable',$dest));
+
+
+
+    foreach( new DirectoryIterator($_source) as $file )
+      if( $file->isFile() and ! $file->isDot() and $file->isReadable() )
+      {
+	copy( $file->getPathname(), $_dest.'/'.$file->getFilename() );
+	DstyleDoc::log( sprintf( 'Copy <strong>%s</strong>', $dest.'/'.$file->getFilename() ), true );
+      }
+  }
+
+  // }}}
+
   // {{{ convert_file()
 
   public function convert_file( DstyleDoc_Element_File $file )
@@ -269,16 +293,34 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   }
 
   // }}}
+  // {{{ print_previous_index()
+
+  static public function print_ascent_index( $params, Template_Lite $tpl )
+  {
+    if( isset($params['class']) and $params['class'] instanceof DstyleDoc_Element_Class )
+      $tpl->assign( array(
+	'_class' => $params['class'],
+	'_file' => $params['class']->file ) );
+    elseif( isset($tpl->_vars['class']) and $tpl->_vars['class'] instanceof DstyleDoc_Element_Class )
+      $tpl->assign( array(
+        '_class' => $tpl->_vars['class'],
+	'_file' => $tpl->_vars['class']->file ) );
+
+    return $tpl->fetch( __CLASS__.':print_ascent_index.tpl' );
+  }
+
+  // }}}
 
   // {{{ template_get_source()
 
   static public function template_get_source( $template, &$source, $tpl )
   {
-    if( ! is_readable( $file = realpath( pathinfo(__FILE__,PATHINFO_FILENAME).'/'.$template ) ) or
-      ! is_file( $file ) )
-      throw new RuntimeException( "template: $template don't exists" );
-    else
+    if( is_readable( $file = $tpl->template_dir.$template ) and is_file( $file ) )
       $source = file_get_contents( $file );
+    elseif( is_readable( $file = realpath( pathinfo(__FILE__,PATHINFO_FILENAME).'/'.$template ) ) and is_file( $file ) )
+      $source = file_get_contents( $file );
+    else
+      throw new RuntimeException( "template: $template don't exists" );
     return true;
   }
 
@@ -319,6 +361,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
     $this->tpl->assign_by_ref( '_converter', &$this );
 
+    //$this->tpl->assign( 'href', '?%1$s=%2$s' );
+
     $this->tpl->register_resource( __CLASS__, array(
       array(__CLASS__, 'template_get_source'),
       array(__CLASS__, 'template_get_timestamp'),
@@ -329,7 +373,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
     $this->tpl->register_function( 'classes_index', array($this,'print_classes_index') );
     $this->tpl->register_function( 'methods_index', array($this,'print_methods_index') );
     $this->tpl->register_function( 'functions_index', array($this,'print_functions_index') );
-//    $this->tpl->register_function( 'packages_index', array($this,'print_packages_index') );
+    //    $this->tpl->register_function( 'packages_index', array($this,'print_packages_index') );
+    $this->tpl->register_function( 'ascent_index', array($this,'print_ascent_index') );
     $this->tpl->register_function( 'home', array($this,'print_home') );
   }
 

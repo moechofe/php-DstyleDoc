@@ -13,21 +13,21 @@
   {if $_method.params}
   <div class="content-params">
     <h2>{if isset(#method_params#)}{#method_params#|string_format:$_method.display:$_method.link}{else}#method_params(method.name,method.link)#{/if}</h2>
-    <ul>
+    <dl>
       {foreach item=param from=$_method.params}
-	<li>{$param}</li>
+	{$param}
       {/foreach}
-    </ul>
+    </dl>
   </div>
   {/if}
   {if $_method.returns}
   <div class="content-returns">
     <h2>{if isset(#method_returns#)}{#method_returns#|string_format:$_method.display:$_method.link}{else}#method_returns(method.name,method.link)#{/if}</h2>
-    <ul>
+    <dl>
       {foreach item=return from=$_method.returns}
-	<li>{$return}</li>
+	{$return}
       {/foreach}
-    </ul>
+    </dl>
   </div>
   {/if}
 

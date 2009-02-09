@@ -7,61 +7,96 @@ require_once( 'converter.template_lite.php' );
  */
 class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 {
-  // {{{ write_all_files(), display_on_file()
+  // {{{ $browse
 
-  protected function write_all_files()
+  protected $_browse_mode = true;
+
+  protected function get_browse_mode()
   {
-    foreach( $this->files as $file )
-    {
-      $this->tpl->assign( 'file', $file );
-      $writed = $this->write( 'file.tpl', $tmp = $this->destination_dir.'/'.$file->id.'.html' );
-      if( $writed )
-        DstyleDoc::log( sprintf( 'file: %s write to <strong>%s</strong>', $file->name, $tmp ), true );
-      else
-	DstyleDoc::warning( sprintf( 'cant write documentation file %s to <strong>%s</strong>', $file->name, $tmp ), true );
-    }
-
+    return (boolean)$this->_browse_mode;
   }
 
-  protected function display_on_file()
+  protected function set_browse_mode( $browse_mode )
   {
-    if( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
-    {
-      $this->tpl->assign( 'file', $found );
-      $this->write( 'file.tpl' );
-    }
-
-    elseif( ! empty($_GET['class']) and @list($file,$class) = explode(',',$_GET['class']) and $found = $this->class_exists($class) )
-    {
-      $this->tpl->assign( 'class', $found );
-      $this->write( 'class.tpl' );
-    }
-
-    elseif( ! empty($_GET['method']) and @list($file,$class,$method) = explode(',',$_GET['method']) and $found = $this->method_exists($class,$method) )
-    {
-      $this->tpl->assign( 'method', $found );
-      $this->write( 'method.tpl' );
-    }
-
-    elseif( ! empty($_GET['function']) and @list($file,$function) = explode(',',$_GET['function']) and $found = $this->function_exists($function) )
-    {
-      $this->tpl->assign( 'function', $found );
-      $this->write( 'function.tpl' );
-    }
-
-    else
-      $this->write( 'home.tpl' );
+    $this->_browse_mode = (boolean)$browse_mode;
+    $this->tpl->assign( 'browse_mode', $this->browse_mode );
   }
 
   // }}}
+  // {{{ copy_skin()
+
+  protected function copy_skin()
+  {
+    $skin_dir = $this->tpl->template_dir.'skins/'.$this->tpl->get_config_vars('skin');
+    if( is_dir($skin_dir) and is_readable($skin_dir) )
+      $this->copy_dir( $skin_dir, $this->destination_dir );
+  }
+
+  // }}}
+
+  // {{{ convert_link()
+
+  public function convert_link( $id, $name, DstyleDoc_Element $element )
+  {
+    $this->tpl->assign( '_id', $id );
+    $this->tpl->assign( '_name', $name );
+    $this->tpl->assign( '_element', $element );
+    $this->tpl->assign( '_type', strtolower(substr(get_class($element),18)) );
+    return $this->tpl->fetch( 'convert_link.tpl' );
+  }
+
+  // }}}
+
   // {{{ convert_all()
 
   public function convert_all()
   {
-    if( isset($this->destination_dir) )
-      $this->write_all_files();
+    if( ! $this->browse_mode )
+    {
+      $this->copy_skin();
+
+      $this->write( 'home.tpl', $tmp = $this->destination_dir.'/index' );
+
+      foreach( $this->files as $file )
+      {
+        $this->tpl->assign( 'file', $file );
+        $this->tpl->assign( 'this', $file );
+	$this->write( 'file.tpl', $tmp = $this->destination_dir.'/'.$file->id );
+      }
+
+      foreach( $this->classes as $class )
+      {
+	$this->tpl->assign( 'class', $class );
+        $this->tpl->assign( 'this', $class );
+        $this->write( 'class.tpl', $tmp = $this->destination_dir.'/'.$class->id );
+      }
+    }
+    elseif( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
+    {
+      $this->tpl->assign( 'file', $found );
+      $this->tpl->assign( 'this', $found );
+      $this->tpl->display( 'file.tpl' );
+    }
+    elseif( ! empty($_GET['class']) and @list($file,$class) = explode(',',$_GET['class']) and $found = $this->class_exists($class) )
+    {
+      $this->tpl->assign( 'class', $found );
+      $this->tpl->assign( 'this', $found );
+      $this->tpl->display( 'class.tpl' );
+    }
+    elseif( ! empty($_GET['method']) and @list($file,$class,$method) = explode(',',$_GET['method']) and $found = $this->method_exists($class,$method) )
+    {
+      $this->tpl->assign( 'method', $found );
+      $this->tpl->assign( 'this', $found );
+      $this->tpl->display( 'method.tpl' );
+    }
+    elseif( ! empty($_GET['function']) and @list($file,$function) = explode(',',$_GET['function']) and $found = $this->function_exists($function) )
+    {
+      $this->tpl->assign( 'function', $found );
+      $this->tpl->assign( 'this', $found );
+      $this->tpl->display( 'function.tpl' );
+    }
     else
-      $this->display_on_file();
+      $this->tpl->display( 'home.tpl' );
   }
 
   // }}}
@@ -72,7 +107,7 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
   /**
    * Todo:
    *   Prévoir de la création de dossier
-   *   et de la coorection de '/' '\'.
+   *   et de la correction de '/' '\'.
    */
   public function destination_dir( $path )
   {
@@ -101,27 +136,27 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 
   /**
    * Todo: trouver un moyen pour le charset
-   * Todo: vérifier le fichier et le dossier.
    */
   protected function write( $template, $to = null )
   {
+/*    if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
+    $this->tpl->display( $template );
+
     if( ! is_null($to) )
-    {
-      if( ( file_exists($to) and is_writable($to) )
-	or is_writable(dirname($to)) )
+    {*/
+      if( ( file_exists($to.'.html') and is_writable($to.'.html') )
+	or is_writable(dirname($to.'.html')) )
       {
-	file_put_contents( $to, $this->tpl->fetch($template) );
-	return true;
+	//
+	//throw new RuntimeException('utiliser une fonction smarty ici, compilé ou non, pour allez chercher le chemin');
+	//$this->tpl->assign( 'href', '%2$s.html' );
+
+	file_put_contents( $to.'.html', $this->tpl->fetch( $template ) );
+	DstyleDoc::log( sprintf( 'Write <strong>%s</strong>', $to.'.html' ), true );
       }
       else
-	return false;
-    }
-    else
-    {
-      if( ! headers_sent() ) header( 'Content-type: text/html; charset=utf-8' );
-      $this->tpl->display( $template );
-      return true;
-    }
+	DstyleDoc::warning( sprintf( 'Write <strong>%s</strong>', $to.'.html' ), true );
+    //}
   }
 
   // }}}
@@ -129,7 +164,9 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 
   static function hie()
   {
-    return new self;
+    $instance = new self;
+    $instance->browse_mode = true;
+    return $instance;
   }
 
   // }}}

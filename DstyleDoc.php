@@ -2,6 +2,7 @@
 
 /**
  * Script principale de DstyleDoc.
+ * Contient la classe de controle DstyleDoc, l'interface pour les converteurs DstyleDoc_Converter_Convert ainsi que différentes classes d'outils.
  */
 
 // {{{ properties class
@@ -16,13 +17,13 @@ class DstyleDoc_Properties
   /**
    * Permet d'utiliser des getter.
    * __get() est appelé automatiquement par PHP lorsque la lecture de donnée d'un membre est inaccessible.
-   * __get() vérifiera au préalable que la fonction "get_"+<nom_du_membre> existe et quelle est appelable. Dans le cas contraire, une exception BadPropertyException sera lancé.
+   * __get() vérifiera au préalable que la fonction "get_"+nom_du_membre existe et quelle est appelable. Dans le cas contraire, une exception BadPropertyException sera lancé.
    * Params:
    *   string $property = Le nom du membre.
    * Returns:
-   *   mixed = Retournera la valeur retournée par la fonction "get_"+<nom_du_membre>.
+   *   mixed = Retournera la valeur retournée par la fonction "get_"+nom_du_membre.
    * Throws:
-   *   BadPropertyException = Lancé si la fonction "get_"+<nom_du_membre> n'est pas disponible.
+   *   BadPropertyException = Lancé si la fonction "get_"+nom_du_membre n'est pas disponible.
    */
   protected function __get( $property )
   {
@@ -96,10 +97,10 @@ class DstyleDoc extends DstyleDoc_Properties
     $args = func_get_args();
     foreach( $args as $arg )
       if( is_string($arg) or is_numeric($arg) )
-        echo $arg;
+        echo sprintf( '<small>%s</small> %s', date('H:i:s'), $arg );
       elseif( is_array($arg) )
         foreach( $arg as $key => $value )
-          echo "<strong>$key: </strong> $value, ";
+          echo sprintf( '<small>%s</small> <strong>%s : </strong> %s, ', date('H:i:s'), $key, $value );
     $last = array_pop($args);
     if( is_bool($last) and $last )
       echo "<br />";
@@ -286,6 +287,7 @@ HTML;
     'syntax' => true,
     'type' => true,
     'since' => true,
+    'todo' => true,
 
     'element_link' => true,
     'href_link' => true,
@@ -301,6 +303,7 @@ HTML;
     'javadoc_syntax' => true,
     'javadoc_var' => true,
     'javadoc_since' => true,
+    'javadoc_todo' => true,
 
     'javadoc_link' => true,
 

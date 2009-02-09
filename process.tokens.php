@@ -1,13 +1,15 @@
 <?php
 
 /**
- * Classes d'analyse du code PHP.
- * A partir de la liste des token retourné par la fonction token_get_all()
- *
- * Todo:
- *   Stoker dans des chaines des fonctions des classes et des fichier pour l'analyser plus tard ?
+ * Les classes des tokens.
+ * Contient les classes de correspondante avec les tokens PHP retournés par la fonction http://php.net/token_get_all .
+ * Ces classes analyse le code PHP et instancie les classes d'éléments correspondantes.
  */
 
+/**
+ * Interface de travail.
+ * Déclare la méthode d'instanciation hie().
+ */
 interface DstyleDoc_Token_Work
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line );
@@ -28,7 +30,7 @@ class DstyleDoc_Token_Stop extends DstyleDoc_Token_Custom
 }
 
 /**
- * Classe de token de base.
+ * Classe de token qui ne fait rien.
  */
 abstract class DstyleDoc_Token_None extends DstyleDoc_Token_Custom
 {
@@ -50,7 +52,7 @@ abstract class DstyleDoc_Token_None extends DstyleDoc_Token_Custom
 }
 
 /**
- * Classe de token de base.
+ * Classe de token légère
  */
 abstract class DstyleDoc_Token_Light extends DstyleDoc_Token_Custom implements DstyleDoc_Token_Work
 {

@@ -1883,7 +1883,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 }
 
 /**
- * Classe d'un element de type paramètre.
+ * Classe d'un element de type exception.
  */
 class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 {
@@ -1924,6 +1924,29 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
   protected function get_convert()
   {
     return $this->converter->convert_exception( $this );
+  }
+
+  // }}}
+}
+
+/**
+ * Classe d'un element de type todo.
+ */
+class DstyleDoc_Element_Todo extends DstyleDoc_Custom_Element
+{
+  // {{{ $display
+
+  protected function get_display()
+  {
+    return $this->converter->convert_todo( $this );
+  }
+
+  // }}}
+  // {{{ $convert
+
+  protected function get_convert()
+  {
+    return $this->converter->convert_todo( $this );
   }
 
   // }}}

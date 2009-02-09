@@ -1,4 +1,4 @@
-<div class="param-type-var">
+<dt class="param-type-var">
   <span class="param-type">
   {section name=type loop=$_param.types}
     <em>{$_param.types[type]}{if ! $templatelite.section.type.last}, {/if}</em>
@@ -7,7 +7,7 @@
   <span class="param-var">
     <strong>${$_param.var}</strong>
   </span>
-</div>
-<div class="return-description">
+</dt>
+<dd class="param-description">
 {$_param.description}
-</div>
+</dd>

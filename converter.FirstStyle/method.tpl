@@ -12,6 +12,7 @@
 {include file="_header.tpl"}
 </div>
 <div id="page-browser">
+{ascent_index class=$method.class}
 {methods_index class=$method.class}
 </div>
 </body>
