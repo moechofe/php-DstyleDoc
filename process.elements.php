@@ -535,7 +535,7 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
     return $todo;
   }
 
-  protected function get_totos()
+  protected function get_todos()
   {
     return $this->_todos;
   }
