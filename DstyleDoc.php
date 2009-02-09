@@ -476,9 +476,9 @@ interface DstyleDoc_Converter_Convert
    * Converti la description longue.
    * Params:
    *    array(string) $description = Toutes les lignes de la description longue.
-   *    $element = L'ÈlÈment concernÈ par la dÈscription courte.
+   *    $element = L'√©l√©ment concern√© par la d√©scription courte.
    * Returns:
-   *    mixed = DÈpends du convertisseur.
+   *    mixed = D√©pends du convertisseur.
    */
   function convert_description( $description, DstyleDoc_Custom_Element $element );
 
@@ -614,7 +614,7 @@ interface DstyleDoc_Converter_Convert
   /**
    * Converti une portion de texte contenu dans une description.
    * Params:
-   *    string $text = La portion de texte ‡ convertir.
+   *    string $text = La portion de texte √† convertir.
    */
   function convert_text( $text );
 
@@ -624,9 +624,21 @@ interface DstyleDoc_Converter_Convert
   /**
    * Converti du code PHP.
    * Params:
-   *    string $code = Le cde PHP ‡ convertir.
+   *    string $code = Le cde PHP √† convertir.
    */
   function convert_php( $code );
+
+  // }}}
+  // {{{ convert_todo()
+
+  /**
+   * G√©n√®re la documentation d'un √©lement de la todolist.
+   * Params:
+   *    array(string) $todo = Toutes les lignes de la description de l'√©l√©ment de la todolist.
+   * Returns:
+   *    mixed = D√©pends du convertisseur.
+   */
+  function convert_todo( $todo );
 
   // }}}
   // {{{ search_element()

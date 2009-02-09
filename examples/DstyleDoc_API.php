@@ -51,6 +51,8 @@ DstyleDoc::hie()
 'classes_index_list_header' => 'Liste des classes déclarées dans le fichier %2$s',
 'methods_index_list_header' => 'Liste des méthodes de la classe <span class="class">%s</span>',
 
+'todos' => 'todolist',
+
       ) )
 
     );

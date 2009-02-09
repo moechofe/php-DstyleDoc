@@ -51,6 +51,9 @@ HTML;
   // }}}
   // {{{ convert_text()
 
+  /**
+   * Todo: C'est utilis√© √ßa ?
+   */
   public function convert_text( $text )
   {
     return htmlspecialchars($text);
@@ -65,14 +68,22 @@ HTML;
   }
 
   // }}}
+  // {{{ convert_todo()
+
+  public function convert_todo( $todo )
+  {
+    return implode('<br />',$description);
+  }
+
+  // }}}
   // {{{ html_id()
 
   /**
-   * S'assure que les caratËres contenu dans la chaÓne sont acceptÈes dans la valeur d'un attribut ID HTML.
+   * S'assure que les carat√®res contenu dans la cha√Æne sont accept√©es dans la valeur d'un attribut ID HTML.
    * Params:
-   *    string $string = La chaÓne ‡ traiter.
+   *    string $string = La cha√Æne a traiter.
    * Returns:
-   *    string La chaÓne traiter.
+   *    string La cha√Æne traiter.
    */
   protected function html_id( $string )
   {
