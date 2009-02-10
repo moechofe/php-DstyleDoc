@@ -1759,14 +1759,13 @@ class DstyleDoc_Analyser_Element_Todo_List extends DstyleDoc_Analyser implements
    */
   public function apply( DstyleDoc_Element $element )
   {
-    if( $element instanceof DstyleDoc_Element_Function
-      or $element instanceof DstyleDoc_Element_Class
-      or $element instanceof DstyleDoc_Element_Interface
-      or $element instanceof DstyleDoc_Element_Constant
-      or $element instanceof DstyleDoc_Element_Member )
-    {
-      $element->todo->description = $this->description;
-    }
+    if( $this->description )
+      if( $element instanceof DstyleDoc_Element_Function
+        or $element instanceof DstyleDoc_Element_Class
+        or $element instanceof DstyleDoc_Element_Interface
+	or $element instanceof DstyleDoc_Element_Constant
+        or $element instanceof DstyleDoc_Element_Member )
+        $element->todo->description = $this->description;
     return $this;
   }
 
