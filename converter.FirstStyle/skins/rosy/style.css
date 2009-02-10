@@ -36,7 +36,7 @@ span.display-file { background: url("Icon_file.png") no-repeat left; padding-lef
 
 h1 span.display { background: inherit !important; padding-left: 0px !important; }
 
-a { color: MediumBlue; }
+a { color: mediumblue; }
 
 /**
  * Le design pour l'entete
@@ -91,5 +91,5 @@ a { color: MediumBlue; }
 #page-browser ul.ascent { list-style: none; padding: 0px; margin: 0px; }
 #page-browser ul.ascent li { font-size: 13px; border-bottom: solid 3px white; padding: 5px 13px 2px 13px; }
 #page-browser ul.ascent li a:visited { text-decoration: none; }
-#page-browser ul.ascent li.displayed { background: gold; }
+#page-browser ul li.displayed { background: gold; }
 
