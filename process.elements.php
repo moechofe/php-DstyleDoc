@@ -1936,7 +1936,7 @@ class DstyleDoc_Element_Todo extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_todo( $this->description );
+    return $this->converter->convert_todo( $this->descriptions );
   }
 
   // }}}
@@ -1944,7 +1944,7 @@ class DstyleDoc_Element_Todo extends DstyleDoc_Custom_Element
 
   protected function get_convert()
   {
-    return $this->converter->convert_todo( $this->description );
+    return $this->converter->convert_todo( $this->descriptions );
   }
 
   // }}}
