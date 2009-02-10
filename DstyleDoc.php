@@ -59,7 +59,7 @@ class DstyleDoc_Properties
 
     call_user_func( array($this,'unset_'.(string)$property) );
   }
-
+/*
   protected function __call( $method, $arguments )
   {
     if( ! method_exists($this,'call_'.(string)$method) or ! is_callable( array($this,'call_'.(string)$method) ) )
@@ -67,6 +67,7 @@ class DstyleDoc_Properties
 
     return call_user_func_array( array($this,'call_'.(string)$method), $arguments );
   }
+*/
 }
 
 // }}}
@@ -529,7 +530,7 @@ interface DstyleDoc_Converter_Convert
   /**
    * Convertie et renvoie le nom d'affichage d'un élément.
    * Params:
-   *    $name = Le nom de l'élément a afficher.
+   *    string $name = Le nom de l'élément a afficher.
    *    $element = L'élément vers lequel se destine le lien.
    * Returns:
    *    mixed = Dépends du convertisseur.
@@ -779,6 +780,9 @@ class DstyleDoc_Element_Container
  * Todo:
  *    - reporter set_method() dans les autres methodes de ce genre.
  * Todo: gérer les constantes
+ * Members:
+ *   - (out) array(DstyleDoc_Element_Class) $classes = La listes des classes.
+ *   - DstyleDoc_Element_Class $class = Ajoute une nouvelle classe dans la liste ou retourne la dernière ajoutée.
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements ArrayAccess
 {

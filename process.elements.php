@@ -37,11 +37,17 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
   /**
    * Todo:
    *   apparement on passe toujours des strings.
+   *   FAUX
+   *   on passe par un DstyleDoc_Descritable
    */
   protected function set_description( $description )
   {
     //d( gettype( $description ) );
-    $this->_descriptions[] = (string)$description;
+    /*if( $description instanceof DstyleDoc_Descritable )
+      $this->_descriptions = array_merge( $this->_descriptions, $description->descriptions );
+    else*/
+//      $this->_descriptions[] = (string)$description;
+      $this->_descriptions[] = $description;
   }
 
   protected function get_description()
@@ -190,7 +196,7 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 }
 
 /**
- * Classe abstraite d'un Element.
+ * Classe abstraite d'un élement.
  */
 abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 {
@@ -416,7 +422,7 @@ HTML;
 }
 
 /**
- * Classe abstratite d'un Element Contenant un titre.
+ * Classe abstraite d'un élement contenant un titre.
  */
 abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 {
@@ -448,7 +454,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 }
 
 /**
- * Classe abstraite d'un Element possédant un lien dans un fichier.
+ * Classe abstraite d'un élement possédant un lien dans un fichier.
  */
 abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 {
@@ -496,7 +502,7 @@ abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 }
 
 /**
- * Classe abstraite d'un Element possédant un lien dans un fichier et un nom.
+ * Classe abstraite d'un élement possédant un lien dans un fichier et un nom.
  */
 abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
 {
@@ -557,7 +563,7 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
 }
 
 /**
- * Classe d'un element de type fichier.
+ * Classe d'un élement de type fichier.
  */
 class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 {
@@ -1541,7 +1547,7 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
   protected function get_display()
   {
-    return $this->converter->convert_display( $this->class->name.($this->static?'::':'->').$this->name.'()', $this );
+    return $this->converter->convert_display( $this->class->name.(($this->static)?'::':'->').$this->name.'()', $this );
   }
 
   // }}}

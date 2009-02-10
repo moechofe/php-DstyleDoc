@@ -1,6 +1,6 @@
 <div class="method-content"><div class="frame"><div class="content">
   <div class="content-title"><p>{$_method.title}</p></div>
-  <div class="content-display"><h1>{$_method.display}</h1></div>
+  <div class="content-display"><h1>{if isset(#method_header_display#)}{#method_header_display#|string_format:$_method.display}{else}#method_header_display(method-name)#{/if}</h1></div>
   <div class="content-syntax">
     <h2>{if isset(#method_syntax#)}{#method_syntax#|string_format:$_method.display:$_method.link}{else}#method_syntax(methode-name,method-link)#{/if}</h2>
     <ul>
