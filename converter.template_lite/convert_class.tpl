@@ -6,11 +6,13 @@
 {if $_class.todos}
   <div class="content-todos">
     <h2>{if isset(#todos#)}{#todos#|string_format:$_class.display:$_class.link}{else}#todos(class.name,class.link)#{/if}</h2>
-{foreach item=todo from=$_class.todos}
+{if $_class.todos}
     <ul>
+{foreach item=todo from=$_class.todos}
       <li>{$todo}</li>
-    </ul>
 {/foreach}
+    </ul>
+{/if}
   </div>
 {/if}
 </div></div></div>
