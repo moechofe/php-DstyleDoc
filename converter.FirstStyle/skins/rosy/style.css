@@ -60,8 +60,8 @@ a { color: MediumBlue; }
 #page-content div.page-content h1 span.display { background: inherit !important; padding-left: 0px !important; }
 #page-content h3.list-header { margin: 10px 10px 0px 10px; font-weight: normal; }
 #page-content ul.list { list-style: none; padding: 0px; margin: 0px 10px 10px 10px; }
-#page-content div.content-title p { margin-bottom: 0px; }
-#page-content div.content-display h1 { margin-top: 0px; margin-bottom: 30px; }
+#page-content div.content-title p { margin-bottom: 5px; }
+#page-content div.content-display h1 { margin-top: 5px; margin-bottom: 30px; }
 #page-content div.content-index { background: antiquewhite; float: left; }
 #page-content div.content-index li { font-size: 13px; line-height: 20px; }
 #page-content div.content-syntax { border-top: solid 5px sandybrown; background-color: wheat; padding: 8px 10px; margin-top: 10px; }
