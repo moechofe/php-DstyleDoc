@@ -13,7 +13,7 @@ error_reporting( E_ALL | E_STRICT );
 
 DstyleDoc::hie()
   ->source( 'DstyleDoc.php' )
-  ->source( 'process.tokens.php' )
+//  ->source( 'process.tokens.php' )
   ->convert_with(
 
     DstyleDoc_Converter_FirstStyle::hie()

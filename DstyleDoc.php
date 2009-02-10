@@ -777,7 +777,7 @@ class DstyleDoc_Element_Container
 /**
  * Convertisseur abstrait
  * Todo:
- *    - reporter set_method() dans les autres methode de ce genre.
+ *    - reporter set_method() dans les autres methodes de ce genre.
  * Todo: gérer les constantes
  */
 abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements ArrayAccess
