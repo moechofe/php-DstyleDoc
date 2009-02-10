@@ -72,7 +72,7 @@ HTML;
 
   public function convert_todo( $todo )
   {
-    return implode('<br />',$description);
+    return implode('<br />',$todo);
   }
 
   // }}}
