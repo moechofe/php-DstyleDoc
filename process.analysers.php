@@ -87,7 +87,7 @@ class DstyleDoc_Analyser_Description extends DstyleDoc_Analyser
   // {{{ apply()
 
   /**
-   * Ajoute une nouvelle ligne de description à l'élément.
+   * Ajoute une nouvelle ligne de description a l'Ã©lÃ©ment.
    */
   public function apply( DstyleDoc_Element $element )
   {
@@ -658,6 +658,12 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
 
 /**
  * Classe d'analyse d'un Ã©lÃ©ment de liste de retour.
+ * Todo:
+ *   l'analyse est trop complex,
+ *   remplacer (?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)
+ *   par (?:([-_,\| \pLpN]+)\s+)
+ *   OU PAS
+ *   faire l'inverse plutÃ´t
  */
 class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -1039,21 +1045,38 @@ class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
  */
 class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
-  // {{{ $syntax
+  // {{{ $returns
 
-  protected $_syntax = array();
+  protected $_returns = array();
 
-  protected function set_syntax( $syntax )
+  protected function set_returns( $returns )
   {
     $optional = false;
-    foreach( explode(',', $syntax) as $var )
+    foreach( explode(',', $returns) as $type )
+      $this->_returns[] = trim($type);
+  }
+
+  protected function get_returns()
+  {
+    return $this->_returns;
+  }
+
+  // }}}
+  // {{{ $params
+
+  protected $_params = array();
+
+  protected function set_params( $params )
+  {
+    $optional = false;
+    foreach( explode(',', $params) as $var )
     {
       // \s*(\[?)\s*(?:([-_\pLpN]+)\s)?\s*(\$[-_\pLpN]+|\.{3})\s*\]?
       if( preg_match('/\\s*(\\[?)\\s*(?:([-_\\pLpN]+)\\s)?\\s*(\\$[-_\\pLpN]+|\\.{3})\\s*\\]?/', $var, $matches) )
       {
         if( ! empty($matches[1]) )
           $optional = true;
-        $this->_syntax[] = array(
+        $this->_params[] = array(
           'types' => $matches[2]?$matches[2]:false,
           'var' => $matches[3],
           'optional' => ($optional)?true:(($matches[3]==='...')?true:false) );
@@ -1061,9 +1084,9 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
     }
   }
 
-  protected function get_syntax()
+  protected function get_params()
   {
-    return $this->_syntax;
+    return $this->_params;
   }
 
   // }}}
@@ -1099,39 +1122,39 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
   // {{{ analyse()
 
   /**
-   * Analyse la ligne de documentation à la recherche d'un probable élément de liste de syntax.
+   * Analyse la ligne de documentation a la recherche d'un probable Ã©lÃ©ment de liste de syntax.
    * Params:
-   *    DstyleDoc_Analyser $current = L'instance de la ligne précédante.
-   *    string $source = La ligne de documentation à tester.
-   *    DstyleDoc_Analyser_Syntax,null $instance = L'instance à retourné en cas de succès.
-   *    integer $priority = La priorité de l'élément trouvé en cas de succès.
+   *    DstyleDoc_Analyser $current = L'instance de la ligne prÃ©cÃ©dante.
+   *    string $source = La ligne de documentation a tester.
+   *    DstyleDoc_Analyser_Syntax,null $instance = L'instance a retourner en cas de succÃ©s.
+   *    integer $priority = La prioritÃ© de l'Ã©lÃ©ment trouvÃ© en cas de succÃ©s.
    * Returns:
-   *    boolean = Renvoie true en case de succès, sinon false.
+   *    boolean = Renvoie true en case de succÃ©s, sinon false.
    */
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    // ^(?:[-+*]\s+)?((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]\s*(.*)$
+    // ^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]\s*(.*)$
     if( $dsd->dstyledoc and $dsd->syntax and ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/^(?:[-+*]\\s+)?((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]\s*(.*)$/', $source, $matches ) )
       {
-        $instance = new self( $matches[1], $matches[2] );
+        $instance = new self( $matches[1], $matches[2], $matches[3] );
         $priority = self::priority;
         return true;
       }
 
-    // ^(?:[-+*]\s+)((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
+    // ^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]?\s*(.*)$
     elseif( $dsd->dstyledoc and $dsd->syntax and ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/^(?:[-+*]\\s+)((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]?\s*(.*)$/', $source, $matches ) )
       {
-        $instance = new self( $matches[1], $matches[2] );
+        $instance = new self( $matches[1], $matches[2], $matches[3] );
         $priority = self::priority;
         return true;
       }
 
-    // ^(?:@syntax\s+)((?:\s*,?\s*\[?\s*(?:[-_\pLpN]+\s+)?(?:\$[-_\pLpN]+|\.{3}))*\]?)\s*[:=]?\s*(.*)$
-    elseif( $dsd->javadoc and $dsd->javadoc_syntax and preg_match( '/^(?:@syntax\\s+)((?:\\s*,?\\s*\\[?\\s*(?:[-_\\pLpN]+\\s+)?(?:\\$[-_\\pLpN]+|\\.{3}))*\\]?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+    // ^(?:@syntax\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]?\s*(.*)$
+    elseif( $dsd->javadoc and $dsd->javadoc_syntax and preg_match( '/^(?:@syntax\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]?\s*(.*)$/i', $source, $matches ) )
       {
-        $instance = new self( $matches[1], $matches[2] );
+        $instance = new self( $matches[1], $matches[2], $matches[3] );
         $priority = self::priority;
         return true;
       }
@@ -1143,24 +1166,24 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
   // }}}
   // {{{ apply()
 
-  /**
-   * Ajoute une exception à l'élément.
-   */
   public function apply( DstyleDoc_Element $element )
   {
     if( $element instanceof DstyleDoc_Element_Function )
     {
-      foreach( $this->syntax as $key => $syntax )
-      {
-        $element->param = $syntax['var'];
-        $element->param->type = $syntax['types'];
-        $element->param->optional = $syntax['optional'];
-        if( $syntax['var'] === '...' )
-          $element->param->optional = true;
-      }
-      $element->syntax = $this->syntax;
+      $element->syntax = true;
       $element->syntax->description = $this->description;
       $element->syntax->function = $element;
+      foreach( $this->params as $param )
+      {
+        $element->param = $param['var'];
+        $element->param->type = $param['types'];
+        $element->param->optional = $param['optional'];
+        if( $param['var'] === '...' )
+	  $element->param->optional = true;
+	$element->syntax->param = $element->param;
+      }
+      foreach( $this->returns as $return )
+	$element->return = $return;
     }
     return $this;
   }
@@ -1168,9 +1191,10 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
   // }}}
   // {{{ __construct()
 
-  public function __construct( $syntax, $description )
+  public function __construct( $returns, $params, $description )
   {
-    $this->syntax = $syntax;
+    $this->returns = $returns;
+    $this->params = $params;
     $this->description = $description;
   }
 
