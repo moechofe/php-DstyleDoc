@@ -426,6 +426,7 @@ HTML;
 {$this->either($element->description,'<dt>description</dt><dd>'.$element->description.'</dd>')}
 {$this->either($element->version,'<dt>version</dt><dd>'.$element->version.'</dd>')}
 {$this->either($element->historys,'<dt>history</dt><dd>'.$this->forall($element->historys,'<li><b>{$value->version}: </b>{$value->description}</li>').'</dd>')}
+{$this->either($element->packages,'<dt>package</dt><dd>'.$this->forall($element->packages,'<li>{$value}</li>').'</dd>')}
 HTML;
   }
 
