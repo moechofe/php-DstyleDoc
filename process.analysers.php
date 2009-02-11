@@ -1606,10 +1606,12 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
 
   protected function set_package( $packages )
   {
-    // [^-_\pL\pN]+
-    foreach( preg_split( '/[^-_\pL\pN]+/i', (string)$packages ) as $package )
+    // [.,:/]+
+    foreach( preg_split( '%[.,:/]+%', (string)$packages ) as $package )
+    {
       if( $package )
-        $this->_packages[] = $package;
+	$this->_packages[] = $package;
+    }
   }
 
   protected function get_packages()
@@ -1627,17 +1629,17 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
 
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    // ^-\s*([-_\pL\pN]+)$
+    //  ^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*[.,:\/]+\s*)*[-_\pLpN]+)$
     if( $dsd->dstyledoc and $dsd->package and ($current instanceof DstyleDoc_Analyser_Package or $current instanceof DstyleDoc_Analyser_Element_Package_List)
-      and preg_match( '/^-\s*([-_\pL\pN]+)$/i', $source, $matches ) )
+      and preg_match( '%^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*[.,:/]+\s*)*[-_\pLpN]+)$%', $source, $matches ) )
     {
       $instance = new self( $matches[1] );
       $priority = self::priority;
       return true;
     }
 
-    // ^@package\s*([-_\pL\pN]+)$
-    elseif( $dsd->javadoc and $dsd->javadoc_package and preg_match( '/^@package\s*([-_\pL\pN]+)$/i', $source, $matches ) )
+    // ^@(sub)?package\s+((?:[-_\pLpN]+\s*[.,:\/]+\s*)*[-_\pLpN]+)$
+    elseif( $dsd->javadoc and $dsd->javadoc_package and preg_match( '%^@package\s+((?:[-_\pLpN]+\s*[.,:/]+\s*)*[-_\pLpN]+)$%i', $source, $matches ) )
     {
       $instance = new self( $matches[1] );
       $priority = self::priority;
@@ -1657,6 +1659,7 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
   public function apply( DstyleDoc_Element $element )
   {
     $element->packages = $this->packages;
+    d( $this );
     return $this;
   }
 
