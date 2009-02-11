@@ -150,7 +150,13 @@ HTML;
 
     $returns = '';
     foreach( $syntax->returns as $return )
-      $returns .= ", <i>{$return->type}</i>";;
+    {
+      $type = $return->type;
+      if( $type instanceof DstyleDoc_Element )
+	$returns .= ", <i>{$type->link}</i>";
+      else
+	$returns .= ", <i>{$type}</i>";
+    }
     $returns = substr($returns,2);
 //    if( $returns ) $returns .= ' = ';
 
