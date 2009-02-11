@@ -6,6 +6,8 @@ h1 { font-family: georgia, serif; font-size: 29px; }
 h2 { font-family: georgia, serif; font-size: 19px; }
 p, li, dd, dt { font-family: arial, "sans serif"; font-size: 15px; line-height: 20px; }
 
+wbr:after { content: "\00200B"; }
+
 #page-header { position: absolute; top: 0px; left: 0px; width: 100%; height: 40px; }
 
 #page-browser { position: absolute; top: 40px; left: 0px; width: 300px; }
