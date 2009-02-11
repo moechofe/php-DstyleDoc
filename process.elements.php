@@ -1818,6 +1818,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
    */
   protected function set_return( $return )
   {
+
     $found = false;
     if( ! empty($return) and count($this->_returns) )
     {
@@ -1869,15 +1870,17 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 
   // }}}
   // {{{ __construct()
-
+/*
   public function __construct( DstyleDoc_Converter $converter, $syntax )
   {
     parent::__construct( $converter );
+
+
     if( is_array($syntax) or $syntax instanceof ArrayAccess )
       foreach( $syntax as $param )
         $this->param = $param;
   }
-
+ */
   // }}}
   // {{{ $convert
 
@@ -1945,7 +1948,7 @@ class DstyleDoc_Element_Todo extends DstyleDoc_Custom_Element
 
   protected function get_display()
   {
-    return $this->converter->convert_todo( $this->descriptions );
+    return $this->converter->convert_display( $this->descriptions, $this );
   }
 
   // }}}
