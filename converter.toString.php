@@ -139,19 +139,25 @@ HTML;
 
   public function convert_syntax( DstyleDoc_Element_Syntax $syntax )
   {
-    $result = '';
+    $params = '';
     foreach( $syntax->params as $param )
-      $result .= ', '.
+      $params .= ', '.
         (($param->optional)?'[ ':'').
-        (($param->types)?'<i>'.$param->types.'</i> ':'').
-        $param->var.
+        (($param->type)?'<i>'.$param->type.'</i> ':'').
+        "\${$param->var}".
         (($param->optional)?' ]':'');
+    $params = substr($params,2);
 
-    $result = substr($result,2);
+    $returns = '';
+    foreach( $syntax->returns as $return )
+      $returns .= ", <i>{$return->type}</i>";;
+    $returns = substr($returns,2);
+//    if( $returns ) $returns .= ' = ';
+
     $call = substr($syntax->function->display,0,-1);
 
     return <<<HTML
-<li><span class="syntax">{$call}</span> {$result} )<br/>{$syntax->description}</li>
+<li><span class="syntax">{$returns} {$call} {$params} )</span> = {$syntax->description}</li>
 HTML;
   }
 
@@ -162,26 +168,34 @@ HTML;
   {
     $types = implode(', ', $param->types);
     return <<<HTML
-{$param->var}: {$this->either($param->types,'<i>('.$types.')</i> ')}{$this->either($param->default,'<i>\['.$param->default.'\]</i> ')}{$param->description}
+{$this->either($param->types,'<i>('.$types.')</i> ') }\${$param->var} = {$this->either($param->default,'<i>\['.$param->default.'\]</i> ')}{$param->description}
 HTML;
   }
 
   // }}}
   // {{{ convert_type()
 
-
   public function convert_type( DstyleDoc_Element_Type $type )
   {
     $types = $type->type;
     if( $types instanceof DstyleDoc_Element )
       return <<<HTML
+{$types->link}
+HTML;
+    /*
+      return <<<HTML
 {$types->link}: {$type->description}
 HTML;
-
+     */
     else
+      return <<<HTML
+{$types}
+HTML;
+    /*
       return <<<HTML
 {$types}: {$type->description}
 HTML;
+       */
   }
 
   // }}}
@@ -197,7 +211,7 @@ HTML;
 
     else
       return <<<HTML
-{$types}: {$return->description}
+<i>{$types}</i> = {$return->description}
 HTML;
   }
 
