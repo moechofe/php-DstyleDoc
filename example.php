@@ -39,7 +39,6 @@ function test_param( $string, $array, $integer, $null, test_float $object )
 {
 }
 
-__halt_compiler();
 
 /**
  * Returns:
@@ -179,4 +178,5 @@ $a = null;
 $a = " string {$a} string ${a} ";
 
 
+__halt_compiler();
 ?>
