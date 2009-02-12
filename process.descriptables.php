@@ -115,7 +115,7 @@ interface DstyleDoc_Descritable_Analysable
 }
 
 /**
- * Classe de résultat si un analyse à réussi.
+ * Classe de rÃ©sultat si un analyse a rÃ©ussi.
  */
 final class DstyleDoc_Descritable_Analysable_Replace extends DstyleDoc_Properties
 {
@@ -184,10 +184,11 @@ final class DstyleDoc_Descritable_Analysable_Replace extends DstyleDoc_Propertie
   // }}}
 }
 
-// todo c'est beaucoup le bordel cette partie
-// on car on cherche pas les element dans l'ordre dans lequel on les trouve mais dans un ordre de type
-// et comme la fonction est recusrive.
-// $content est une reference
+/* todo: c'est beaucoup le bordel cette partie
+ on car on cherche pas les element dans l'ordre dans lequel on les trouve mais dans un ordre de type
+ et comme la fonction est recusrive.
+ $content est une reference
+ */
 class DstyleDoc_Descritable_Link implements DstyleDoc_Descritable_Analysable
 {
   // {{{ result()
