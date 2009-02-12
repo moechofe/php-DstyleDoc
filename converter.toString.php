@@ -141,11 +141,13 @@ HTML;
   {
     $params = '';
     foreach( $syntax->params as $param )
+    {
       $params .= ', '.
         (($param->optional)?'[ ':'').
         (($param->type)?'<i>'.$param->type.'</i> ':'').
         "\${$param->var}".
         (($param->optional)?' ]':'');
+    }
     $params = substr($params,2);
 
     $returns = '';
