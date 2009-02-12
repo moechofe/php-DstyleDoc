@@ -274,6 +274,15 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 
   protected $_packages = array();
 
+  protected function set_package( $package )
+  {
+    if( is_array($package) or $package instanceof Iterator )
+      foreach( $package as $p )
+	$this->_packages[] = (string)$p;
+    elseif( $package )
+      $this->_packages[] = (string)$package;
+  }
+
   protected function set_packages( $packages )
   {
     $this->_packages = $packages;
@@ -348,7 +357,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
    * Returns:
    *    mixed = Dépends du convertisseur.
    */
-  protected function call_link( $text )
+  public function link( $text )
   {
     return $this->converter->convert_link( $this->id, (string)$text, $this );
   }
