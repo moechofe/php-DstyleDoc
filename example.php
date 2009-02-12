@@ -3,13 +3,17 @@ ul { margin: 0px; padding: 0px 0px 0px 18px; }
 </style>
 <?php
 
+// un dumper/frontend pour xdebug
 require_once( 'xdebug.front.end.php' );
 
+// LE script DstylDoc
 require_once( 'DstyleDoc.php' );
+// LE converteur WEB 1.0
 require_once( 'converter.toString.php' );
 
 set_time_limit( 90 );
 
+// Configure et lance l'analyse et la conversion
 $d =
 DstyleDoc::hie()
   ->config_database_pass( 'SeveuSe' )
@@ -18,8 +22,12 @@ DstyleDoc::hie()
   ->enable_come_across_element
   ->enable_href_link
   ->enable_javadoc_link
-  ->source( 'example.php' )
+  ->source( basename(__FILE__) )
   ->convert_with( new DstyleDoc_Converter_toString() );
+
+// Affichage du code source de ce script
+echo '<hr />';
+echo str_replace($d->database_pass,'*****',highlight_file( __FILE__, true ) );
 
 /**
  * Params:
@@ -31,7 +39,7 @@ DstyleDoc::hie()
  *   true = Succès.
  *   false,null = Echèc.
  * Packages:
- *   - core.return
+ *   core.return
  * Syntax:
  *   object ( test $test ) = example de modification de la syntaxe.
  */
@@ -39,12 +47,11 @@ function test_param( $string, $array, $integer, $null, test_float $object )
 {
 }
 
-
 /**
  * Returns:
- *   array = Retourne un tableau
- *   false = Ecrasement indirect
- *   true = Ne devrait pas écraser
+ *   - array Retourne un tableau
+ *   - false Ecrasement indirect
+ *   - true Ne devrait pas écraser
  * Packages:
  *   - core
  *   - return
@@ -69,7 +76,7 @@ function test_doc_ref()
 
 /**
  * Returns:
- *   string = Auto ecrasement de string
+ *   string = Ecrasement direct
  *   true = Se fait-il écrasé ?
  * Packages: core return
  */
@@ -104,7 +111,7 @@ function test_multiple_type()
 {
 }
 
-function test_direct_return()
+function test_direct_return( a $a )
 {
   return 123;
 }
@@ -139,10 +146,10 @@ class b extends a
 /**
  * documentation pour aa()
  * Syntax:
- *    false, string = (integer $a, [$b]) = Call with an integer
+ *    false, string (integer $a, [resource $b]) = Call with an integer
  *    and with a documentation on two line
  *    or more
- *    string $a = Call with a string
+ *    true (string $a) = Call with a string
  * Params:
  *    $a = Description for the 1st parameter $a
  * Returns:
@@ -176,7 +183,6 @@ function b( $a = 'test' )
 $a = null;
 
 $a = " string {$a} string ${a} ";
-
 
 __halt_compiler();
 ?>
