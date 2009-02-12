@@ -1133,9 +1133,9 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
    */
   static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
   {
-    // ^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]\s*(.*)$
+    // ^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:\[?\s*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})[\s\]]*\s*)?\)\s*[:=]\s*(.*)$
     if( $dsd->dstyledoc and $dsd->syntax and ($current instanceof DstyleDoc_Analyser_Syntax or $current instanceof DstyleDoc_Analyser_Element_Syntax_List)
-      and preg_match( '/^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*,\s*)*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3}))?\s*\)\s*[:=]\s*(.*)$/', $source, $matches ) )
+      and preg_match( '/^(?:[-+*]\s+)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)?\s*\(\s*((?:\[?\s*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pLpN]+\s+)(?:\$[-_\pLpN]+|\.{3})[\s\]]*\s*)?\)\s*[:=]\s*(.*)$/', $source, $matches ) )
       {
         $instance = new self( $matches[1], $matches[2], $matches[3] );
         $priority = self::priority;
@@ -1610,7 +1610,7 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
     foreach( preg_split( '%[.,:/]+%', (string)$packages ) as $package )
     {
       if( $package )
-	$this->_packages[] = $package;
+	$this->_packages[] = trim($package);
     }
   }
 
@@ -1638,8 +1638,8 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
       return true;
     }
 
-    // ^@(sub)?package\s+((?:[-_\pLpN]+\s*[.,:\/]+\s*)*[-_\pLpN]+)$
-    elseif( $dsd->javadoc and $dsd->javadoc_package and preg_match( '%^@package\s+((?:[-_\pLpN]+\s*[.,:/]+\s*)*[-_\pLpN]+)$%i', $source, $matches ) )
+    // ^@(?:sub)?package\s+((?:[-_\pLpN]+\s*[.,:\/]+\s*)*[-_\pLpN]+)$
+    elseif( $dsd->javadoc and $dsd->javadoc_package and preg_match( '%^@(?:sub)?package\s+((?:[-_\pLpN]+\s*[.,:/]+\s*)*[-_\pLpN]+)$%i', $source, $matches ) )
     {
       $instance = new self( $matches[1] );
       $priority = self::priority;
@@ -1658,8 +1658,7 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
    */
   public function apply( DstyleDoc_Element $element )
   {
-    $element->packages = $this->packages;
-    d( $this );
+    $element->package = $this->packages;
     return $this;
   }
 
