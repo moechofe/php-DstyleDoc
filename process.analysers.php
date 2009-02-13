@@ -590,7 +590,12 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
         $element->param->var = $this->var;
 
       foreach( $this->types as $type )
-        $element->param->type = $type;
+	// j'ai bien galléré pour trouver ça, j'espère que c'est la bonne solution.
+	// dans les cas ou :
+	// - de la doc pour "Syntax:" déclare des types pour les paramètres
+	// - et, de la doc pour "Params:" ne déclare pas les types pour les même paramètres.
+	if( $type )
+          $element->param->type = $type;
 
       $element->param->description = $this->description;
     }
@@ -1177,13 +1182,21 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
       {
         $element->param = $param['var'];
         $element->param->type = $param['types'];
-        $element->param->optional = $param['optional'];
+	$element->param->optional = $param['optional'];
         if( $param['var'] === '...' )
 	  $element->param->optional = true;
-	$element->syntax->param = $element->param;
+
+	$element->syntax->param = $param['var'];
+	$element->syntax->param->type = $param['types'];
+	$element->syntax->param->optional = $param['optional'];
+        if( $param['var'] === '...' )
+	  $element->syntax->param->optional = true;
       }
       foreach( $this->returns as $return )
+      {
 	$element->return = $return;
+	$element->syntax->return = $return;
+      }
     }
     return $this;
   }
