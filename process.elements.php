@@ -1790,14 +1790,50 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
     return $this->_params;
   }
 
+  /**
+   * Séléction un paramètre existant ou en crée un nouveau.
+   * Le paramètre ainsi séléctionné peut être récupèrer avec get_param().
+   * Params:
+   *  $param = Le nom de la variable existante ou qui sera créer.
+   */
   protected function set_param( $param )
   {
-    $this->_params[] = (object)$param;
+    $found = false;
+
+    if( $param{0} == '$' ) $param = substr($param,1);
+
+    if( ! empty($param) and count($this->_params) )
+    {
+      reset($this->_params);
+      while( true)
+      {
+	$value = current($this->_params);
+        if( strtolower($value->var) == strtolower($param) )
+        {
+          $found = true;
+          break;
+        }
+        elseif( false === next($this->_params) )
+          break;
+      }
+    }
+
+    if( ! $found )
+    {
+      $this->_params[] = new DstyleDoc_Element_Param( $this->converter, $param );
+      end($this->_params);
+    }
   }
 
   protected function get_param()
   {
-    return end($this->_params);
+    if( ! count($this->_params) )
+    {
+      $this->_params[] = new DstyleDoc_Element_Param( $this->converter, null );
+      return end($this->_params);
+    }
+    else
+      return current($this->_params);
   }
 
   // }}}
