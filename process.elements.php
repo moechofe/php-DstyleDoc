@@ -1203,6 +1203,8 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
         $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, $return );
       end($this->_returns);
     }
+    d( $this->_returns )->d2->label( $return );
+    d( $this->returns )->d2->label( $return );
   }
 
   /**
@@ -1229,6 +1231,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
     foreach( $returns as $return )
     {
       $types = $return->type;
+      d( $types )->d2->label( $return );
       if( is_array($types) )
       {
         foreach( $this->returns_types($types) as $type => $return )
@@ -1236,7 +1239,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
       }
       else
       {
-      $this->smart_add_return_type( $result, $types, $return );
+	$this->smart_add_return_type( $result, $types, $return );
       }
     }
     return $result;
