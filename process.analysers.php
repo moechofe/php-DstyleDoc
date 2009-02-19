@@ -754,8 +754,10 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
   // {{{ apply()
 
   /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+   * Ajoute un nouveau paragraphe Ã  la description de l'Ã©lÃ©ment.
+   * S'assure que le prÃ©cÃ©dent ajout n'Ã©taient pas dÃ©jÃ  un nouveau paragraphe.
+   * Todo:
+   *   - ne devrait pas faire de trim() ici.
    */
   public function apply( DstyleDoc_Element $element )
   {
@@ -1346,13 +1348,14 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
   // {{{ apply()
 
   /**
-   * Ajoute un nouveau paragraphe à la description à l'élément.
-   * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+   * Ajoute un nouveau paragraphe Ã  la description Ã  l'Ã©lÃ©ment.
+   * S'assure que le prÃ©cÃ©dent ajout n'Ã©taient pas dÃ©jÃ  un nouveau paragraphe.
    */
   public function apply( DstyleDoc_Element $element )
   {
     if( $element instanceof DstyleDoc_Element_Member )
     {
+      d( $this->type );
       $element->type = $this->type;
       $element->type->description = $this->description;
     }
