@@ -23,11 +23,77 @@ DstyleDoc::hie()
   ->enable_href_link
   ->enable_javadoc_link
   ->source( basename(__FILE__) )
-  ->convert_with( new DstyleDoc_Converter_toString() );
+  ->convert_with( $c = new DstyleDoc_Converter_toString() );
+
 
 // Affichage du code source de ce script
 echo '<hr />';
 echo str_replace($d->database_pass,'*****',highlight_file( __FILE__, true ) );
+
+class c
+{
+  private $d = null;
+  function f()
+  {
+    return 'string';
+  }
+  static function e()
+  {
+    $instance = new self;
+    $instance->d = new self;
+    return $this->f;
+//    return $d->e->f();
+  }
+}
+
+
+__halt_compiler();
+
+class ccc
+{
+  /**
+   * Type:
+   *	self = L'instance suivante de la classe.
+   */
+  private $d = null;
+  static function e()
+  {
+    $instance = new self;
+    $instance->d = new self;
+    return $d->e->f();
+  }
+  function f()
+  {
+    return 'string';
+  }
+}
+
+
+
+/**
+ * documentation pour aa()
+ * Syntax:
+ *    false, string (integer $a, [resource $b]) = Call with an integer
+ *    and with a documentation on two line
+ *    or more
+ *    true (string $a) = Call with a string
+ * Params:
+ *    $a = Description for the 1st parameter $a
+ * Returns:
+ *    false = Erreur
+ *    string = Retourne une chaîne de caractère
+ * Throws:
+ *    Exception = une exception,
+ *    avec une documentation sur deux lignes.
+ *    LogicException = une deuxième exception.
+ */
+function aa( $a, $b = null )
+{
+  return false;
+  return 'bite';
+  throw new Exception;
+  throw new LogicException;
+}
 
 /**
  * Params:
@@ -78,7 +144,8 @@ function test_doc_ref()
  * Returns:
  *   string = Ecrasement direct
  *   true = Se fait-il écrasé ?
- * Packages: core return
+ * Packages: core
+ * Package: return
  */
 function test_return()
 {
@@ -141,31 +208,6 @@ class b extends a
   {
     // parent::a();
   }
-}
-
-/**
- * documentation pour aa()
- * Syntax:
- *    false, string (integer $a, [resource $b]) = Call with an integer
- *    and with a documentation on two line
- *    or more
- *    true (string $a) = Call with a string
- * Params:
- *    $a = Description for the 1st parameter $a
- * Returns:
- *    false = Erreur
- *    string = Retourne une chaîne de caractère
- * Throws:
- *    Exception = une exception,
- *    avec une documentation sur deux lignes.
- *    LogicException = une deuxième exception.
- */
-function aa( $a, $b = null )
-{
-  return false;
-  return 'bite';
-  throw new Exception;
-  throw new LogicException;
 }
 
 ?>
