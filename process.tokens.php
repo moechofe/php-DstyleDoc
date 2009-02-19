@@ -499,42 +499,60 @@ class DstyleDoc_Token_Expression extends DstyleDoc_Token_Custom
     else
       $class = false;
 
+    if( $current instanceof DstyleDoc_Token_Function )
+      $function = $current;
+    else
+      $function = false;
+
     if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
     {
       if( ! $r = $token->expression_value ) $r = '&nbsp;';
-      if( ! $c = $current->name ) $c = '&nbsp;';
+      if( ! $c = (@get_class($current)).' '.(@$current->name) ) $c = '&nbsp;';
+      if( ! $cl = (@get_class($class)).' '.(@$class->name) ) $cl = '&nbsp;';
+      if( ! $fu = (@get_class($function)).' '.(@$function->name) ) $fu = '&nbsp;';
       echo <<<HTML
-<div style='clear:left;float:left;color:white;background:MediumVioletRed;padding:1px 3px'>{$c}</div>
-<div style='float:left;color:white;background:PaleVioletRed;padding:1px 3px'><b>{$value}</b></div>
-<div style='float:left;color:white;background:LightPink;color:black;padding:1px 3px'><b>{$r}</b></div>
-<div style='background:IndianRed;padding:1px 3px;'><b>{$this->brackets}</b></div>
+<div style='clear:left;float:left;color:white;background:MediumVioletRed;padding:1px 3px'><b>current: </b>{$c}</div>
+<div style='float:left;color:white;background:DarkMagenta;padding:1px 3px'><b>class: </b>{$cl}</div>
+<div style='float:left;color:white;background:BlueViolet;padding:1px 3px'><b>function: </b>{$fu}</div>
+<div style='float:left;color:white;background:PaleVioletRed;padding:1px 3px'><b>analysed value: </b>{$value}</div>
+<div style='float:left;color:white;background:LightPink;color:black;padding:1px 3px'><b>cumulate expression: </b>{$r}</div>
+<div style='background:IndianRed;padding:1px 3px;'><b>brackets: </b>{$this->brackets}</div>
 <div style='clear:both'></div>
 HTML;
     }
 
     $r = false;
 
+    // si une parenthèse à été ouverte et que l'on trouver une parenthèse fermante :
     if( $this->brackets and $value === ')' )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      // alors on ferme la parenthèse.
       $this->brackets--;
     }
 
+    // si une parenthèses à été ouverte :
     elseif( $this->brackets )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      // alors on ne parse pas sont contenu.
       null;
     }
 
+    // si on trouve "self" ou "this" :
     elseif( in_array(strtolower($value), array('self','$this')) )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      // alors on retourne le nom de la classe.
       if( ! $token->expression_value and $class)
         $token->expression_value = $token->expression_value . $class->name;
     }
 
     elseif( substr($token->expression_value,-1) === '(' and $value !== ')' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       null;
+    }
 
     elseif( in_array(substr($value,0,1), array('\'','"')) or in_array(strtolower($value), array('(string)','__file__','__function__','__class__','__dir__','__method__','__namespace__')) )
     {
@@ -612,13 +630,22 @@ HTML;
     }
 
     elseif( $token->expression_value and in_array(strtolower($value), array('null','true','false')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       null;
+    }
 
     elseif( in_array(strtolower($value), array('null','true','false')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       $token->expression_value = strtolower($value);
+    }
 
     elseif( strtolower($value) === 'null' or strtolower($value) === '(unset)' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       $token->expression_value = 'null';
+    }
 
     elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
     {
@@ -632,6 +659,9 @@ HTML;
     elseif( substr($token->expression_value,-2) === '::' or substr($token->expression_value,-2) === '->' )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( $function instanceof DstyleDoc_Token_Function and $function->name == $value )
+	return $token->rollback($current);
+      else
         $token->expression_value = $token->expression_value . $value;
     }
 
@@ -653,11 +683,12 @@ HTML;
     }
 
     else
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       $r = true;
+    }
 
-    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-
-    if( $r)
+    if( $r )
     {
       $token->rollback( $current );
     }
@@ -1248,7 +1279,9 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
       }
 
       foreach( $method->returns as $return )
-        $function->return = $return;
+	$function->return = $return;
+if( $function->name === 'file_exists' )
+d( $method->returns )->d2;
 
       $converter->method = $function;
     }
@@ -1565,7 +1598,12 @@ HTML;
 
     $current->returns = $returns;
 
-    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( $returns );
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
+    {
+      echo '<div style="background:#ccc">';
+      var_dump( $returns );
+      echo '</div>';
+    }
 
     return $this->object;
   }
