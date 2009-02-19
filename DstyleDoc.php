@@ -188,7 +188,8 @@ $cccc = 0;
         static $f = 0;
         $ff = (++$f%2)?'BurlyWood':'Goldenrod';
         $s = htmlentities($source); if(!trim($s))$s='&nbsp;'; $c = get_class($current);
-        echo <<<HTML
+	echo <<<HTML
+<div style='clear:left;background:black;height:2px;'></div>
 <div style='clear:left;float:left;color:white;background:Brown;padding:1px 3px'>{$c}</div>
 <div style='float:left;background:Chocolate;color:white;padding:1px 3px'>$line</div>
 <div style='float:left;background:Wheat;padding:1px 3px'>$call</div>
