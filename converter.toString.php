@@ -49,13 +49,13 @@ HTML;
 <dt>methods</dt>
 <dd>
   <ul>
-    {$this->forall($class->methods,'<li>$value->link</li>')}
+    {$this->forall($class->methods,'<li>$value->link $value->title</li>')}
   </ul>
 </dd>
 <dt>members</dt>
 <dd>
   <ul>
-    {$this->forall($class->members,'<li>$value->link</li>')}
+    {$this->forall($class->members,'<li>$value->link $value->title</li>')}
   </ul>
 </dd>
 <dd>
@@ -123,7 +123,7 @@ HTML;
 <hr /><h1 id="{$method->id}">method: {$method->display}</h1>
 <dl>
 {$this->element_filed($method)}
-<dt>class</dt><dd>{$method->class->link}</dd>
+<dt>class</dt><dd>{$method->class->link} {$method->class->title}</dd>
 <dt>syntax</dt>{$this->forall($method->syntaxs,'<dd>$value</dd>')}
 <dt>params</dt><dd><ul>{$this->forall($method->params,'<li>$value</li>')}</ul></dd>
 {$this->either($method->returns,
