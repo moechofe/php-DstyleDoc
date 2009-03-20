@@ -12,7 +12,7 @@
   </li>
 {/if}
 {if isset($_method)}
-  <li class="method{if $this == $_method} displayed{/if}">
+  <li class="method{if $this === $_method} displayed{/if}">
     {$_method.link}
     {$_method.title}
   </li>
