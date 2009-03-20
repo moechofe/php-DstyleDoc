@@ -293,7 +293,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
   }
 
   // }}}
-  // {{{ print_previous_index()
+  // {{{ print_ascent_index()
 
   static public function print_ascent_index( $params, Template_Lite $tpl )
   {
@@ -453,20 +453,6 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
       return true;
       /*    }*/
     //restore_error_handler();
-  }
-
-  // }}}
-  // {{{ error_config_or_not()
-
-  // virer cette merde
-  static public function error_config_or_not( $errno, $errstr, $errfile, $errline, $errcontext )
-  {
-    $trace = debug_backtrace();
-    d( $trace )->label( $errstr )->d5;
-    if( $errno == 8 and substr($errstr,0,15)=='Undefined index' and isset($errcontext['this']) and $errcontext['this'] instanceof Template_Lite and strpos($errfile,$errcontext['this']->compile_dir) !== false )
-      echo '#'.substr($errstr,18).'#';
-    else
-      return false;
   }
 
   // }}}
