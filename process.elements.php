@@ -1203,8 +1203,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
         $this->_returns[] = new DstyleDoc_Element_Return( $this->converter, $return );
       end($this->_returns);
     }
-    d( $this->_returns )->d2->label( $return );
-    d( $this->returns )->d2->label( $return );
   }
 
   /**
@@ -1231,7 +1229,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
     foreach( $returns as $return )
     {
       $types = $return->type;
-      d( $types )->d2->label( $return );
       if( is_array($types) )
       {
         foreach( $this->returns_types($types) as $type => $return )
@@ -2239,6 +2236,9 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
     if( $this->_type instanceof DstyleDoc_Element_Interface or $this->_type instanceof DstyleDoc_Element_Class )
       return $this->_type;
 
+    elseif( in_array(strtolower($this->_type), $this->types) )
+      return strtolower($this->_type);
+
     elseif( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
     {
       if( ! $found->analysed ) $found->analyse();
@@ -2271,9 +2271,6 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
       }
       return $types;
     }
-
-    elseif( in_array(strtolower($this->_type), $this->types) )
-      return strtolower($this->_type);
 
     else
       return $this->_type;
