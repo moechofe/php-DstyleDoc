@@ -76,7 +76,7 @@ require_once 'process.tokens.php';
 require_once 'process.elements.php';
 require_once 'process.analysers.php';
 require_once 'process.descriptables.php';
-require_once 'extension.state_saver.php';
+//require_once 'extension.state_saver.php';
 
 /**
  * Classe de control de DstyleDoc.
@@ -135,6 +135,8 @@ class DstyleDoc extends DstyleDoc_Properties
     elseif( is_array($files) or $files instanceof Iterator )
       foreach( $files as $file )
         $this->source = $file;
+    else
+      throw new DstyleDoc_Error_Source( $files );
   }
 
   protected function get_sources()
@@ -1423,6 +1425,14 @@ class BadPropertyException extends LogicException
     parent::__construct( sprintf('Access denied for %s::$%s.', get_class($class), $member) );
   }
 }
+}
+
+class DstyleDoc_Error_Source extends RuntimeException
+{
+  public function __construct( $file )
+  {
+    parent::__construct( sprintf('Unreadable source file: %s',(string)$file) );
+  }
 }
 
 ?>
