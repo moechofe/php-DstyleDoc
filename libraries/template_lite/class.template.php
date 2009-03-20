@@ -753,7 +753,7 @@ class Template_Lite {
 	{
 		$arguments = func_get_args();
 		list($variable, $modifier, $php_function, $_map_array) = array_splice($arguments, 0, 4);
-		array_unshift($arguments, $variable);
+                array_unshift($arguments, $variable);
 		if ($_map_array && is_array($variable))
 		{
 			foreach($variable as $key => $value)
