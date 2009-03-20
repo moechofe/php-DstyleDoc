@@ -30,19 +30,32 @@ DstyleDoc::hie()
 echo '<hr />';
 echo str_replace($d->database_pass,'*****',highlight_file( __FILE__, true ) );
 
+/**
+ * La classe C contient c::$d, c::f(), c->e()
+ */
 class c
 {
+  /**
+   * Est a NULL
+   */
   private $d = null;
+  /**
+   * Doit retourner une string
+   */
   function f()
   {
     return 'string';
   }
+  /**
+   * Est statique, retourne string grace a c::f()
+   */
   static function e()
   {
     $instance = new self;
     $instance->d = new self;
-    return $this->f;
-//    return $d->e->f();
+    return $this->f();
+    return $this->d->e->f();
+    return $this->d;
   }
 }
 
