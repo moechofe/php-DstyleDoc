@@ -659,6 +659,7 @@ HTML;
     elseif( substr($token->expression_value,-2) === '::' or substr($token->expression_value,-2) === '->' )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+
       if( $function instanceof DstyleDoc_Token_Function and $function->name == $value )
 	return $token->rollback($current);
       else
@@ -1280,8 +1281,6 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
 
       foreach( $method->returns as $return )
 	$function->return = $return;
-if( $function->name === 'file_exists' )
-d( $method->returns )->d2;
 
       $converter->method = $function;
     }
