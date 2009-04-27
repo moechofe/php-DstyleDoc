@@ -24,6 +24,7 @@
   <div class="content-returns">
     <h2>{if isset(#method_returns#)}{#method_returns#|string_format:$_method.display:$_method.link}{else}#method_returns(method.name,method.link)#{/if}</h2>
     <dl>
+{php}d($this->_vars['_method']->returns);{/php}
 {foreach item=return from=$_method.returns}
       {$return}
 {/foreach}

@@ -811,6 +811,9 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
   // }}}
   // {{{ $files
 
+	/**
+	 * La liste des fichiers analysés.
+	 */
   protected $_files = null;
 
   protected function init_file()
