@@ -27,8 +27,82 @@ DstyleDoc::hie()
 
 
 // Affichage du code source de ce script
-echo '<hr />';
-echo str_replace($d->database_pass,'*****',highlight_file( __FILE__, true ) );
+//echo '<hr />';
+//echo str_replace($d->database_pass,'*****',highlight_file( __FILE__, true ) );
+
+
+	/**
+	 * Permet d'utiliser des getter.
+	 * __get() est appelé automatiquement par PHP lorsque la lecture des données d'un membre est inaccessible.
+	 * __get() vérifiera au préalable que la fonction "get_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
+	 * Params:
+	 *	 string $property = Le nom du membre.
+	 * Returns:
+   *	 mixed = Retournera la valeur retournée par la fonction "get_"+<nom_du_membre>().
+	 * Throws:
+	 *	 BadPropertyException = Lancé si la fonction "get_"+<nom_du_membre>() n'est pas disponible.
+	 */
+	function __get( $property )
+	{
+		if( $property === '__class' )
+			return get_class( $this );
+
+		elseif( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
+			throw new BadPropertyException($this, (string)$property);
+
+		return call_user_func( array($this,'get_'.(string)$property) );
+	}
+
+function test_param( $string, $array, $integer, $null, test_float $object )
+{
+}
+
+
+/**
+ * documentation pour aa()
+ * Syntax:
+ *    (integer $a, [resource $b]) =
+ */
+function aa( $a, $b = null )
+{
+}
+
+__halt_compiler();
+
+/**
+ * documentation pour aa()
+ * Syntax:
+ *    false, string (integer $a, [resource $b]) = Call with an integer
+ *    and with a documentation on two line
+ *    or more
+ *    true (string $a) = Call with a string
+ * Params:
+ *    $a = Description for the 1st parameter $a
+ */
+function aaa( $a, $b = null )
+{
+}
+
+
+/**
+ * documentation pour aa()
+ * Syntax:
+ *    false, string (integer $a, [resource $b]) = Call with an integer
+ *    and with a documentation on two line
+ *    or more
+ *    true (string $a) = Call with a string
+ * Params:
+ *    $a = Description for the 1st parameter $a
+ * Returns:
+ *    false = Erreur
+ *    string = Retourne une chaîne de caractère
+ */
+function aaaa( $a, $b = null )
+{
+}
+
+
+
 
 /**
  * La classe C contient c::$d, c::f(), c->e()
@@ -58,9 +132,6 @@ class c
     return $this->d;
   }
 }
-
-
-__halt_compiler();
 
 class ccc
 {
