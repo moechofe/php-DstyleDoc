@@ -630,8 +630,8 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
 
 	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
 	{
-		// ^returns?\s*:\s*(:([-_\pLpN]+)\s*[:=]?\s*(.*))?$
-		if( $dsd->dstyledoc and $dsd->returns and preg_match( '/^returns?\\s*:\\s*(?:([-_\\pLpN]+)\\s*[:=]?\\s*(.*))?$/i', $source, $matches ) )
+		// ^returns?\s*:\s*(:([-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*))?$
+		if( $dsd->dstyledoc and $dsd->returns and preg_match( '/^returns?\\s*:\\s*(?:([-_\\pLpN]+(?:\(\))?)\\s*[:=]?\\s*(.*))?$/i', $source, $matches ) )
 		{
 			$instance = new self();
 			$priority = self::priority;
@@ -720,26 +720,26 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 
 	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
 	{
-		// ^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$
+		// ^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]\s*(.*)$
 		if( $dsd->dstyledoc and $dsd->returns and ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-			and preg_match( '/^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]\s*(.*)$/', $source, $matches ) )
+			and preg_match( '/^((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]\s*(.*)$/', $source, $matches ) )
 			{
 				$instance = new self( $matches[1], $matches[2] );
 				$priority = self::priority;
 				return true;
 			}
 
-		// ^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$
+		// ^(?:[-+*]\s+)((?:[-_\pLpN]+(?:\(\))?\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$
 		elseif( $dsd->dstyledoc and $dsd->returns and ($current instanceof DstyleDoc_Analyser_Return or $current instanceof DstyleDoc_Analyser_Element_Return_List)
-			and preg_match( '/^(?:[-+*]\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$/', $source, $matches ) )
+			and preg_match( '/^(?:[-+*]\s+)((?:[-_\pLpN]+(?:\(\))?\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$/', $source, $matches ) )
 			{
 				$instance = new self( $matches[1], $matches[2] );
 				$priority = self::priority;
 				return true;
 			}
 
-		// ^(?:@returns?\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+)\s*[:=]?\s*(.*)$
-		elseif( $dsd->javadoc and $dsd->javadoc_returns and preg_match( '/^(?:@returns?\\s+)((?:[-_\pLpN]+\s*,\s*)*[-_\\pLpN]+)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+		// ^(?:@returns?\s+)((?:[-_\pLpN]+(?:\(\))?\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$
+		elseif( $dsd->javadoc and $dsd->javadoc_returns and preg_match( '/^(?:@returns?\\s+)((?:[-_\pLpN]+(?:\(\))?\s*,\s*)*[-_\\pLpN]+(?:\(\))?)\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
 			{
 				$instance = new self( $matches[1], $matches[2] );
 				$priority = self::priority;
