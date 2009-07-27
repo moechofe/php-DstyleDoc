@@ -2034,6 +2034,8 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Simple_Element
 
 	protected function get_class()
 	{
+		if( ! $this->_class and $found = $this->converter->class_exists( $this->name ) )
+			$this->class = $found;
 		return $this->_class;
 	}
 
@@ -2045,8 +2047,6 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Simple_Element
 	protected function set_name( $name )
 	{
 		$this->_name = (string)$name;
-		if( $found = $this->converter->class_exists( (string)$name ) )
-			$this->class = $found;
 	}
 
 	protected function get_name()
