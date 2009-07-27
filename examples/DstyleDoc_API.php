@@ -12,14 +12,14 @@ require_once( 'converter.FirstStyle.php' );
 error_reporting( E_ALL | E_STRICT );
 
 DstyleDoc::hie()
-  ->source( 'DstyleDoc.php' )
-//  ->source( 'process.tokens.php' )
-  ->convert_with(
+	->source( 'DstyleDoc.php' )
+//	->source( 'process.tokens.php' )
+	->convert_with(
 
-    DstyleDoc_Converter_FirstStyle::hie()
-      ->template_dir( 'converter.FirstStyle' )
-      ->destination_dir( 'api_doc' )
-      ->config( array(
+		DstyleDoc_Converter_FirstStyle::hie()
+			->template_dir( 'converter.FirstStyle' )
+			->destination_dir( 'api_doc' )
+			->config( array(
 
 'skin' => 'rosy',
 'charset' => 'utf-8',
@@ -49,12 +49,12 @@ DstyleDoc::hie()
 
 'files_index_list_header' => 'Liste des fichiers',
 'classes_index_list_header' => 'Liste des classes déclarées dans le fichier %2$s',
-'methods_index_list_header' => 'Liste des méthodes de la classe <span class="class">%s</span>',
+'methods_index_list_header' => 'Liste des méthodes de la classe %2$s',
 
 'todos' => 'todolist',
 
-      ) )
+			) )
 
-    );
+		);
 
 ?>
