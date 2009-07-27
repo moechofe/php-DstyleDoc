@@ -196,9 +196,126 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 }
 
 /**
+ * Classe abstraite d'un élement simple.
+ *
+ * Ces éléments sont instancié lorsque leur élément parent à besoin de les afficher.
+ */
+abstract class DstyleDoc_Analyseable_Element extends DstyleDoc_Custom_Element
+{
+	// {{{ $analysed
+
+	protected $_analysed = false;
+
+	protected function set_analysed( $analysed )
+	{
+		$this->_analysed = (boolean)$analysed;
+	}
+
+	protected function get_analysed()
+	{
+		return $this->_analysed;
+	}
+
+	// }}}
+	// {{{ $description
+
+	protected function get_description()
+	{
+		if( ! $this->analysed ) $this->analyse();
+		return $this->converter->convert_description( $this->_descriptions, $this );
+	}
+
+	// }}}
+	// {{{ analyse()
+
+	abstract protected function get_analyseable();
+
+	public function analyse()
+	{
+		$this->analysed = true;
+
+		$analysers = array();
+		foreach( get_declared_classes() as $class )
+			if( is_subclass_of( $class, 'DstyleDoc_Analyser' ) )
+				$analysers[] = $class;
+
+		$current = null;
+		foreach( (array)$this->analyseable as $source )
+		{
+			if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
+			{
+				$c = htmlentities($source);
+				if( ! $c ) $c = '&nbsp;';
+				$s = get_class($current);
+				if( ! $s ) $s = '&nbsp;';
+				$e = get_class($this);
+				try
+				{
+					$ee = $this->name;
+				}
+				catch( BadPropertyException $e )
+				{
+					$ee = '';
+				}
+				echo <<<HTML
+<div style='clear:left;float:left;color:black;background:PowderBlue;padding:1px 3px'>{$e}</div>
+<div style='float:left;color:black;background:LightCyan;padding:1px 3px'>{$ee}</div>
+<div style='float:left;color:white;background:SteelBlue;padding:1px 3px'>{$c}</div>
+<div style='background:DimGray;color:white;padding:1px 3px;'>{$s}</div>
+<div style='clear:left;'></div>
+HTML;
+			}
+			$result = array();
+			$source = DstyleDoc_Analyser::remove_stars($source);
+			foreach( $analysers as $analyser )
+			{
+					if( call_user_func( array($analyser,'analyse'), $current, $source, &$instance, &$priority, $this->converter->dsd ) )
+						$result[$priority] = $instance;
+			}
+			if( $result )
+			{
+				ksort($result);
+				$current = current($result);
+
+				if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
+				{
+					foreach( $result as $k => $v )
+					{
+						$vv = get_class($v);
+						echo <<<HTML
+<div style='clear:left;float:left;color:white;background:SteelBlue;padding:1px 3px'>{$k}</div>
+<div style='float:left;background:MediumPurple;color:white;padding:1px 3px;'>{$vv}</div>
+<div style='clear:left;'></div>
+HTML;
+					}
+				}
+
+				if( $current instanceof DstyleDoc_Analyser )
+					$current = $current->apply( $this );
+			}
+		}
+
+		foreach( $analysers as $analyser )
+			call_user_func( array($analyser,'finalize'), $this );
+	}
+
+	// }}}
+}
+
+abstract class DstyleDoc_Simple_Element extends DstyleDoc_Analyseable_Element
+{
+	protected function get_analyseable()
+	{
+		$return = $this->descriptions;
+		unset($this->description);
+		return $return;
+	}
+}
+
+/**
  * Classe abstraite d'un élement.
  */
-abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
+abstract class DstyleDoc_Element extends DstyleDoc_Analyseable_Element
 {
 		// {{{ __sleep()
 
@@ -363,71 +480,10 @@ abstract class DstyleDoc_Element extends DstyleDoc_Custom_Element
 	}
 
 	// }}}
-	// {{{ analyse()
-
-	public function analyse()
+	protected function get_analyseable()
 	{
-		$this->analysed = true;
-
-		$analysers = array();
-		foreach( get_declared_classes() as $class )
-			if( is_subclass_of( $class, 'DstyleDoc_Analyser' ) )
-				$analysers[] = $class;
-
-		$current = null;
-		foreach( explode("\n",strtr($this->documentation,array("\r\n"=>"\n","\r"=>"\n"))) as $source )
-		{
-			if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
-			{
-				$c = htmlentities($source);
-				if( ! $c ) $c = '&nbsp;';
-				$s = get_class($current);
-				if( ! $s ) $s = '&nbsp;';
-				$e = get_class($this);
-				$ee = $this->name;
-				echo <<<HTML
-<div style='clear:left;float:left;color:black;background:PowderBlue;padding:1px 3px'>{$e}</div>
-<div style='float:left;color:black;background:LightCyan;padding:1px 3px'>{$ee}</div>
-<div style='float:left;color:white;background:SteelBlue;padding:1px 3px'>{$c}</div>
-<div style='background:DimGray;color:white;padding:1px 3px;'>{$s}</div>
-<div style='clear:left;'></div>
-HTML;
-			}
-			$result = array();
-			$source = DstyleDoc_Analyser::remove_stars($source);
-			foreach( $analysers as $analyser )
-			{
-					if( call_user_func( array($analyser,'analyse'), $current, $source, &$instance, &$priority, $this->converter->dsd ) )
-						$result[$priority] = $instance;
-			}
-			if( $result )
-			{
-				ksort($result);
-				$current = current($result);
-
-				if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'doc')!==false )
-				{
-					foreach( $result as $k => $v )
-					{
-						$vv = get_class($v);
-						echo <<<HTML
-<div style='clear:left;float:left;color:white;background:SteelBlue;padding:1px 3px'>{$k}</div>
-<div style='float:left;background:MediumPurple;color:white;padding:1px 3px;'>{$vv}</div>
-<div style='clear:left;'></div>
-HTML;
-					}
-				}
-
-				if( $current instanceof DstyleDoc_Analyser )
-					$current = $current->apply( $this );
-			}
-		}
-
-		foreach( $analysers as $analyser )
-			call_user_func( array($analyser,'finalize'), $this );
+		return explode("\n",strtr($this->documentation,array("\r\n"=>"\n","\r"=>"\n")));
 	}
-
-	// }}}
 }
 
 /**
@@ -1229,10 +1285,11 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 		return (boolean)count($this->_returns);
 	}
 
+	// xxx
 	private function returns_types( $returns )
 	{
 		if( $this->_name == 'file_exists' and ! $returns[0] instanceof DstyleDoc_Element_Return )
-		{	throw new Exception('Jen etais a chercher pourquoi je me retrouve avec un Dstyle_Element_Type, ou du moins, trouver un moyen pour le concertir, ou alors ne plus rendre Return descendant de Type. De plus pourquoi le même type : null est instancié plusisuers fois avec des objet différents ?'); d($returns);  }
+		{	throw new Exception('Jen etais a chercher pourquoi je me retrouve avec un Dstyle_Element_Type, ou du moins, trouver un moyen pour le convertir, ou alors ne plus rendre Return descendant de Type. De plus pourquoi le même type : null est instancié plusisuers fois avec des objet différents ?'); d($returns);  }
 		$result = array();
 		foreach( $returns as $return )
 		{
@@ -1353,8 +1410,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 				$syntax->params = $this->params;
 			if( isset($this->returns) )
 				$syntax->returns = $this->returns;
-			if( $this->descriptions )
-				$syntax->descriptions = $this->descriptions;
 		}
 		return $this->_syntax;
 	}
@@ -1779,7 +1834,7 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
 /**
  * Class d'un element de type syntaxe.
  */
-class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
+class DstyleDoc_Element_Syntax extends DstyleDoc_Simple_Element
 {
 	// {{{ $function
 
@@ -1966,7 +2021,7 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 /**
  * Classe d'un element de type exception.
  */
-class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
+class DstyleDoc_Element_Exception extends DstyleDoc_Simple_Element
 {
 	// {{{ $name
 
@@ -2013,7 +2068,7 @@ class DstyleDoc_Element_Exception extends DstyleDoc_Custom_Element
 /**
  * Classe d'un element de type todo.
  */
-class DstyleDoc_Element_Todo extends DstyleDoc_Custom_Element
+class DstyleDoc_Element_Todo extends DstyleDoc_Simple_Element
 {
 	// {{{ $display
 
@@ -2036,7 +2091,7 @@ class DstyleDoc_Element_Todo extends DstyleDoc_Custom_Element
 /**
  * Classe d'un element de type paramètre.
  */
-class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
+class DstyleDoc_Element_Param extends DstyleDoc_Simple_Element
 {
 
 	/**
@@ -2223,7 +2278,7 @@ class DstyleDoc_Element_Param extends DstyleDoc_Custom_Element
 /**
  * Classe d'un element de type type.
  */
-class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
+class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 {
 	// {{{ $from
 
@@ -2268,8 +2323,8 @@ class DstyleDoc_Element_Type extends DstyleDoc_Custom_Element
 			$types = array();
 			foreach( $found->returns as $v )
 			{
-	$v = clone $v;
-	$v->from = $found;
+				$v = clone $v;
+				$v->from = $found;
 				$types[] = $v;
 			}
 			return $types;
@@ -2350,7 +2405,7 @@ class DstyleDoc_Element_Return extends DstyleDoc_Element_Type
 /**
  * Classe d'un élement de type package.
  */
-class Dstyle_Element_Package extends DstyleDoc_Custom_Element
+class Dstyle_Element_Package extends DstyleDoc_Simple_Element
 {
 	// {{{ $name
 
