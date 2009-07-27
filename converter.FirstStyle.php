@@ -51,6 +51,8 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 
 	public function convert_all()
 	{
+		$this->tpl->assign( 'version', DstyleDoc::version );
+
 		if( ! $this->browse_mode )
 		{
 			$this->copy_skin();
