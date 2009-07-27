@@ -63,6 +63,12 @@ a { color: mediumblue; }
 #page-header h2.logo a { text-decoration: none; color: white; }
 
 /**
+ * Le design pour le pied de page
+ */
+#page-footer ul { list-style: none; padding: 0px; text-align: center; }
+#page-footer li { display: inline; font-size: 11px; }
+
+/**
  * sandybrown, rosybrown, burlywood, antiquewhite, palegoldenrod, tan, beige
  */
 
@@ -101,6 +107,11 @@ a { color: mediumblue; }
 #page-content div.content-todos { clear: left; }
 #page-content div.content-todos h2 { margin-bottom: 10px; }
 #page-content div.content-todos ul { margin-top: 0px; }
+#page-content div.content-exceptions { background-color: palegoldenrod; padding: 8px 10px; margin-top: 10px; }
+#page-content div.content-exceptions h2 { margin-top: 0px; margin-bottom: 10px; }
+#page-content div.content-exceptions dl { margin-bottom: 0px; margin-top: 10px; }
+#page-content dt.exception-class { display: table-cell; border: solid 1px black; background: white; padding: 8px 10px; }
+#page-content dd.exception-description p { margin: 10px 0px 0px 0px; }
 
 /**
  * Le design de la partie navigation
