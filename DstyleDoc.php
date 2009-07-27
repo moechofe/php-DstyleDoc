@@ -12,18 +12,20 @@
  * Permet d'utiliser facilement des getter, setter, issetter et unsetter.
  * Cette classe doit être étendu.
  */
-class DstyleDoc_Properties
+abstract class DstyleDoc_Properties
 {
 	/**
 	 * Permet d'utiliser des getter.
 	 * __get() est appelé automatiquement par PHP lorsque la lecture des données d'un membre est inaccessible.
-	 * __get() vérifiera au préalable que la fonction "get_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
+	 * __get() vérifiera au préalable que la méthode "get_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
 	 * Params:
 	 *	 string $property = Le nom du membre.
+	 *	 Si égale à "__class" alors retourne le nom de la classe dérivé de DstyleDoc_Properties.
 	 * Returns:
-   *	 mixed = Retournera la valeur retournée par la fonction "get_"+<nom_du_membre>().
+	 *	 mixed = Retournera la valeur retournée par la méthode "get_"+<nom_du_membre>().
+	 *	 get_class() = Le nom de la classe dérivé de DstyleDoc_Properties.
 	 * Throws:
-	 *	 BadPropertyException = Lancé si la fonction "get_"+<nom_du_membre>() n'est pas disponible.
+	 *	 BadPropertyException = Lancé si la méthode "get_"+<nom_du_membre>() n'est pas disponible.
 	 */
 	protected function __get( $property )
 	{
@@ -77,6 +79,7 @@ require_once 'process.elements.php';
 require_once 'process.analysers.php';
 require_once 'process.descriptables.php';
 //require_once 'extension.state_saver.php';
+//require_once 'extension.function_return.php';
 
 /**
  * Classe de control de DstyleDoc.
@@ -84,6 +87,11 @@ require_once 'process.descriptables.php';
  */
 class DstyleDoc extends DstyleDoc_Properties
 {
+	// {{{ version
+
+	const version = 'DstyleDoc v0.1 2k8-2k9 Martin Mauchauffée';
+
+	// }}}
 	// {{{ log()
 
 	/**
