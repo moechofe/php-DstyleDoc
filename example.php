@@ -25,6 +25,11 @@ DstyleDoc::hie()
   ->source( basename(__FILE__) )
   ->convert_with( $c = new DstyleDoc_Converter_toString() );
 
+abstract class a
+{
+}
+
+__halt_compiler();
 
 // Affichage du code source de ce script
 //echo '<hr />';
@@ -67,7 +72,6 @@ function aa( $a, $b = null )
 {
 }
 
-__halt_compiler();
 
 /**
  * documentation pour aa()
