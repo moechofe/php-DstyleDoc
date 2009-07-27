@@ -35,6 +35,7 @@ DstyleDoc::hie()
 
 'file_header_display' => 'Le fichier <strong>%s</strong>',
 'class_header_display' => 'La classe <strong>%s</strong>',
+'class_abstract_header_display' => 'La classe abstraite <strong>%s</strong>',
 'method_header_display' => 'La méthode <strong>%s</strong>',
 
 'page_file' => 'Cette page traite du fichier %2$s. <a href="#page-browser">Accédez à la navigation</a>',
@@ -46,6 +47,8 @@ DstyleDoc::hie()
 'method_description' => 'déscription',
 'method_params' => 'paramètres',
 'method_returns' => 'valeurs de retour',
+
+'return_from' => 'Retourné depuis %2$s',
 
 'files_index_list_header' => 'Liste des fichiers',
 'classes_index_list_header' => 'Liste des classes déclarées dans le fichier %2$s',
