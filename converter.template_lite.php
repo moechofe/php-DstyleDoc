@@ -117,6 +117,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
 	public function convert_exception( DstyleDoc_Element_Exception $exception )
 	{
+		$this->tpl->assign( '_exception', $exception );
+		return $this->tpl->fetch( __CLASS__.':convert_exception.tpl' );
 	}
 
 	// }}}
