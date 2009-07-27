@@ -41,7 +41,7 @@ HTML;
 			$super = null;
 
 		return <<<HTML
-<hr /><h1 id="{$class->id}">Class: {$class->display}</h1>
+<hr /><h1 id="{$class->id}">{$this->either($class->final,'Final ','')}{$this->either($class->abstract,'Abstract ','')}Class: {$class->display}</h1>
 <dl>
 {$this->element_filed($class)}
 {$this->either($class->parent,"<dt>super class</dt><dd>$super</dd>")}
