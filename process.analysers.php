@@ -12,7 +12,7 @@ interface DstyleDoc_Analyseable
 	// }}}
 	// {{{ apply()
 
-	function apply( DstyleDoc_Element $element );
+	function apply( DstyleDoc_Custom_Element $element );
 
 	// }}}
 }
@@ -45,7 +45,7 @@ abstract class DstyleDoc_Analyser extends DstyleDoc_Properties implements Dstyle
 	// }}}
 	// {{{ finalize()
 
-	static public function finalize( DstyleDoc_Element $element )
+	static public function finalize( DstyleDoc_Custom_Element $element )
 	{
 	}
 
@@ -89,7 +89,7 @@ class DstyleDoc_Analyser_Description extends DstyleDoc_Analyser
 	/**
 	 * Ajoute une nouvelle ligne de description a l'Ã©lÃ©ment.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $this->descriptable )
 		{
@@ -175,7 +175,7 @@ class DstyleDoc_Analyser_Description_Paragraphe extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( count($element->descriptions) > 1 )
 		{
@@ -189,7 +189,7 @@ class DstyleDoc_Analyser_Description_Paragraphe extends DstyleDoc_Analyser
 	// }}}
 	// {{{ finalize()
 
-	static public function finalize( DstyleDoc_Element $element )
+	static public function finalize( DstyleDoc_Custom_Element $element )
 	{
 		if( count($element->descriptions) > 1 )
 		{
@@ -270,7 +270,7 @@ class DstyleDoc_Analyser_Version extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		$element->version = $this->version;
 		return $this;
@@ -316,7 +316,7 @@ class DstyleDoc_Analyser_History extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -413,7 +413,7 @@ class DstyleDoc_Analyser_Element_History_List extends DstyleDoc_Analyser impleme
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		$element->history = $this->version;
 		$element->history->description = $this->description;
@@ -465,7 +465,7 @@ class DstyleDoc_Analyser_Param extends DstyleDoc_Analyser
 	// }}}
 	// {{{ apply()
 
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -580,7 +580,7 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 	// }}}
 	// {{{ apply()
 
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $element instanceof DstyleDoc_Element_Function )
 		{
@@ -653,7 +653,7 @@ class DstyleDoc_Analyser_Return extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -759,19 +759,19 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 	 * Todo:
 	 *	 - ne devrait pas faire de trim() ici.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $element instanceof DstyleDoc_Element_Function )
 		{
 			foreach( explode(',',$this->type) as $type )
 			{
-	$element->return = trim($type);
-	if( $this->description )
+				$element->return = trim($type);
+				if( $this->description )
 				{
-		unset($element->return->description);
+					unset($element->return->description);
 					$element->return->description = $this->description;
 					$element->return->from = $element;
-	}
+				}
 			}
 		}
 		return $this;
@@ -887,7 +887,7 @@ class DstyleDoc_Analyser_Throw extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -984,7 +984,7 @@ class DstyleDoc_Analyser_Element_Throw_List extends DstyleDoc_Analyser implement
 	/**
 	 * Ajoute une exception à l'élément.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $element instanceof DstyleDoc_Element_Function )
 		{
@@ -1039,7 +1039,7 @@ class DstyleDoc_Analyser_Syntax extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -1175,7 +1175,7 @@ class DstyleDoc_Analyser_Element_Syntax_List extends DstyleDoc_Analyser implemen
 	// }}}
 	// {{{ apply()
 
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $element instanceof DstyleDoc_Element_Function )
 		{
@@ -1255,7 +1255,7 @@ class DstyleDoc_Analyser_Type extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -1353,7 +1353,7 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 	 * Ajoute un nouveau paragraphe Ã  la description Ã  l'Ã©lÃ©ment.
 	 * S'assure que le prÃ©cÃ©dent ajout n'Ã©taient pas dÃ©jÃ  un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $element instanceof DstyleDoc_Element_Member )
 		{
@@ -1412,7 +1412,7 @@ class DstyleDoc_Analyser_Since extends DstyleDoc_Analyser_Version
 	 * Ajoute un nouveau paragraphe à la description à l'élément.
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		$element->since = $this->version;
 		return $this;
@@ -1468,7 +1468,7 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 	// }}}
 	// {{{ apply()
 
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		$tmp = $element->descriptions;
 		$last = end($tmp);
@@ -1544,7 +1544,7 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
 	// }}}
 	// {{{ apply()
 
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		$tmp = $element->descriptions;
 		$last = end($tmp);
@@ -1605,7 +1605,7 @@ class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe Ã  la description Ã  l'Ã©lÃ©ment.
 	 * S'assure que le prÃ©cÃ©dent ajout n'Ã©taient pas dÃ©jÃ  un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -1674,7 +1674,7 @@ class DstyleDoc_Analyser_Element_Package_List extends DstyleDoc_Analyser
 	/**
 	 * Ajoute la liste des packages Ã  l'Ã©lement.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		$element->package = $this->packages;
 		return $this;
@@ -1728,7 +1728,7 @@ class DstyleDoc_Analyser_Todo extends DstyleDoc_Analyser
 	 * Ajoute un nouveau paragraphe Ã  la description Ã  l'Ã©lÃ©ment.
 	 * S'assure que le prÃ©cÃ©dent ajout n'Ã©taient pas dÃ©jÃ  un nouveau paragraphe.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		return $this;
 	}
@@ -1801,13 +1801,13 @@ class DstyleDoc_Analyser_Element_Todo_List extends DstyleDoc_Analyser implements
 	/**
 	 * Ajoute une todo Ã  l'Ã©lÃ©ment.
 	 */
-	public function apply( DstyleDoc_Element $element )
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
 		if( $this->description )
 			if( $element instanceof DstyleDoc_Element_Function
 				or $element instanceof DstyleDoc_Element_Class
 				or $element instanceof DstyleDoc_Element_Interface
-	or $element instanceof DstyleDoc_Element_Constant
+				or $element instanceof DstyleDoc_Element_Constant
 				or $element instanceof DstyleDoc_Element_Member )
 				$element->todo->description = $this->description;
 		return $this;
