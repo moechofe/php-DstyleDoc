@@ -219,11 +219,11 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
     'private' => false );
 
   protected function set_modifier( $modifier )
-  {
+	{
     if( $modifier instanceof DstyleDoc_Token_Custom )
       $this->modifiers = $modifier->modifiers;
     elseif( is_string($modifier) and isset($this->_modifiers[$modifier]) )
-      $this->_modifiers[$modifier] = true;
+			$this->_modifiers[$modifier] = true;
   }
 
   protected function set_modifiers( $modifiers )
@@ -1231,7 +1231,9 @@ class DstyleDoc_Token_Class extends DstyleDoc_Token implements DstyleDoc_Token_V
     $class->file = $this->file;
     $class->line = $this->line;
     $class->documentation = $this->documentation;
-    $class->parent = $this->extend;
+		$class->parent = $this->extend;
+		$class->abstract = $this->modifiers['abstract'];
+		$class->final = $this->modifiers['final'];
 
     foreach( $this->vars as $var )
     {
@@ -1378,7 +1380,7 @@ class DstyleDoc_Token_Final extends DstyleDoc_Token_Custom
 class DstyleDoc_Token_Abstract extends DstyleDoc_Token_Custom
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
-  {
+	{
     return DstyleDoc_Token_Modifier::hie( $converter, $current, $source, $file, $line );
   }
 }
