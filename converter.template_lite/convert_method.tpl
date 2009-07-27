@@ -30,5 +30,14 @@
     </dl>
   </div>
 {/if}
-
+{if $_method.exceptions}
+  <div class="content-exceptions">
+    <h2>{if isset(#method_exceptions#)}{#method_exceptions#|string_format:$_method.display:$_method.link}{else}#method_exceptions(method.name,method.link)#{/if}</h2>
+    <dl>
+{foreach item=exception from=$_method.exceptions}
+      {$exception}
+{/foreach}
+    </dl>
+  </div>
+{/if}
 </div></div></div>
