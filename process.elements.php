@@ -1223,6 +1223,12 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 			return current($this->_returns);
 	}
 
+	// todo: copier ça partout
+	protected function isset_returns()
+	{
+		return (boolean)count($this->_returns);
+	}
+
 	private function returns_types( $returns )
 	{
 		if( $this->_name == 'file_exists' and ! $returns[0] instanceof DstyleDoc_Element_Return )
@@ -1258,6 +1264,12 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 	protected function get_returns()
 	{
 		return array_values( $this->returns_types($this->_returns) );
+	}
+
+	// fixme: il faudrait vérifiez le type des entrées du tableau est encoyer des exceptions et recopier le code dans les autres méthodes.
+	protected function set_returns( $returns )
+	{
+		$this->_returns = (array)$returns;
 	}
 
 	// }}}
@@ -1316,9 +1328,9 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
 	protected $_syntax = array();
 
-	protected function set_syntax( $syntax )
+	protected function set_syntax()
 	{
-		$this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $syntax );
+		$this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter );
 	}
 
 	protected function get_syntax()
@@ -1326,7 +1338,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 		if( count($this->_syntax) )
 			return end($this->_syntax);
 		else
-			return new DstyleDoc_Element_Syntax( $this->converter, null );
+			return new DstyleDoc_Element_Syntax( $this->converter );
 	}
 
 	protected function get_syntaxs()
@@ -1334,9 +1346,15 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 		if( ! $this->analysed ) $this->analyse();
 		if( ! $this->_syntax )
 		{
-			$this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter, $this->params );
+			$this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter );
 			$syntax = end($this->_syntax);
 			$syntax->function = $this;
+			if( $this->params )
+				$syntax->params = $this->params;
+			if( isset($this->returns) )
+				$syntax->returns = $this->returns;
+			if( $this->descriptions )
+				$syntax->descriptions = $this->descriptions;
 		}
 		return $this->_syntax;
 	}
@@ -1915,19 +1933,25 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Custom_Element
 			return $this->_returns;
 	}
 
+	protected function set_returns( $returns )
+	{
+		$this->_returns = (array)$returns;
+	}
+
 	// }}}
 	// {{{ __construct()
-/*
+
+	/* xxx
 	public function __construct( DstyleDoc_Converter $converter, $syntax )
 	{
 		parent::__construct( $converter );
-
 
 		if( is_array($syntax) or $syntax instanceof ArrayAccess )
 			foreach( $syntax as $param )
 				$this->param = $param;
 	}
- */
+	 */
+
 	// }}}
 	// {{{ $convert
 
