@@ -2023,13 +2023,30 @@ class DstyleDoc_Element_Syntax extends DstyleDoc_Simple_Element
  */
 class DstyleDoc_Element_Exception extends DstyleDoc_Simple_Element
 {
+	// {{{ $class
+
+	protected $_class = null;
+
+	protected function set_class( DstyleDoc_Element_Class $class )
+	{
+		$this->_class = $class;
+	}
+
+	protected function get_class()
+	{
+		return $this->_class;
+	}
+
+	// }}}
 	// {{{ $name
 
 	protected $_name = '';
 
 	protected function set_name( $name )
 	{
-		$this->_name = strtolower((string)$name);
+		$this->_name = (string)$name;
+		if( $found = $this->converter->class_exists( (string)$name ) )
+			$this->class = $found;
 	}
 
 	protected function get_name()
@@ -2284,9 +2301,12 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 
 	protected $_from = null;
 
-	protected function set_from( DstyleDoc_Element $from )
+	// fixme: c'est un peu flou, on peut mettre de l'objet, du dtring ou un array de string
+	// todo: faire une classe DstyleDoc_Linked_Element
+	protected function set_from( $from )
 	{
-		$this->_from = $from;
+		if( $from instanceof DstyleDoc_Element or is_string($from) or is_array($from) )
+			$this->_from = $from;
 	}
 
 	protected function get_from()
@@ -2304,7 +2324,6 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 
 	protected function set_type( $type )
 	{
-		//d($type);
 		if( $type instanceof DstyleDoc_Element_Interface or $type instanceof DstyleDoc_Element_Class )
 			$this->_type = $type;
 		else
@@ -2317,6 +2336,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 		if( $this->_type instanceof DstyleDoc_Element_Interface or $this->_type instanceof DstyleDoc_Element_Class )
 			return $this->_type;
 
+		// xxx: ça marche ça ?
 		elseif( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
 		{
 			if( ! $found->analysed ) $found->analyse();
@@ -2337,6 +2357,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 			return $found;
 		}
 
+		// xxx: ça marche ça
 		elseif( $found instanceof DstyleDoc_Element_Member )
 		{
 			if( ! $found->analysed ) $found->analyse();
@@ -2353,8 +2374,23 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 		elseif( in_array(strtolower($this->_type), $this->types) )
 			return strtolower($this->_type);
 
+		elseif( substr($this->_type,-2)=='()' and $this->_type[0]!='$' and class_exists('DstyleDoc_Function_Return') and $type = DstyleDoc_Function_Return::get_return( substr(strtolower($this->_type),0,-2) ) )
+		{
+			$types = array();
+			foreach( $type as $v )
+			{
+				$v = new DstyleDoc_Element_Return( $this->converter, $v );
+				// fixme: comptement foireux
+				$v->from = '<a href="http://php.net/'.substr(strtolower($this->_type),0,-2).'" target="_blank">'.strtolower($this->_type).'</a>';
+				$types[] = $v;
+			}
+			return $types;
+		}
+
 		else
+		{
 			return $this->_type;
+		}
 	}
 
 	// }}}
