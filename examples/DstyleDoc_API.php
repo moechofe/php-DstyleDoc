@@ -47,8 +47,11 @@ DstyleDoc::hie()
 'method_description' => 'déscription',
 'method_params' => 'paramètres',
 'method_returns' => 'valeurs de retour',
+'method_exceptions' => 'exceptions lancés',
 
 'return_from' => 'Retourné depuis %2$s',
+// fixme: très foireux
+'return_from_free' => 'Retourné depuis %1$s',
 
 'files_index_list_header' => 'Liste des fichiers',
 'classes_index_list_header' => 'Liste des classes déclarées dans le fichier %2$s',
