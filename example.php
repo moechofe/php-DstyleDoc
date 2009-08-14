@@ -22,12 +22,33 @@ DstyleDoc::hie()
   ->enable_come_across_element
   ->enable_href_link
   ->enable_javadoc_link
+//  ->source( 'DstyleDoc.php' )
   ->source( basename(__FILE__) )
   ->convert_with( $c = new DstyleDoc_Converter_toString() );
 
-abstract class a
+/**
+ * DOC pour le fichier
+ * DOC pour le fichier
+ */
+
+/**
+ * Members:
+ *   integer $int = Integer
+ *   (get,set,isset,unset) null, mixed = Mixed ou Null
+ * Methods:
+ *   array, resource get_a() = Retourne A
+ */
+class a
 {
+	/**
+	 * Params:
+	 *   (in) float $b = Float
+	 *   (out) object $c = L'objet setté
+	 */
+	public function b(){}
 }
+
+d( $c );
 
 __halt_compiler();
 
