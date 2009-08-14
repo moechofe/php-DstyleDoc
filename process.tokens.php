@@ -23,13 +23,6 @@ abstract class DstyleDoc_Token_Custom extends DstyleDoc_Properties
 }
 
 /**
- * Classe de token qui stope l'analyse.
- */
-class DstyleDoc_Token_Stop extends DstyleDoc_Token_Custom
-{
-}
-
-/**
  * Classe de token qui ne fait rien.
  */
 abstract class DstyleDoc_Token_None extends DstyleDoc_Token_Custom
@@ -170,14 +163,13 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
   protected $_documentation = '';
 
   protected function set_documentation( $documentation )
-  {
-    if( $documentation instanceof DstyleDoc_Token_Class )
-    {
-    }
+	{
+		if( $documentation instanceof DstyleDoc_Token_Open_Tag )
+			null;
+		elseif( $documentation instanceof DstyleDoc_Token_Class )
+			null;
     elseif( $documentation instanceof DstyleDoc_Token_Doc_Comment or $documentation instanceof DstyleDoc_Token )
-    {
       $this->set_documentation( $documentation->documentation );
-    }
     elseif( trim((string)$documentation) )
     {
       if( $this->_documentation )
@@ -455,6 +447,13 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
   }
 
   // }}}
+}
+
+/**
+ * Classe de token qui stope l'analyse.
+ */
+abstract class DstyleDoc_Token_Stop extends DstyleDoc_Token
+{
 }
 
 // {{{ Expressionable
@@ -1017,7 +1016,7 @@ class DstyleDoc_Token_Function extends DstyleDoc_Token implements DstyleDoc_Toke
     $return->modifier = $current;
     $return->file = $file;
     $return->line = $line;
-    $return->documentation = $current;
+		$return->documentation = $current;
     $return->object = $current;
 
     if( ! $return->object instanceof DstyleDoc_Token_Fake )
@@ -2149,8 +2148,9 @@ class DstyleDoc_Token_Halt_Compiler extends DstyleDoc_Token_Stop
 {
   static function hie( DstyleDoc_Converter $converter, DstyleDoc_Token_Custom $current, $source, $file, $line )
   {
-    DstyleDoc_Token_Close_Tag::hie( $converter, $current, $source, $file, $line );
-    return new self;
+		$return = new self;
+		$return->open_tag = $current->open_tag;
+    return $return;
   }
 }
 
@@ -2332,4 +2332,3 @@ class DstyleDoc_Token_Close_Tag extends DstyleDoc_Token
 
 // }}}
 
-?>
