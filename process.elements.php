@@ -221,7 +221,7 @@ abstract class DstyleDoc_Analyseable_Element extends DstyleDoc_Custom_Element
 
 	protected function get_description()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_description( $this->_descriptions, $this );
 	}
 
@@ -232,6 +232,7 @@ abstract class DstyleDoc_Analyseable_Element extends DstyleDoc_Custom_Element
 
 	public function analyse()
 	{
+		if( $this->analysed ) return;
 		$this->analysed = true;
 
 		$analysers = array();
@@ -395,7 +396,7 @@ abstract class DstyleDoc_Element extends DstyleDoc_Analyseable_Element
 	{
 		if( is_array($package) or $package instanceof Iterator )
 			foreach( $package as $p )
-	$this->_packages[] = (string)$p;
+				$this->_packages[] = (string)$p;
 		elseif( $package )
 			$this->_packages[] = (string)$package;
 	}
@@ -495,7 +496,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 
 	protected function get_description()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		$copy = $this->_descriptions;
 		if( count($copy) )
 			array_shift($copy);
@@ -507,7 +508,7 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 
 	protected function get_title()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		if( count($this->_descriptions) )
 			list($result) = $this->_descriptions;
 		else
@@ -561,6 +562,20 @@ abstract class DstyleDoc_Element_Filed extends DstyleDoc_Element_Titled
 	protected function get_line()
 	{
 		return (integer)$this->_line;
+	}
+
+	// }}}
+	// {{{ $package
+
+	protected function get_packages()
+	{
+		if( ! $this->_packages and $this->file )
+		{
+			$this->file->analyse();
+			return $this->file->packages;
+		}
+		else
+			return parent::get_packages();
 	}
 
 	// }}}
@@ -724,7 +739,7 @@ class DstyleDoc_Element_File extends DstyleDoc_Element_Titled
 
 	protected function get_convert()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_file( $this );
 	}
 
@@ -812,7 +827,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 	{
 		$methods = $this->_methods;
 
-		if( $this->parent )
+		if( $this->parent instanceof DstyleDoc_Element )
 			foreach( $this->parent->heritable_methods as $method )
 					// todo: in_array() do not work correctly. see bug #38356 at http://bugs.php.net/bug.php?id=39356
 				//				if( ! in_array($method, $methods) )
@@ -935,18 +950,18 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 	// {{{ $members
 
 	/**
-	 * Contient la listes des membres déclaré ppar la classe.
+	 * Contient la listes des membres déclaré par la classe.
 	 * Type:
-	 *		array(DstyleDoc_Element_Member) = Tableau a lalefs numériques contentant des instances de DstyleDoc_Element_Member.
+	 *		array(DstyleDoc_Element_Member) = Tableau a clefs numériques contentant des instances de DstyleDoc_Element_Member.
 	 */
 	protected $_members = array();
 
 	/**
-	 * Ajoute un membre a laa classe ou selectionne un membre existant.
+	 * Ajoute un membre a la classe ou selectionne un membre existant.
 	 * Si le membre à été ajouté, il sera sélectionné. Le membre sera alors renvoyé par la propriété $membre.
 	 * Params:
-	 *		string = Le nom du membre a lajouter ou a laélectionner.
-	 *		DstyleDoc_Element_Member = L'instance du membre a lajouter ou a laélectionner.
+	 *		string = Le nom du membre a ajouter ou a sélectionner.
+	 *		DstyleDoc_Element_Member = L'instance du membre a ajouter ou a laélectionner.
 	 */
 	protected function set_member( $name )
 	{
@@ -997,7 +1012,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 	{
 		$membres = $this->_members;
 
-		if( $this->parent )
+		if( $this->parent instanceof DstyleDoc_Element )
 			foreach( $this->parent->heritable_members as $membre )
 				if( ! in_array($membre, $membres) )
 					$membres[] = $membre;
@@ -1048,8 +1063,19 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 
 	protected function get_convert()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_class( $this );
+	}
+
+	// }}}
+	// {{{ $package
+
+	protected function get_packages()
+	{
+		if( ! $this->_packages and $this->parent instanceof DstyleDoc_Element )
+			return $this->parent->packages;
+		else
+			return parent::get_packages();
 	}
 
 	// }}}
@@ -1119,7 +1145,7 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 
 	protected function get_id()
 	{
-		return $this->converter->convert_id( array($this->file->file, $this->name) );
+		return $this->converter->convert_id( array($this->file->file, $this->name), $this );
 	}
 
 	// }}}
@@ -1127,7 +1153,7 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 
 	protected function get_display()
 	{
-		return $this->converter->convert_display( $this->name );
+		return $this->converter->convert_display( $this->name, $this );
 	}
 
 	// }}}
@@ -1135,7 +1161,7 @@ class DstyleDoc_Element_Interface extends DstyleDoc_Element_Methoded_Filed_Named
 
 	protected function get_convert()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_interface( $this );
 	}
 
@@ -1288,8 +1314,6 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 	// xxx
 	private function returns_types( $returns )
 	{
-		if( $this->_name == 'file_exists' and ! $returns[0] instanceof DstyleDoc_Element_Return )
-		{	throw new Exception('Jen etais a chercher pourquoi je me retrouve avec un Dstyle_Element_Type, ou du moins, trouver un moyen pour le convertir, ou alors ne plus rendre Return descendant de Type. De plus pourquoi le même type : null est instancié plusisuers fois avec des objet différents ?'); d($returns);  }
 		$result = array();
 		foreach( $returns as $return )
 		{
@@ -1309,11 +1333,18 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 			$key = $type->name;
 		else
 			$key = $type;
-/*
+
+		// xxx: encore une foix, je ne devrait pas faire ça car je convertir des _Return en _Type que je reconvertie en _Return
+		// xxx: il faut que les _Return utilise des _Type
 		if( ! $return instanceof DstyleDoc_Element_Return )
 		{
-			$return
- */
+			$old = clone $return;
+			unset($return);
+			$return = new DstyleDoc_Element_Return( $old->converter, $old->type );
+			$return->from = $old->from;
+			$return->descriptions = $old->descriptions;
+		}
+
 		if( ! isset($array[$key]) or ! isset($array[$key]->description) or ($return->from === $this and isset($return->description)) )
 			$array[$key] = $return;
 	}
@@ -1400,7 +1431,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
 	protected function get_syntaxs()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		if( ! $this->_syntax )
 		{
 			$this->_syntax[] = new DstyleDoc_Element_Syntax( $this->converter );
@@ -1435,7 +1466,7 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 
 	protected function get_convert()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_function( $this );
 	}
 
@@ -1451,10 +1482,10 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
 	protected function get_description()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		if( ! $this->_descriptions and $this->parent )
 		{
-			if( ! $this->parent->analysed ) $this->parent->analyse();
+			$this->parent->analyse();
 			return $this->parent->description;
 		}
 		elseif( ! $this->_descriptions )
@@ -1468,10 +1499,10 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
 	protected function get_title()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		if( ! $this->_descriptions and $this->parent )
 		{
-			if( ! $this->parent->analysed ) $this->parent->analyse();
+			$this->parent->analyse();
 			return $this->parent->title;
 		}
 		elseif( ! $this->_descriptions )
@@ -1639,7 +1670,7 @@ class DstyleDoc_Element_Method extends DstyleDoc_Element_Function
 
 	protected function get_convert()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_method( $this );
 	}
 
@@ -1824,7 +1855,7 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
 
 	protected function get_convert()
 	{
-		if( ! $this->analysed ) $this->analyse();
+		$this->analyse();
 		return $this->converter->convert_member( $this );
 	}
 
@@ -2339,7 +2370,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 		// xxx: ça marche ça ?
 		elseif( ($found = $this->converter->search_element($this->_type)) instanceof DstyleDoc_Element_Function )
 		{
-			if( ! $found->analysed ) $found->analyse();
+			$found->analyse();
 			$types = array();
 			foreach( $found->returns as $v )
 			{
@@ -2360,7 +2391,7 @@ class DstyleDoc_Element_Type extends DstyleDoc_Simple_Element
 		// xxx: ça marche ça
 		elseif( $found instanceof DstyleDoc_Element_Member )
 		{
-			if( ! $found->analysed ) $found->analyse();
+			$found->analyse();
 			$types = array();
 			foreach( $found->types as $v )
 			{
