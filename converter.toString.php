@@ -17,14 +17,16 @@ class DstyleDoc_Converter_toString extends DstyleDoc_Converter_HTML
 		return <<<HTML
 <hr /><h1 id="{$file->id}">File: {$file->display}</h1>
 <dl>
+{$this->either($file->title,'<dt>title</dt><dd>'.$file->title.'</dd>')}
+{$this->either($file->description,'<dt>description</dt><dd>'.$file->description.'</dd>')}
+{$this->either($file->version,'<dt>version</dt><dd>'.$file->version.'</dd>')}
+{$this->either($file->historys,'<dt>history</dt><dd>'.$this->forall($file->historys,'<li><b>{$value->version}: </b>{$value->description}</li>').'</dd>')}
+{$this->either($file->packages,'<dt>package</dt><dd>'.$this->forall($file->packages,'<li>{$value}</li>').'</dd>')}
 {$this->either($file->classes,'<dt>classes</dt><dd><ul>'.$this->forall($file->classes,'<li>$value->link</li>').'</ul></dd>')}
 {$this->either($file->interfaces,'<dt>interfaces</dt><dd><ul>'.$this->forall($file->interfaces,'<li>$value->link</li>').'</ul></dd>')}
 {$this->either($file->functions,'<dt>functions</dt><dd><ul>'.$this->forall($file->functions,'<li>$value->link</li>').'</ul></dd>')}
 </dl>
 HTML;
-
-
-			(string)$file->file;
 	}
 
 	// }}}
@@ -35,8 +37,10 @@ HTML;
 		if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
 			DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert class: <strong>{$class->display}</strong></span>", true );
 
-		if( $class->parent )
+		if( is_object($class->parent) )
 			$super = $class->parent->link;
+		elseif( $class->parent )
+			$super = $class->parent;
 		else
 			$super = null;
 
