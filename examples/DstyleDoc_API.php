@@ -33,10 +33,18 @@ DstyleDoc::hie()
 'home_title' => 'Documentation API de DstyleDoc',
 'home_text' => '<p><strong><em>DstyleDoc</em> est un générateur de documentation</strong> pour PHP <strong>léger et puissant</strong>. - Il pourrait être encore plus léger et puissant, mais je n\'ai pas que ça a faire. - Pour s\'en assurer scrutez la liste des avantages.</p><dl><dt>Capacité à <strong>générer la documentation</strong> et de l\'afficher sur une page Web <strong>à la volé</strong>.</dt><dd>Gràce à une <s>super</s> technique <s>futuriste</s> nommé l\'<a href="http://en.wikipedia.org/wiki/Lazy_evaluation">évaluation paresseuse</a> <em>DstyleDoc</em> analyse la documentation seulement si cela est nécessaire. Résultat, sur des petites documentations : les pages peuvent être générées à la volé.</dd><dt>Compatible avec JavaDoc et la "D Embedded Documentation".</dt><dd>Oubliez la viellissante JavaDoc pas très adapté et adoptez la symphatique <a href="http://www.digitalmars.com/d/2.0/ddoc.html">syntaxe de documentation du langage D</a>. Dans les deux cas, <em>DstyleDoc</em> implémente des nouveaux tags spéciales pour PHP.</dd><dt>Analyse du code à la <strong>recherche des exceptions lancées et des valeurs de retours</strong>.</dt><dd><small>Ma fonctionnalitée favorite :</small> <em>DstyleDoc</em> recherche dans le code des fonctions, pour trouver les classes des exceptions lancées et les types des valeurs retournées. La moitier de la documentation est faite.</dd><dt><strong>Liens automatique vers les éléments</strong> de la documentation.</dt><dd>Ne saisissez plus de tags internes {@link}. <em>DstyleDoc</em> détecte automatiquement si des références vers d\'autre éléments apparaîssent dans le texte et crée les liens correspondants.</dd></dl>',
 
-'file_header_display' => 'Le fichier <strong>%s</strong>',
-'class_header_display' => 'La classe <strong>%s</strong>',
-'class_abstract_header_display' => 'La classe abstraite <strong>%s</strong>',
-'method_header_display' => 'La méthode <strong>%s</strong>',
+'file_title' => '%s',
+'file_display' => 'Le fichier <strong>%s</strong>',
+'file_package' => 'Paquetages : ',
+
+'class_title' => '%s',
+'class_display' => 'La classe <strong>%s</strong>',
+'class_abstract_display' => 'La classe abstraite <strong>%s</strong>',
+'class_package' => 'Paquetages : ',
+
+'method_title' => '%s',
+'method_display' => 'La méthode <strong>%s</strong>',
+'method_package' => 'Paquetages : ',
 
 'page_file' => 'Cette page traite du fichier %2$s. <a href="#page-browser">Accédez à la navigation</a>',
 'page_home' => 'Cette page traite de la documentation de DstyleDoc. <a href="#page-browser">Accédez à la navigation</a>',
