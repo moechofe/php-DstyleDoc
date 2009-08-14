@@ -2,7 +2,8 @@
 
 /**
  * Script principale de DstyleDoc.
- * Contient la classe de controle DstyleDoc, l'interface pour les converteurs DstyleDoc_Converter_Convert ainsi que différentes classes d'outils.
+ * Déclare la classe de controle DstyleDoc, l'interface pour les converteurs DstyleDoc_Converter_Convert ainsi que différentes classes d'outils.
+ * Packages: core
  */
 
 // {{{ properties class
@@ -16,7 +17,7 @@ abstract class DstyleDoc_Properties
 {
 	/**
 	 * Permet d'utiliser des getter.
-	 * __get() est appelé automatiquement par PHP lorsque la lecture des données d'un membre est inaccessible.
+	 * __get() est appelé automatiquement par PHP lors de l'accès en lecture d'un membre inexistant.
 	 * __get() vérifiera au préalable que la méthode "get_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
 	 * Params:
 	 *	 string $property = Le nom du membre.
@@ -38,6 +39,17 @@ abstract class DstyleDoc_Properties
 		return call_user_func( array($this,'get_'.(string)$property) );
 	}
 
+	/**
+	 * Permet d'utiliser des setter.
+	 * __set() est appelé automatiquement par PHP lors de l'accès en écriture d'un membre inexistant.
+	 * __set() vérifiera au préalable que la méthode "set_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
+	 * Params:
+	 *	 string $property = Le nom du membre.
+	 * Returns:
+	 *	 mixed = Retournera la valeur retournée par la méthode "set_"+<nom_du_membre>().
+	 * Throws:
+	 *	 BadPropertyException = Lancé si la méthode "set_"+<nom_du_membre>() n'est pas disponible.
+	 */
 	protected function __set( $property, $value )
 	{
 		if( ! method_exists($this,'set_'.(string)$property) or ! is_callable( array($this,'set_'.(string)$property) ) )
@@ -46,6 +58,17 @@ abstract class DstyleDoc_Properties
 		call_user_func( array($this,'set_'.(string)$property), $value );
 	}
 
+	/**
+	 * Permet d'utiliser des issetter.
+	 * __isset() est appelé automatiquement par PHP lors de l'accès d'existance d'un membre inexistant.
+	 * __isset() vérifiera au préalable que la méthode "isset_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
+	 * Params:
+	 *	 string $property = Le nom du membre.
+	 * Returns:
+	 *	 mixed = Retournera la valeur retournée par la méthode "isset_"+<nom_du_membre>().
+	 * Throws:
+	 *	 BadPropertyException = Lancé si la méthode "isset_"+<nom_du_membre>() n'est pas disponible.
+	 */
 	protected function __isset( $property )
 	{
 		if( ! method_exists($this,'isset_'.(string)$property) or ! is_callable( array($this,'isset_'.(string)$property) ) )
@@ -54,6 +77,17 @@ abstract class DstyleDoc_Properties
 		return call_user_func( array($this,'isset_'.(string)$property) );
 	}
 
+	/**
+	 * Permet d'utiliser des unsetter.
+	 * __unset() est appelé automatiquement par PHP lors de l'accès d'effacement d'un membre inexistant.
+	 * __unset() vérifiera au préalable que la méthode "unset_"+<nom_du_membre>() existe et quelle est appelable. Dans le cas contraire, l'exception BadPropertyException sera lancé.
+	 * Params:
+	 *	 string $property = Le nom du membre.
+	 * Returns:
+	 *	 mixed = Retournera la valeur retournée par la méthode "isset_"+<nom_du_membre>().
+	 * Throws:
+	 *	 BadPropertyException = Lancé si la méthode "unset_"+<nom_du_membre>() n'est pas disponible.
+	 */
 	protected function __unset( $property )
 	{
 		if( ! method_exists($this,'unset_'.(string)$property) or ! is_callable( array($this,'unset_'.(string)$property) ) )
@@ -61,15 +95,6 @@ abstract class DstyleDoc_Properties
 
 		call_user_func( array($this,'unset_'.(string)$property) );
 	}
-/*
-	protected function __call( $method, $arguments )
-	{
-		if( ! method_exists($this,'call_'.(string)$method) or ! is_callable( array($this,'call_'.(string)$method) ) )
-			throw new BadMethodCallException;
-
-		return call_user_func_array( array($this,'call_'.(string)$method), $arguments );
-	}
-*/
 }
 
 // }}}
@@ -178,7 +203,6 @@ class DstyleDoc extends DstyleDoc_Properties
 		$line = 1;
 		$current = new DstyleDoc_Token_Fake;
 		$doc = '';
-$cccc = 0;
 		foreach( token_get_all(file_get_contents($file)) as $token )
 		{
 			if( is_array($token) )
@@ -226,7 +250,7 @@ HTML;
 				{
 					$o = get_class($current->open_tag);
 					if( $current->open_tag instanceof DstyleDoc_Token_Open_Tag )
-						$d = strlen($current->open_tag->documentation);
+						$d = strlen($current->open_tag->documentation)." ".substr($current->open_tag->documentation,0,30);
 				}
 				if(!trim($d))$d='&nbsp;';
 				echo <<<HTML
@@ -236,14 +260,15 @@ HTML;
 <div style='clear:both'></div>
 HTML;
 			}
-//if( $cccc == 1596 ) {var_dump('wesh'); exit;}
+
 			if( ! $current instanceof DstyleDoc_Token_Custom )
 			{
 				throw new UnexpectedValueException;
 			}
-//echo memory_get_usage(),'<br>';
-//if($cccc++ > 1595 )exit;
 		}
+
+		if( $current instanceof DstyleDoc_Token_Open_Tag or $current instanceof DstyleDoc_Token_Halt_Compiler )
+			DstyleDoc_Token_Close_Tag::hie( $converter, $current, $source, $file, $line );
 	}
 
 	// }}}
@@ -300,6 +325,7 @@ HTML;
 		'type' => true,
 		'since' => true,
 		'todo' => true,
+		'member' => true,
 
 		'element_link' => true,
 		'href_link' => true,
@@ -316,6 +342,7 @@ HTML;
 		'javadoc_var' => true,
 		'javadoc_since' => true,
 		'javadoc_todo' => true,
+		'javadoc_member' => true,
 
 		'javadoc_link' => true,
 
@@ -789,8 +816,10 @@ class DstyleDoc_Element_Container
 /**
  * Convertisseur abstrait
  * Todo:
- *		- reporter set_method() dans les autres methodes de ce genre.
- * Todo: gérer les constantes
+ *	 - reporter set_method() dans les autres methodes de ce genre.
+ *   - gérer les constantes
+ *   - gérer les membres
+ *   - gérer la ligne suivante
  * Members:
  *	 - (out) array(DstyleDoc_Element_Class) $classes = La listes des classes.
  *	 - DstyleDoc_Element_Class $class = Ajoute une nouvelle classe dans la liste ou retourne la dernière ajoutée.
@@ -799,13 +828,33 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 {
 	// {{{ $dsd
 
+	/**
+	 * L'instance de DstyleDoc associé au converteur.
+	 * Type: DstyleDoc
+	 * Members:
+	 *   (set,get) DstyleDoc $dsd = L'instance de DstyleDoc associé au converteur.
+	 */
 	protected $_dsd = null;
 
+	/**
+	 * Setter pour $_dsd
+	 * Met à jour l'instance de DstyleDoc associé au converteur.
+	 * Il est préferable d'accèder au membre $_dsd en écriture plutôt que d'appelé cette méthode.
+	 * Params:
+	 *   DstyleDoc = L'instance de DstyleDoc à associer au converteur.
+	 */
 	protected function set_dsd( DstyleDoc $dsd )
 	{
 		$this->_dsd = $dsd;
 	}
 
+	/**
+	 * Getter pour $_dsd
+	 * Retourne l'instance de DstyleDoc associé au converteur.
+	 * Il est préferable d'accèder au membre $_dsd en lecture plutôt que d'appelé cette méthode.
+	 * Returns:
+	 *   DstyleDoc = L'instance de DstyleDoc associé au converteur.
+	 */
 	protected function get_dsd()
 	{
 		return $this->_dsd;
@@ -821,6 +870,7 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 
 	/**
 	 * La liste des fichiers analysés.
+	 * Type: DstyleDoc_Element_Container
 	 */
 	protected $_files = null;
 
@@ -830,6 +880,9 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 			$this->_files = new DstyleDoc_Element_Container( 'DstyleDoc_Element_File' );
 	}
 
+	/**
+	 * Setter pour $_file
+	 */
 	protected function set_file( $file )
 	{
 		$this->init_file();
