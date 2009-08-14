@@ -1357,7 +1357,6 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 	{
 		if( $element instanceof DstyleDoc_Element_Member )
 		{
-			d( $this->type );
 			$element->type = $this->type;
 			$element->type->description = $this->description;
 		}
@@ -1818,6 +1817,171 @@ class DstyleDoc_Analyser_Element_Todo_List extends DstyleDoc_Analyser implements
 
 	public function __construct( $description )
 	{
+		$this->description = $description;
+	}
+
+	// }}}
+}
+
+/**
+ * Classe d'analyse d'une balise de membre.
+ */
+class DstyleDoc_Analyser_Member extends DstyleDoc_Analyser
+{
+	// {{{ priority
+
+	const priority = 10;
+
+	// }}}
+	// {{{ analyse()
+
+	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
+	{
+		// ^todos?\s*:\s*(.*)?$
+		if( $dsd->dstyledoc and $dsd->throws and preg_match( '/^todos?\s*:\s*(.*)?$/i', $source, $matches ) )
+		{
+			$instance = new self();
+			$priority = self::priority;
+			if( isset($matches[1]) )
+			{
+				$instance = new DstyleDoc_Analyser_Element_Todo_List( $matches[1] );
+				$property = DstyleDoc_Analyser_Element_Todo_List::priority;
+			}
+			return true;
+		}
+		else
+			return false;
+	}
+
+	// }}}
+	// {{{ apply()
+
+	/**
+	 * Ajoute un nouveau paragraphe à la description à l'élément.
+	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+	 */
+	public function apply( DstyleDoc_Custom_Element $element )
+	{
+		return $this;
+	}
+
+	// }}}
+}
+
+/**
+ * Classe d'analyse d'un élement de liste des membres.
+ */
+class DstyleDoc_Analyser_Element_Member_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
+{
+	// {{{ $description
+
+	protected $_description = '';
+
+	protected function set_description( $description )
+	{
+		$this->_description = (string)$description;
+	}
+
+	protected function get_description()
+	{
+		return $this->_description;
+	}
+
+	// }}}
+	// {{{ descriptable()
+
+	public function descriptable( DstyleDoc_Element $element, $description )
+	{
+		if( $element instanceof DstyleDoc_Element_Function )
+			$element->member->description = $description;
+	}
+
+	// }}}
+	// {{{ priority
+
+	const priority = 15;
+
+	// }}}
+	// {{{ analyse()
+
+	/**
+	 * todo: copier or $current instanceof self) partout
+	 */
+	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
+	{
+		// ^(\([-,_\pLpN\s]+\)\s)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]\s*(.*)$
+		if( $dsd->dstyledoc and $dsd->member and ($current instanceof DstyleDoc_Analyser_Member or $current instanceof self)
+			and preg_match( '/^(\([-,_\pLpN\s]+\)\s)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]\s*(.*)$/', $source, $matches ) )
+			{
+				$instance = new self( $matches[1], $matches[2], $matches[3] );
+				$priority = self::priority;
+				return true;
+			}
+
+		// ^(?:[-+*]\s+)(\([-,_\pLpN\s]+\)\s)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$
+		if( $dsd->dstyledoc and $dsd->member and ($current instanceof DstyleDoc_Analyser_Member or $current instanceof self)
+			and preg_match( '/^(?:[-+*]\s+)(\([-,_\pLpN\s]+\)\s)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$/', $source, $matches ) )
+			{
+				$instance = new self( $matches[1], $matches[2], $matches[3] );
+				$priority = self::priority;
+				return true;
+			}
+
+		/*
+		 * *****
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 *
+		 * PRENDRE CELLE CI
+		 */
+		// ^(?:@members?\s+)(?:\(((?:get|set|isset|unset|\s*,?\s*|)+)\)\s*)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$
+		elseif( $dsd->javadoc and $dsd->javadoc_member and preg_match( '/^(?:@members?\s+)(\([-,_\pLpN\s]+\)\s)?((?:[-_\pLpN]+\s*,\s*)*[-_\pLpN]+(?:\(\))?)\s*[:=]?\s*(.*)$/i', $source, $matches ) )
+			{
+				$instance = new self( $matches[1], $matches[2], $matches[3] );
+				$priority = self::priority;
+				return true;
+			}
+
+		else
+			return false;
+	}
+
+	// }}}
+	// {{{ apply()
+
+	/**
+	 * Ajoute une todo à l'élément.
+	 */
+	public function apply( DstyleDoc_Custom_Element $element )
+	{
+		if( $this->description )
+			if( $element instanceof DstyleDoc_Element_Function
+				or $element instanceof DstyleDoc_Element_Class
+				or $element instanceof DstyleDoc_Element_Interface
+				or $element instanceof DstyleDoc_Element_Constant
+				or $element instanceof DstyleDoc_Element_Member )
+				$element->todo->description = $this->description;
+		return $this;
+	}
+
+	// }}}
+	// {{{ __construct()
+
+	public function __construct( $attr, $types, $var, $description )
+	{
+		$this->attr = $attr;
+		foreach( preg_split('/[,|]/', $types) as $type )
+			$this->type = trim($type);
+		$this->var = $var;
 		$this->description = $description;
 	}
 
