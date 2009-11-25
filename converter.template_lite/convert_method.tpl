@@ -2,12 +2,14 @@
   <div class="content-title"><p>{if isset(#method_title#)}{#method_title#|string_format:$_method.title:$_method.link}{else}#method_title(method-title,method-link)#{/if}</p></div>
   <div class="content-display"><h1>{if isset(#method_display#)}{#method_display#|string_format:$_method.display:$_method.link}{else}#method_display(method-name,method-link){/if}</h1></div>
   <div class="content-package">
+{if $_method.packages}
 		{if isset(#method_package#)}{#method_package#|string_format:$_method.display:$_method.link}{else}#method_package(method-name,method-link)#{/if}
 		<ul>
 {foreach from=$_method.packages item=package}
 			<li>{if is_object($package)}$package.link{else}{$package}{/if}</li>
 {/foreach}
 		</ul>
+{/if}
 	</div>
   <div class="content-syntax">
     <h2>{if isset(#method_syntax#)}{#method_syntax#|string_format:$_method.display:$_method.link}{else}#method_syntax(methode-name,method-link)#{/if}</h2>
