@@ -157,13 +157,28 @@ class DstyleDoc extends DstyleDoc_Properties
 	}
 
 	// }}}
+	// {{{ $source_dir
+
+	protected $_source_dir = '';
+
+	protected function set_source_dir( $source_dir )
+	{
+		$this->_source_dir = (string)$source_dir;
+	}
+
+	protected function get_source_dir()
+	{
+		return $this->_source_dir;
+	}
+
+	// }}}
 	// {{{ $sources
 
 	protected $_sources = array();
 
 	protected function set_source( $files )
 	{
-		if( file_exists((string)$files) and is_file((string)$files) and is_readable((string)$files) )
+		if( file_exists($this->source_dir.(string)$files) and is_file($this->source_dir.(string)$files) and is_readable($this->source_dir.(string)$files) )
 			$this->_sources[] = (string)$files;
 		elseif( is_array($files) or $files instanceof Iterator )
 			foreach( $files as $file )
@@ -203,7 +218,7 @@ class DstyleDoc extends DstyleDoc_Properties
 		$line = 1;
 		$current = new DstyleDoc_Token_Fake;
 		$doc = '';
-		foreach( token_get_all(file_get_contents($file)) as $token )
+		foreach( token_get_all(file_get_contents($this->source_dir.$file)) as $token )
 		{
 			if( is_array($token) )
 				list( $token, $source, $line ) = $token;
@@ -272,7 +287,13 @@ HTML;
 	}
 
 	// }}}
-	// {{{ source()
+	// {{{ source_dir(), source()
+
+	public function source_dir( $source_dir )
+	{
+		$this->source_dir = $source_dir;
+		return $this;
+	}
 
 	public function source()
 	{
