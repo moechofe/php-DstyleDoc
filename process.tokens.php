@@ -212,7 +212,7 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
     'static' => false,
     'abstract' => false,
     'final' => false,
-    'public' => false,
+    'public' => true,
     'protected' => false,
     'private' => false );
 
