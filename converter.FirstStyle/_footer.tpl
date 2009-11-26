@@ -8,14 +8,17 @@
 {literal}
 $(function(){
 	$('ul.list li').not('.displayed').map( function(){
-		$(this).hover(
-			function(){$(this).addClass('hover');},
-			function(){$(this).removeClass('hover');});
-		$(this).click( function(){
-			document.location = $(this).children('a').attr('href');
-		});
-		$(this).css('cursor', 'pointer');
-		$(this).attr('title', {/literal}{if $browse_mode}document.location.protocol+'//'+document.location.hostname+document.location.port+document.location.pathname+{/if}{literal}$(this).children('a').attr('href'));
+		if( $(this).children('a').length )
+		{
+			$(this).hover(
+				function(){$(this).addClass('hover');},
+				function(){$(this).removeClass('hover');});
+			$(this).click( function(){
+				document.location = $(this).children('a').attr('href');
+			});
+			$(this).css('cursor', 'pointer');
+			$(this).attr('title', {/literal}{if $browse_mode}document.location.protocol+'//'+document.location.hostname+document.location.port+document.location.pathname+{/if}{literal}$(this).children('a').attr('href'));
+		}
 	});
 });
 {/literal}
