@@ -27,9 +27,9 @@ span.display-method { background-repeat: no-repeat; background-position: left; p
 span.display-method.method-public { background-image: url("Icon_method_public.png"); }
 span.display-method.method-protected { background-image: url("Icon_method_protected.png"); }
 span.display-method.method-private { background-image: url("Icon_method_private.png"); }
-span.display-method.method-public-static { background-image: url("Icon_method_public_static.png"); }
-span.display-method.method-protected-static { background-image: url("Icon_method_protected_static.png"); }
-span.display-method.method-private-static { background-image: url("Icon_method_private_static.png"); }
+span.display-method.method-public-static { background-image: url("Icon_static_method_public.png"); }
+span.display-method.method-protected-static { background-image: url("Icon_static_method_protected.png"); }
+span.display-method.method-private-static { background-image: url("Icon_static_method_private.png"); }
 span.display-method.method-public-final { background-image: url("Icon_method_public_final.png"); }
 span.display-method.method-protected-final { background-image: url("Icon_method_protected_final.png"); }
 span.display-method.method-private-final { background-image: url("Icon_method_private_final.png"); }
