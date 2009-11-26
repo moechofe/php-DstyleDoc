@@ -311,7 +311,10 @@ HTML;
 		//		d( $converter )->d6;
 		$converter->dsd = $this;
 		$this->analyse_all( $converter );
-		$converter->convert_all();
+		if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'hide')!==false )
+			null;
+		else
+			$converter->convert_all();
 		return $this;
 	}
 
