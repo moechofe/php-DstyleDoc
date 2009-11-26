@@ -676,8 +676,10 @@ HTML;
     elseif( substr($value,0,1) === '$' )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
-      if( ! in_array($token->expression_value,$this->types) and substr($token->expression_value,0,1) !== '$' )
+      if( ! in_array($token->expression_value,$this->types) and $token->expression_value == '$this' /*substr($token->expression_value,0,1) !== '$'*/ )
         $token->expression_value .= $value;
+			else
+				$token->rollback($current);
     }
 
     elseif( substr($token->expression_value,0,1) !== '$' )
