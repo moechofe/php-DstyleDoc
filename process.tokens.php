@@ -169,7 +169,13 @@ abstract class DstyleDoc_Token extends DstyleDoc_Token_Custom implements DstyleD
 		elseif( $documentation instanceof DstyleDoc_Token_Class )
 			null;
     elseif( $documentation instanceof DstyleDoc_Token_Doc_Comment or $documentation instanceof DstyleDoc_Token )
-      $this->open_tag->set_documentation( $documentation->documentation );
+		{
+			//var_dump( get_class($this) );
+			if( $this instanceof DstyleDoc_Token_Class or $this instanceof DstyleDoc_Token_Modifier or $this instanceof DstyleDoc_Token_Variable or $this instanceof DstyleDoc_Token_Function or $this instanceof DstyleDoc_Token_Const )
+				$this->set_documentation( $documentation->documentation );
+			else
+	      $this->open_tag->set_documentation( $documentation->documentation );
+		}
     elseif( trim((string)$documentation) )
     {
       if( $this->_documentation )
