@@ -547,26 +547,26 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
 	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
 	{
-		// ^(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]\s*(.*)$
+		// ^(?:[(]([-_,\| \pLpN]+)[)]\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]\s*(.*)$
 		if( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-			and preg_match( '/^(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+			and preg_match( '/^(?:[(]([-_,\\| \\pLpN]+)[)]\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
 		{
 			$instance = new self( $matches[1], $matches[2], $matches[3] );
 			$priority = self::priority;
 			return true;
 		}
 
-		// ^(?:[-+*]\s+)(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
+		// ^(?:[-+*]\s+)(?:[(]([-_,\| \pLpN]+)[)]\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
 		elseif( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-			and preg_match( '/^(?:[-+*]\\s+)(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+			and preg_match( '/^(?:[-+*]\\s+)(?:[(]([-_,\\| \\pLpN]+)[)]\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
 		{
 			$instance = new self( $matches[1], $matches[2], $matches[3] );
 			$priority = self::priority;
 			return true;
 		}
 
-		// ^(?:@params?\s+)(?:([-_,\| \pLpN]+)\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
-		elseif( $dsd->javadoc and $dsd->javadoc_params and preg_match( '/^(?:@params?\\s+)(?:([-_,\\| \\pLpN]+)\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+		// ^(?:@params?\s+)(?:[(]([-_,\| \pLpN]+)[)]\s+)?(\$[-_\pLpN]+|\.{3})\s*[:=]?\s*(.*)$
+		elseif( $dsd->javadoc and $dsd->javadoc_params and preg_match( '/^(?:@params?\\s+)(?:[(]([-_,\\| \\pLpN]+)[)]\\s+)?(\\$[-_\\pLpN]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
 		{
 			$instance = new self( $matches[1], $matches[2], $matches[3] );
 			$priority = self::priority;
