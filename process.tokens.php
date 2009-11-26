@@ -479,7 +479,7 @@ interface DstyleDoc_Token_Expressionable
 class DstyleDoc_Token_Expression extends DstyleDoc_Token_Custom
 {
   private $types = array(
-    'string', 'number', 'boolean', 'array', 'object', 'null', 'binary', 'resource' );
+    'string', 'number', 'integer', 'float', 'double', 'real', 'boolean', 'array', 'object', 'null', 'binary', 'resource' );
 
   private $brackets = 0;
 
@@ -591,7 +591,16 @@ HTML;
         return $token->rollback($current);
     }
 
-    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','(int)','(integer)','(float)','(double)','(real)','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
+    elseif( in_array(strtolower($value), array('(int)','(integer)','(float)','(double)','(real)')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('number','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = ($value=='(int)')?'integer':substr($value,1,-1);
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
     {
       if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
       if( in_array($token->expression_value,array('number','')) or ! in_array($token->expression_value,$this->types) )
