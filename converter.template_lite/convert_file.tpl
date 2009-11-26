@@ -14,4 +14,5 @@
   <div class="content-description">{$_file.description}</div>
   <div class="content-index">{classes_index file=$_file}</div>
   <div class="content-index">{functions_index file=$_file}</div>
+	<div class="content-licence">{$_file.licence}</div>
 </div></div></div>

@@ -162,6 +162,16 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 	}
 
 	// }}}
+	// {{{ convert_licence()
+
+	public function convert_licence( $licence, DstyleDoc_Custom_Element $element )
+	{
+		$this->tpl->assign( '_licence', $licence );
+		$this->tpl->assign( '_type', strtolower(substr(get_class($element),18)) );
+		return $this->tpl->fetch( __CLASS__.':licence.tpl' );
+	}
+
+	// }}}
 	// {{{ convert_id()
 
 	public function convert_id( $id, DstyleDoc_Element $element )

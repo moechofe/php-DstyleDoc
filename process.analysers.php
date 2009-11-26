@@ -790,67 +790,6 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 }
 
 /**
- * Classe d'analyse d'une balise de paquetage.
- * todo: compatible javadoc package and subpackage.
- * /
-class DstyleDoc_Analyser_Package extends DstyleDoc_Analyser
-{
-	// {{{ $packages
-
-	protected $_packages = '';
-
-	protected function set_packages( $packages )
-	{
-		$this->_packages = (array)$packages;
-	}
-
-	protected function get_packages()
-	{
-		return $this->_packages;
-	}
-
-	// }}}
-	// {{{ priority
-
-	const priority = 10;
-
-	// }}}
-	// {{{ analyse()
-
-	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
-	{
-		// ^package\s*:\s*(.+)$
-		if( $dsd->dstyledoc and $dsd->javadoc_package and preg_match( '/^package\\s*:\\s*(.+)$/i', $source, $matches ) )
-		{
-			$instance = new self( $matches[1] );
-			$priority = self::priority;
-			return true;
-		}
-		else
-			return false;
-	}
-
-	// }}}
-	// {{{ __construct()
-
-	protected function __construct( $package )
-	{
-		$this->packages = preg_split( '/[.,;:> ]+/', $package );
-	}
-
-	// }}}
-	// {{{ apply()
-
-	public function apply( DstyleDoc_Element $element )
-	{
-		$element->packages = $this->packages;
-		return $this;
-	}
-
-	// }}}
-}*/
-
-/**
  * Classe d'analyse d'une balise d'exception.
  */
 class DstyleDoc_Analyser_Throw extends DstyleDoc_Analyser
@@ -1705,7 +1644,7 @@ class DstyleDoc_Analyser_Todo extends DstyleDoc_Analyser
 	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
 	{
 		// ^todos?\s*:\s*(.*)?$
-		if( $dsd->dstyledoc and $dsd->throws and preg_match( '/^todos?\s*:\s*(.*)?$/i', $source, $matches ) )
+		if( $dsd->dstyledoc and $dsd->todo and preg_match( '/^todos?\s*:\s*(.*)?$/i', $source, $matches ) )
 		{
 			$instance = new self();
 			$priority = self::priority;
@@ -1983,6 +1922,72 @@ class DstyleDoc_Analyser_Element_Member_List extends DstyleDoc_Analyser implemen
 			$this->type = trim($type);
 		$this->var = $var;
 		$this->description = $description;
+	}
+
+	// }}}
+}
+
+/**
+ * Classe d'analyse d'une balise licence.
+ * Todo: permettre la javadoc
+ * Todo: permettre les urls de licence
+ */
+class DstyleDoc_Analyser_Licence extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
+{
+	// {{{ $licence
+
+	protected $_licence = '';
+
+	protected function set_licence( $licence )
+	{
+		$this->_licence = (string)$licence;
+	}
+
+	protected function get_licence()
+	{
+		return $this->_licence;
+	}
+
+	// }}}
+	// {{{ descriptable()
+
+	public function descriptable( DstyleDoc_Element $element, $licence )
+	{
+		if( $element instanceof DstyleDoc_Element_File )
+			$element->licence = $licence;
+	}
+
+	// }}}
+	// {{{ priority
+
+	const priority = 10;
+
+	// }}}
+	// {{{ analyse()
+
+	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
+	{
+		// ^licence\s*:\s*$
+		if( $dsd->dstyledoc and $dsd->licence and preg_match( '/^licence\s*:\s*$/i', $source, $matches ) )
+		{
+			$instance = new self();
+			$priority = self::priority;
+			return true;
+		}
+		else
+			return false;
+	}
+
+	// }}}
+	// {{{ apply()
+
+	/**
+	 * Ajoute un nouveau paragraphe à la description à l'élément.
+	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+	 */
+	public function apply( DstyleDoc_Custom_Element $element )
+	{
+		return $this;
 	}
 
 	// }}}

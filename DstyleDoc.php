@@ -350,6 +350,7 @@ HTML;
 		'since' => true,
 		'todo' => true,
 		'member' => true,
+		'licence' => true,
 
 		'element_link' => true,
 		'href_link' => true,

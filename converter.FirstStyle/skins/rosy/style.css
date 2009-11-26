@@ -115,6 +115,8 @@ a { color: mediumblue; }
 #page-content div.content-package { font-size: 11px; color: #444; font-family: arial, "sans serif"; margin-bottom: 40px; }
 #page-content div.content-package ul { margin: 0px; padding: 0px; list-style: none; display: inline; }
 #page-content div.content-package li { display: inline; font-size: 11px; }
+#page-content div.content-licence { clear: left; }
+#page-content div.content-licence dfn { display: block; margin: 10px 0px; font: 10px/12px "lucida console", "courrier new", monospace; }
 
 /**
  * Le design de la partie navigation

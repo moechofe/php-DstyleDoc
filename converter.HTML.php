@@ -20,7 +20,15 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   }
 
   // }}}
-  // {{{ convert_id()
+  // {{{ convert_description()
+
+  public function convert_licence( $licence, DstyleDoc_Custom_Element $element )
+  {
+    return '<tt>'.implode('<br />',$licence).'</tt>';
+  }
+
+  // }}}
+	// {{{ convert_id()
 
   public function convert_id( $id, DstyleDoc_Element $element )
   {
