@@ -268,10 +268,12 @@ HTML;
 			}
 			$result = array();
 			$source = DstyleDoc_Analyser::remove_stars($source);
+			$instance = (object)array('value'=>null);
+			$priority = (object)array('value'=>null);
 			foreach( $analysers as $analyser )
 			{
-					if( call_user_func( array($analyser,'analyse'), $current, $source, &$instance, &$priority, $this->converter->dsd ) )
-						$result[$priority] = $instance;
+				if( call_user_func( array($analyser,'analyse'), $current, $source, $instance, $priority, $this->converter->dsd ) )
+					$result[$priority->value] = $instance->value;
 			}
 			if( $result )
 			{
