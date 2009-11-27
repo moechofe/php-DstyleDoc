@@ -4,7 +4,7 @@ ul { margin: 0px; padding: 0px 0px 0px 18px; }
 <?php
 
 // un dumper/frontend pour xdebug
-require_once( 'xdebug.front.end.php' );
+require_once( 'xdebug-frontend.php' );
 
 // LE script DstylDoc
 require_once( 'DstyleDoc.php' );
