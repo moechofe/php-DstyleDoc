@@ -28,7 +28,7 @@ abstract class DstyleDoc_Properties
 	 * Throws:
 	 *	 BadPropertyException = Lancé si la méthode "get_"+<nom_du_membre>() n'est pas disponible.
 	 */
-	protected function __get( $property )
+	public function __get( $property )
 	{
 		if( $property === '__class' )
 			return get_class( $this );
@@ -50,7 +50,7 @@ abstract class DstyleDoc_Properties
 	 * Throws:
 	 *	 BadPropertyException = Lancé si la méthode "set_"+<nom_du_membre>() n'est pas disponible.
 	 */
-	protected function __set( $property, $value )
+	public function __set( $property, $value )
 	{
 		if( ! method_exists($this,'set_'.(string)$property) or ! is_callable( array($this,'set_'.(string)$property) ) )
 			throw new BadPropertyException($this, (string)$property);
@@ -69,7 +69,7 @@ abstract class DstyleDoc_Properties
 	 * Throws:
 	 *	 BadPropertyException = Lancé si la méthode "isset_"+<nom_du_membre>() n'est pas disponible.
 	 */
-	protected function __isset( $property )
+	public function __isset( $property )
 	{
 		if( ! method_exists($this,'isset_'.(string)$property) or ! is_callable( array($this,'isset_'.(string)$property) ) )
 			throw new BadPropertyException($this, (string)$property);
@@ -88,7 +88,7 @@ abstract class DstyleDoc_Properties
 	 * Throws:
 	 *	 BadPropertyException = Lancé si la méthode "unset_"+<nom_du_membre>() n'est pas disponible.
 	 */
-	protected function __unset( $property )
+	public function __unset( $property )
 	{
 		if( ! method_exists($this,'unset_'.(string)$property) or ! is_callable( array($this,'unset_'.(string)$property) ) )
 			throw new BadPropertyException($this, (string)$property);
