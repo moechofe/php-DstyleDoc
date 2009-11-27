@@ -342,6 +342,7 @@ HTML;
 		'version' => true,
 		'history' => true,
 		'params' => true,
+		'params_sub' => true,
 		'returns' => true,
 		'package' => true,
 		'throws' => true,
