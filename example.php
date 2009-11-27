@@ -38,7 +38,7 @@ DstyleDoc::hie()
 /**
  * Members:
  *   integer $int = Integer
- *   (get,set,isset,unset) null, mixed = Mixed ou Null
+ *   null, mixed $mixed = Mixed ou Null
  * Methods:
  *   array, resource get_a() = Retourne A
  */

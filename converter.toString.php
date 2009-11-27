@@ -258,7 +258,11 @@ HTML;
 	<ul>{$this->forall($type,'<li>$value</li>')}</ul>
 </dd>
 HTML;
+		else
+			trigger_error('fixme');
 
+		// fixme: ça sert a quoi ?
+		/*
 		elseif( $type instanceof DstyleDoc_Element )
 			return <<<HTML
 {$return}
@@ -272,7 +276,7 @@ HTML;
 			return <<<HTML
 {$return}
 {$type}: {$member->description}
-HTML;
+HTML;*/
 	}
 
 	// }}}
