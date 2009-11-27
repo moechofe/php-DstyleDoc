@@ -78,7 +78,7 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 	// }}}
 	// {{{ __get()
 
-	protected function __get( $property )
+	public function __get( $property )
 	{
 		if( substr((string)$property,0,2)=='is' )
 			return substr((string)$property,2)==substr(get_class($this),2-strlen((string)$property));
@@ -115,7 +115,7 @@ abstract class DstyleDoc_Custom_Element extends DstyleDoc_Properties implements 
 	// }}}
 	// {{{ __toString()
 
-	final private function __toString()
+	final public function __toString()
 	{
 		try
 		{
