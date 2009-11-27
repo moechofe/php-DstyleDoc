@@ -87,6 +87,7 @@ a { color: mediumblue; }
 #page-content div.content-display h1 { margin-top: 5px; margin-bottom: 0px; }
 #page-content div.content-index { background: antiquewhite; float: left; }
 #page-content div.content-index li { font-size: 14px; line-height: 20px; }
+ #page-content div.content-index + div.content-index { margin-top: 20px; }
 #page-content div.content-syntax { border-top: solid 5px sandybrown; background-color: wheat; padding: 8px 10px; margin-top: 10px; }
 #page-content div.content-syntax h2 { margin-top: 0px; margin-bottom: 10px; }
 #page-content div.content-syntax ul { margin-bottom: 0px; list-style: none; padding-left: 0px; margin-top: 10px; }
