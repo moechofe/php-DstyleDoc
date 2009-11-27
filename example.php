@@ -50,13 +50,11 @@ class a
 	public $real_int = 0;
 	/**
 	 * Params:
-	 *   (in) float $b = Float
-	 *   (out) object $c = L'objet setté
+	 *   float $b = Float
+	 *   object $c = L'objet setté
 	 */
 	public function b(){}
 }
-
-d( $c );
 
 __halt_compiler();
 
