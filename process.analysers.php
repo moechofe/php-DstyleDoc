@@ -2017,6 +2017,10 @@ class DstyleDoc_Analyser_Element_Member_List extends DstyleDoc_Analyser_Element_
 					$element->member->type = $type;
 
 			$element->member->description = $this->description;
+
+			$element->member->class = $element;
+			$element->member->file = $element->file;
+			$element->member->line = $element->line;
 		}
 		return $this;
 	}

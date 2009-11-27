@@ -45,6 +45,10 @@ DstyleDoc::hie()
 class a
 {
 	/**
+	 * Real Integer
+	 */
+	public $real_int = 0;
+	/**
 	 * Params:
 	 *   (in) float $b = Float
 	 *   (out) object $c = L'objet setté

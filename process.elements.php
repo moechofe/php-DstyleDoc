@@ -1775,7 +1775,7 @@ class DstyleDoc_Element_Member extends DstyleDoc_Element_Filed_Named
 
 	protected function set_name( $name )
 	{
-		if( substr((string)$name,0,1)==='$' )
+		if( substr((string)$name,0,1)=='$' )
 			$this->_name = substr((string)$name,1);
 		else
 			$this->_name = (string)$name;
