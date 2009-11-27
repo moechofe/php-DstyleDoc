@@ -247,7 +247,7 @@ abstract class DstyleDoc_Analyseable_Element extends DstyleDoc_Custom_Element
 			{
 				$c = htmlentities($source);
 				if( ! $c ) $c = '&nbsp;';
-				$s = get_class($current);
+				$s = @get_class($current);
 				if( ! $s ) $s = '&nbsp;';
 				$e = get_class($this);
 				try
