@@ -1865,6 +1865,13 @@ class DstyleDoc_Token_Logical_Xor extends DstyleDoc_Token_Value
 }
 
 // }}}
+// {{{ Or Equal
+
+class DstyleDoc_Token_Or_Equal extends DstyleDoc_Token_Value
+{
+}
+
+// }}}
 // {{{ Try
 
 class DstyleDoc_Token_Try extends DstyleDoc_Token_None
