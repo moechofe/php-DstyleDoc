@@ -94,20 +94,18 @@ a { color: mediumblue; }
 #page-content div.content-params { background-color: palegoldenrod; padding: 8px 10px; margin-top: 10px; }
 #page-content div.content-params h2 { margin-top: 0px; margin-bottom: 10px; }
 #page-content div.content-params dl { margin-bottom: 0px; margin-top: 10px; }
-#page-content div.content-params li + li { margin-top: 20px; }
-#page-content div.content-params ul { margin-bottom: 0px; list-style: none; padding-left: 0px; margin-top: 10px; }
-#page-content dt.param-type-var { display: table-cell; border: solid 1px black; background: white; padding: 8px 10px; }
+#page-content div.content-params dd + dt { margin-top: 20px; }
+#page-content div.content-params dd { clear: left; }
+#page-content div.content-params dt { display: block; float: left; border: solid 1px black; background: white; padding: 8px 10px; }
 #page-content dd.param-description p { margin: 10px 0px 0px 0px; }
-#page-content dt.return-type i { border: solid 1px black; background: white; padding: 8px 10px; }
-#page-content dt.return-type { margin: 16px 0px; }
-#page-content dt.return-type + dt.return-type { padding-top: 10px; }
 #page-content dd.return-description p { margin: 10px 0px 0px 0px; }
 #page-content span.return-from { font-size: 13px; }
 #page-content div.content-returns { background-color: wheat; padding: 8px 10px; margin-top: 10px; }
 #page-content div.content-returns h2 { margin-top: 0px; margin-bottom: 10px; }
 #page-content div.content-returns dl { margin-bottom: 0px; margin-top: 10px; }
-#page-content div.content-returns ul { margin-bottom: 0px; list-style: none; padding-left: 0px; margin-top: 10px; }
-#page-content div.content-returns li + li { margin-top: 20px; }
+#page-content div.content-returns dd + dt { margin-top: 20px; }
+#page-content div.content-returns dd { clear: left; }
+#page-content div.content-returns dt { display: block; float: left; border: solid 1px black; background: white; padding: 8px 10px; }
 #page-content div.content-todos { clear: left; }
 #page-content div.content-todos h2 { margin-bottom: 10px; }
 #page-content div.content-todos ul { margin-top: 0px; }

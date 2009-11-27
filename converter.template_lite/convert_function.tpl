@@ -23,23 +23,23 @@
   {if $_function.params}
   <div class="content-params">
     <h2>{if isset(#function_params#)}{#function_params#|string_format:$_function.display:$_function.link}{else}#function_params(function.name,function.link)#{/if}</h2>
-    <ul>
-      {foreach item=param from=$_function.params}
-				<li>{$param}</li>
-      {/foreach}
-      {foreach item=param from=$_function.params_sub}
-				<li>{$param}</li>
-      {/foreach}
-    </ul>
+    <dl>
+{foreach item=param from=$_function.params}
+			{$param}
+{/foreach}
+{foreach item=param from=$_function.params_sub}
+			{$param}
+{/foreach}
+    </dl>
   </div>
   {/if}
   {if $_function.returns}
   <div class="content-returns">
     <h2>{if isset(#function_returns#)}{#function_returns#|string_format:$_function.display:$_function.link}{else}#function_returns(function.name,function.link)#{/if}</h2>
-    <ul>
-      {foreach item=return from=$_function.returns}
-	<li>{$return}</li>
-      {/foreach}
+    <dl>
+{foreach item=return from=$_function.returns}
+			{$return}
+{/foreach}
     </ul>
   </div>
   {/if}
