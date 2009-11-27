@@ -621,33 +621,90 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
  */
 class DstyleDoc_Analyser_Element_Param_Sub_List extends DstyleDoc_Analyser_Element_Param_List
 {
+	// {{{ $ref
+
+	protected $_ref = null;
+
+	protected function set_ref( DstyleDoc_Analyser_Element_Param_List $ref )
+	{
+		if( $ref instanceof self )
+			$this->_ref = $ref->ref;
+		else
+			$this->_ref = $ref;
+	}
+
+	protected function get_ref()
+	{
+		return $this->_ref;
+	}
+
+	// }}}
+	// {{{ get_ref_var()
+
+	static protected function get_ref_var( DstyleDoc_Analyser_Element_Param_List $ref )
+	{
+		if( $ref instanceof self )
+			return $ref->ref->var;
+		else
+			return $ref->var;
+	}
+
+	// }}}
 	// {{{ analyse()
 
 	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
 	{
 		// ^(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]\s*(.*)$
 		if( $dsd->dstyledoc and $dsd->params_sub and
-			($current instanceof DstyleDoc_Analyser_Element_Param_List and $current->types[0]=='array' )
+			( ($current instanceof DstyleDoc_Analyser_Element_Param_List and $current->types[0]=='array')
+				or ($current instanceof self) )
 			and preg_match( '/^(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]\s*(.*)$/', $source, $matches ) )
 		{
-			$instance = new self( $matches[1], 'array['.$matches[2].']', $matches[3] );
+			$instance = new self( $matches[1], '$'.self::get_ref_var($current).'[ '.$matches[2].' ]', $matches[3] );
+			$instance->ref = $current;
 			$priority = self::priority;
-			//return true;
-			return false;
+			return true;
 		}
 
 		// ^(?:[-+*]\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]?\s*(.*)$
-		elseif( $dsd->dstyledoc and $dsd->params_sub and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
+		elseif( $dsd->dstyledoc and $dsd->params_sub and
+			( ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
+				or ($current instanceof self) )
 			and preg_match( '/^(?:[-+*]\s+)(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]?\s*(.*)$/', $source, $matches ) )
 		{
 			$instance = new self( $matches[1], $matches[2], $matches[3] );
+			$instance->ref = $current;
 			$priority = self::priority;
-			//return true;
-			return false;
+			return true;
 		}
 
 		else
 			return false;
+	}
+
+	// }}}
+	// {{{ apply()
+
+	public function apply( DstyleDoc_Custom_Element $element )
+	{
+		if( $element instanceof DstyleDoc_Element_Function )
+		{
+			$element->param_sub = $this->var;
+
+			if( $this->var and ! $element->param_sub->var )
+				$element->param_sub->var = $this->var;
+
+			foreach( $this->types as $type )
+	// j'ai bien galléré pour trouver ça, j'espère que c'est la bonne solution.
+	// dans les cas ou :
+	// - de la doc pour "Syntax:" déclare des types pour les paramètres
+	// - et, de la doc pour "Params:" ne déclare pas les types pour les même paramètres.
+	if( $type )
+					$element->param_sub->type = $type;
+
+			$element->param_sub->description = $this->description;
+		}
+		return $this;
 	}
 
 	// }}}

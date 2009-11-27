@@ -1269,6 +1269,67 @@ class DstyleDoc_Element_Function extends DstyleDoc_Element_Filed_Named
 	}
 
 	// }}}
+	// {{{ $params_sub
+
+	protected $_params_sub = array();
+
+	protected function set_params_sub( $params )
+	{
+		$this->_params_sub = (array)$params;
+	}
+
+	protected function get_params_sub()
+	{
+		return $this->_params_sub;
+	}
+
+	/**
+	 * Séléction un paramètre existant ou en crée un nouveau.
+	 * Le paramètre ainsi séléctionné peut être récupèrer avec get_param().
+	 * Params:
+	 *	$param = Le nom de la variable existante ou qui sera créer.
+	 */
+	protected function set_param_sub( $param )
+	{
+		$found = false;
+
+		if( $param{0} == '$' ) $param = substr($param,1);
+
+		if( ! empty($param) and count($this->_params_sub) )
+		{
+			reset($this->_params_sub);
+			while( true)
+			{
+	$value = current($this->_params_sub);
+				if( strtolower($value->var) == strtolower($param) )
+				{
+					$found = true;
+					break;
+				}
+				elseif( false === next($this->_params_sub) )
+					break;
+			}
+		}
+
+		if( ! $found )
+		{
+			$this->_params_sub[] = new DstyleDoc_Element_Param( $this->converter, $param );
+			end($this->_params_sub);
+		}
+	}
+
+	protected function get_param_sub()
+	{
+		if( ! count($this->_params_sub) )
+		{
+			$this->_params_sub[] = new DstyleDoc_Element_Param( $this->converter, null );
+			return end($this->_params_sub);
+		}
+		else
+			return current($this->_params_sub);
+	}
+
+	// }}}
 	// {{{ $returns
 
 	/**

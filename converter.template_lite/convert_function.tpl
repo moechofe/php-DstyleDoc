@@ -25,7 +25,10 @@
     <h2>{if isset(#function_params#)}{#function_params#|string_format:$_function.display:$_function.link}{else}#function_params(function.name,function.link)#{/if}</h2>
     <ul>
       {foreach item=param from=$_function.params}
-	<li>{$param}</li>
+				<li>{$param}</li>
+      {/foreach}
+      {foreach item=param from=$_function.params_sub}
+				<li>{$param}</li>
       {/foreach}
     </ul>
   </div>
