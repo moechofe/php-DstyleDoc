@@ -654,11 +654,11 @@ class DstyleDoc_Analyser_Element_Param_Sub_List extends DstyleDoc_Analyser_Eleme
 
 	static public function analyse( $current, $source, &$instance, &$priority, DstyleDoc $dsd )
 	{
-		// ^(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]\s*(.*)$
+		// ^(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?"([\PC]+|\.{3})"\s*[:=]\s*(.*)$
 		if( $dsd->dstyledoc and $dsd->params_sub and
 			( ($current instanceof DstyleDoc_Analyser_Element_Param_List and $current->types[0]=='array')
 				or ($current instanceof self) )
-			and preg_match( '/^(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]\s*(.*)$/', $source, $matches ) )
+			and preg_match( '/^(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([\\PC]+|\.{3})"\s*[:=]\s*(.*)$/', $source, $matches ) )
 		{
 			$instance = new self( $matches[1], '$'.self::get_ref_var($current).'[ '.$matches[2].' ]', $matches[3] );
 			$instance->ref = $current;
@@ -666,11 +666,11 @@ class DstyleDoc_Analyser_Element_Param_Sub_List extends DstyleDoc_Analyser_Eleme
 			return true;
 		}
 
-		// ^(?:[-+*]\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]?\s*(.*)$
+		// ^(?:[-+*]\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?"([\PC]+|\.{3})"\s*[:=]?\s*(.*)$
 		elseif( $dsd->dstyledoc and $dsd->params_sub and
 			( ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
 				or ($current instanceof self) )
-			and preg_match( '/^(?:[-+*]\s+)(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([-_\pL\d]+|\.{3})"\s*[:=]?\s*(.*)$/', $source, $matches ) )
+			and preg_match( '/^(?:[-+*]\s+)(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([\\PC]+|\.{3})"\s*[:=]?\s*(.*)$/', $source, $matches ) )
 		{
 			$instance = new self( $matches[1], $matches[2], $matches[3] );
 			$instance->ref = $current;
