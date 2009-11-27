@@ -41,6 +41,10 @@ DstyleDoc::hie()
  *   null, mixed $mixed = Mixed ou Null
  * Methods:
  *   array, resource get_a() = Retourne A
+ *   boolean get_b( integer $a, object $b ) = Retourne true
+ *   encore de la documentation pour la fonction get_b()
+ *   sur plusieurs lignes
+ *   get_c( $b, [$c] ) = Return rien
  */
 class a
 {

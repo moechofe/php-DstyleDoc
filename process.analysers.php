@@ -2028,3 +2028,147 @@ class DstyleDoc_Analyser_Element_Member_List extends DstyleDoc_Analyser_Element_
 	// }}}
 }
 
+
+/**
+ * Classe d'analyse d'un élément de liste de paramètre.
+ */
+class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
+{
+	// {{{ $types
+
+	protected $_types = '';
+
+	protected function set_types( $types )
+	{
+		$this->_types = (array)$types;
+	}
+
+	protected function set_type( $type )
+	{
+		$this->_types[] = (string)$type;
+	}
+
+	protected function get_types()
+	{
+		return $this->_types;
+	}
+
+	// }}}
+	// {{{ $var
+
+	protected $_var = '';
+
+	protected function set_var( $var )
+	{
+		if( $var{0}=='$' ) $var = substr($var,1);
+		$this->_var = $var;
+	}
+
+	protected function get_var()
+	{
+		return $this->_var;
+	}
+
+	// }}}
+	// {{{ $description
+
+	protected $_description = '';
+
+	protected function set_description( $description )
+	{
+		$this->_description = (string)$description;
+	}
+
+	protected function get_description()
+	{
+		return $this->_description;
+	}
+
+	// }}}
+	// {{{ descriptable()
+
+	public function descriptable( DstyleDoc_Element $element, $description )
+	{
+		if( $element instanceof DstyleDoc_Element_Function )
+			$element->param->description = $description;
+	}
+
+	// }}}
+	// {{{ priority
+
+	const priority = 15;
+
+	// }}}
+	// {{{ analyse()
+
+	static public function analyse( $current, $source, $instance, $priority, DstyleDoc $dsd )
+	{
+		// ^(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?(\$[-_\pL\d]+|\.{3})\s*[:=]\s*(.*)$
+		if( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
+			and preg_match( '/^(?:[(]?([-_,\\| \\pL\d]+)[)]?\\s+)?(\\$[-_\\pL\d]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+		{
+			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
+			$priority->value = self::priority;
+			return true;
+		}
+
+		// ^(?:[-+*]\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?(\$[-_\pL\d]+|\.{3})\s*[:=]?\s*(.*)$
+		elseif( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
+			and preg_match( '/^(?:[-+*]\\s+)(?:[(]?([-_,\\| \\pL\d]+)[)]?\\s+)?(\\$[-_\\pL\d]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+		{
+			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
+			$priority->value = self::priority;
+			return true;
+		}
+
+		// ^(?:@params?\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?(\$[-_\pL\d]+|\.{3})\s*[:=]?\s*(.*)$
+		elseif( $dsd->javadoc and $dsd->javadoc_params and preg_match( '/^(?:@params?\\s+)(?:[(]?([-_,\\| \\pL\d]+)[)]?\\s+)?(\\$[-_\\pL\d]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+		{
+			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
+			$priority->value = self::priority;
+			return true;
+		}
+
+		else
+			return false;
+	}
+
+	// }}}
+	// {{{ apply()
+
+	public function apply( DstyleDoc_Custom_Element $element )
+	{
+		if( $element instanceof DstyleDoc_Element_Function )
+		{
+			$element->param = $this->var;
+
+			if( $this->var and ! $element->param->var )
+				$element->param->var = $this->var;
+
+			foreach( $this->types as $type )
+				// j'ai bien galléré pour trouver ça, j'espère que c'est la bonne solution.
+				// dans les cas ou :
+				// - de la doc pour "Syntax:" déclare des types pour les paramètres
+				// - et, de la doc pour "Params:" ne déclare pas les types pour les même paramètres.
+				if( $type )
+					$element->param->type = $type;
+
+			$element->param->description = $this->description;
+		}
+		return $this;
+	}
+
+	// }}}
+	// {{{ __construct()
+
+	public function __construct( $types, $var, $description )
+	{
+		foreach( preg_split('/[,|]/', $types) as $type )
+			$this->type = trim($type);
+		$this->var = $var;
+		$this->description = $description;
+	}
+
+	// }}}
+}
+
