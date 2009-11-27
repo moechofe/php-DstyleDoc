@@ -5,7 +5,7 @@
   {/section}
   </span>
   <span class="param-var">
-    <strong>${$_param.var}</strong>
+    <strong>${$_param.var|escape:"html"}</strong>
   </span>
 </dt>
 <dd class="param-description">
