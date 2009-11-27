@@ -1,7 +1,17 @@
 <div class="function-content"><div class="frame"><div class="content">
   <div class="content-title"><p>{$_function.title}</p></div>
   <div class="content-display"><h1>{$_function.display}</h1></div>
-  <div class="content-syntax">
+  <div class="content-package">
+{if $_function.packages}
+		{if isset(#function_package#)}{#function_package#|string_format:$_function.display:$_function.link}{else}#function_package(function-name,function-link)#{/if}
+		<ul>
+{foreach from=$_function.packages item=package}
+			<li>{if is_object($package)}$package.link{else}{$package}{/if}</li>
+{/foreach}
+		</ul>
+{/if}
+	</div>
+	<div class="content-syntax">
     <h2>{if isset(#function_syntax#)}{#function_syntax#|string_format:$_function.display:$_function.link}{else}#function_syntax(function.name,function.link)#{/if}</h2>
     <ul>
     {foreach item=syntax from=$_function.syntaxs}
