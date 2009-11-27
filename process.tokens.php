@@ -829,6 +829,7 @@ class DstyleDoc_Token_Unknown extends DstyleDoc_Token_Light
     case '&' :
     case '|' :
     case '^' :
+		case '~' :
       if( $current instanceof DstyleDoc_Token_Return )
       {
         $current->value = $source;
