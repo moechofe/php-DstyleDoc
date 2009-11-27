@@ -277,9 +277,7 @@ HTML;
 			}
 
 			if( ! $current instanceof DstyleDoc_Token_Custom )
-			{
 				throw new UnexpectedValueException;
-			}
 		}
 
 		if( $current instanceof DstyleDoc_Token_Open_Tag or $current instanceof DstyleDoc_Token_Halt_Compiler )
