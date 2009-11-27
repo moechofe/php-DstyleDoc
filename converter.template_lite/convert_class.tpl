@@ -15,14 +15,12 @@
   <div class="content-index">{methods_index class=$_class}</div>
 {if $_class.todos}
   <div class="content-todos">
-    <h2>{if isset(#todos#)}{#todos#|string_format:$_class.display:$_class.link}{else}#todos(class.name,class.link)#{/if}</h2>
-{if $_class.todos}
+    <h2>{if isset(#class_todos#)}{#class_todos#|string_format:$_class.display:$_class.link}{else}#class_todos(class.name,class.link)#{/if}</h2>
     <ul>
 {foreach item=todo from=$_class.todos}
       <li>{$todo}</li>
 {/foreach}
     </ul>
-{/if}
   </div>
 {/if}
 </div></div></div>

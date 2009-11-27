@@ -1744,7 +1744,10 @@ class DstyleDoc_Analyser_Todo extends DstyleDoc_Analyser
 			$priority = self::priority;
 			if( isset($matches[1]) )
 			{
-				$instance = new DstyleDoc_Analyser_Element_Todo_List( $matches[1] );
+				if( trim($matches[1]) )
+					$instance = new DstyleDoc_Analyser_Element_Todo_List( $matches[1] );
+				else
+					$instance = new self;
 				$property = DstyleDoc_Analyser_Element_Todo_List::priority;
 			}
 			return true;
@@ -1835,12 +1838,7 @@ class DstyleDoc_Analyser_Element_Todo_List extends DstyleDoc_Analyser implements
 	 */
 	public function apply( DstyleDoc_Custom_Element $element )
 	{
-		if( $this->description )
-			if( $element instanceof DstyleDoc_Element_Function
-				or $element instanceof DstyleDoc_Element_Class
-				or $element instanceof DstyleDoc_Element_Interface
-				or $element instanceof DstyleDoc_Element_Constant
-				or $element instanceof DstyleDoc_Element_Member )
+		if( $this->description and $element instanceof DstyleDoc_Element_Titled )
 				$element->todo->description = $this->description;
 		return $this;
 	}

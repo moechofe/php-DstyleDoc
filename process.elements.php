@@ -517,6 +517,26 @@ abstract class DstyleDoc_Element_Titled extends DstyleDoc_Element
 	}
 
 	// }}}
+	// {{{ $todo
+
+	protected $_todos = array();
+
+	protected function get_todo()
+	{
+		if( ($todo = end($this->_todos)) instanceof DstyleDoc_Element_Todo and ! $todo->descriptions )
+			null;
+		else
+			$this->_todos[] = $todo = new DstyleDoc_Element_Todo( $this->converter );
+		return $todo;
+	}
+
+	protected function get_todos()
+	{
+		$this->analyse();
+		return $this->_todos;
+	}
+
+	// }}}
 }
 
 /**
@@ -608,25 +628,6 @@ abstract class DstyleDoc_Element_Filed_Named extends DstyleDoc_Element_Filed
 	protected function get_name()
 	{
 		return (string)$this->_name;
-	}
-
-	// }}}
-	// {{{ $todo
-
-	protected $_todos = array();
-
-	protected function get_todo()
-	{
-		if( ($todo = end($this->_todos)) instanceof DstyleDoc_Element_Todo and ! $todo->descriptions )
-			null;
-		else
-			$this->_todos[] = $todo = new DstyleDoc_Element_Todo( $this->converter );
-		return $todo;
-	}
-
-	protected function get_todos()
-	{
-		return $this->_todos;
 	}
 
 	// }}}

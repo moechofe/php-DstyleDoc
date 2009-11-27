@@ -46,6 +46,14 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 	}
 
 	// }}}
+	// {{{
+
+	public function convert_php( $code )
+  {
+    return '<pre name="code" class="php:nocontrols:">'.$code.'</pre>';
+  }
+
+	// }}}
 
 	// {{{ convert_all()
 

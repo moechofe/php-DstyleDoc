@@ -14,5 +14,15 @@
   <div class="content-description">{$_file.description}</div>
   <div class="content-index">{classes_index file=$_file}</div>
   <div class="content-index">{functions_index file=$_file}</div>
+{if $_file.todos}
+  <div class="content-todos">
+    <h2>{if isset(#file_todos#)}{#file_todos#|string_format:$_file.display:$_file.link}{else}#file_todos(file.name,file.link)#{/if}</h2>
+    <ul>
+{foreach item=todo from=$_file.todos}
+      <li>{$todo}</li>
+{/foreach}
+    </ul>
+  </div>
+{/if}
 	<div class="content-licence">{$_file.licence}</div>
 </div></div></div>

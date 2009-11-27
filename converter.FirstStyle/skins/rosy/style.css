@@ -120,6 +120,8 @@ a { color: mediumblue; }
 #page-content div.content-package li { display: inline; font-size: 11px; }
 #page-content div.content-licence { clear: left; }
 #page-content div.content-licence dfn { display: block; margin: 10px 0px; font: 10px/12px "lucida console", "courrier new", monospace; }
+#page-content div.content-description div.dp-hightlighter
+#page-content div.content-description div.pre { margin-right: 12px; border-top: solid 1px #e7e5dc; border-bottom: solid 1px #e7e5dc; padding: 3px 5px; font: 13px/13px "lucida console", monospace; }
 
 /**
  * Le design de la partie navigation
@@ -135,4 +137,12 @@ a { color: mediumblue; }
 #page-browser ul.list li.displayed,#page-browser ul.ascent li.displayed { background: gold; }
 #page-browser ul.list span.display-method span.class-part { display: none; }
 #page-browser ul.list li.hover { background: white; }
+
+/**
+ * Design pour le plugin dp-highlighter
+ */
+.dp-highlighter ol li
+{ border-left-color: #666 !important; }
+.dp-highlighter li
+{ font: 13px/17px "lucida console", monospace !important; }
 
