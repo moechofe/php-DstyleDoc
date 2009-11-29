@@ -50,6 +50,8 @@ class a
 {
 	/**
 	 * Real Integer
+	 * Type:
+	 *   null, string
 	 */
 	public $real_int = 0;
 	/**

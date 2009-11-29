@@ -1316,16 +1316,19 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 {
 	// {{{ $type
 
-	protected $_type = '';
+	protected $_types = array();
 
-	protected function set_type( $type )
+	protected function set_types( $types )
 	{
-		$this->_type = (string)$type;
+		// (\s*,\s*)
+		foreach( preg_split( '/(\s*,\s*)/', $types ) as $type )
+			if( trim($type) )
+				$this->_types[] = $type;
 	}
 
-	protected function get_type()
+	protected function get_types()
 	{
-		return $this->_type;
+		return $this->_types;
 	}
 
 	// }}}
@@ -1403,7 +1406,10 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 	{
 		if( $element instanceof DstyleDoc_Element_Member )
 		{
-			$element->type = $this->type;
+			foreach( $this->types as $type )
+				if( $type )
+					$element->type = $type;
+
 			$element->type->description = $this->description;
 		}
 		return $this;
