@@ -350,6 +350,7 @@ HTML;
 		'todo' => true,
 		'member' => true,
 		'licence' => true,
+		'method' => true,
 
 		'element_link' => true,
 		'href_link' => true,
@@ -367,6 +368,7 @@ HTML;
 		'javadoc_since' => true,
 		'javadoc_todo' => true,
 		'javadoc_member' => true,
+		'javadoc_method' => true,
 
 		'javadoc_link' => true,
 
