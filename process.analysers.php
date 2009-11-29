@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * Todo:
+ *   - supprimer la moitier des classes, les tests (regex) peuvent etre combiné dans une seul fonction analyse()
+ *   - accélérer le process générale, supprimer des classes et des tests.
+ */
+
+/**
  * Interface de la base des analysers
  */
 interface DstyleDoc_Analyseable
@@ -2026,47 +2032,134 @@ class DstyleDoc_Analyser_Element_Member_List extends DstyleDoc_Analyser_Element_
 	}
 
 	// }}}
+	// {{{ descriptable()
+
+	public function descriptable( DstyleDoc_Element $element, $description )
+	{
+		if( $element instanceof DstyleDoc_Element_Function )
+			$element->member->description = $description;
+	}
+
+	// }}}
 }
 
 
 /**
- * Classe d'analyse d'un Ã©lÃ©ment de liste de paramÃ¨tre.
+ * Classe d'analyse d'une balise de syntaxe.
+ * todo: ajouter la positibilitÃ© de mettre la syntaxe apres ^syntax\s*:
  */
-class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
+class DstyleDoc_Analyser_Function extends DstyleDoc_Analyser
 {
-	// {{{ $types
+	// {{{ priority
 
-	protected $_types = '';
+	const priority = 10;
 
-	protected function set_types( $types )
+	// }}}
+	// {{{ analyse()
+
+	static public function analyse( $current, $source, $instance, $priority, DstyleDoc $dsd )
 	{
-		$this->_types = (array)$types;
-	}
-
-	protected function set_type( $type )
-	{
-		$this->_types[] = (string)$type;
-	}
-
-	protected function get_types()
-	{
-		return $this->_types;
+		// ^(?:methods?|functions?)\s*:\s*(?:(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]?\s*(.*))?$
+		if( $dsd->dstyledoc and $dsd->method and preg_match( '/^(?:methods?|functions?)\s*:\s*(?:(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]?\s*(.*))?$/i', $source, $matches ) )
+		{
+			if( isset($matches[4]) )
+			{
+				$instance->value = new DstyleDoc_Analyser_Element_Function_List( $matches[1], $matches[2], $matches[3], $matches[4] );
+				$priority->value = DstyleDoc_Analyser_Element_Function_List::priority;
+			}
+			else
+			{
+				$instance->value = new self();
+				$priority->value = self::priority;
+			}
+			return true;
+		}
+		else
+			return false;
 	}
 
 	// }}}
-	// {{{ $var
+	// {{{ apply()
 
-	protected $_var = '';
-
-	protected function set_var( $var )
+	/**
+	 * Ajoute un nouveau paragraphe à la description à l'élément.
+	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
+	 */
+	public function apply( DstyleDoc_Custom_Element $element )
 	{
-		if( $var{0}=='$' ) $var = substr($var,1);
-		$this->_var = $var;
+		return $this;
 	}
 
-	protected function get_var()
+	// }}}
+}
+
+/**
+ * Classe d'analyse d'un Ã©lÃ©ment de liste de paramÃ¨tre.
+ */
+class DstyleDoc_Analyser_Element_Function_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
+{
+	// {{{ $returns
+
+	protected $_returns = '';
+
+	protected function set_returns( $returns )
 	{
-		return $this->_var;
+		$this->_returns = (array)$returns;
+	}
+
+	protected function set_return( $return )
+	{
+		d($return)->return;
+		$this->_returns[] = (string)$return;
+	}
+
+	protected function get_returns()
+	{
+		return $this->_returns;
+	}
+
+	// }}}
+	// {{{ $function
+
+	protected $_function = '';
+
+	protected function set_function( $function )
+	{
+		d($function)->function;
+		$this->_function = $function;
+	}
+
+	protected function get_function()
+	{
+		return $this->_function;
+	}
+
+	// }}}
+	// {{{ $params
+
+	protected $_params = array();
+
+	protected function set_params( $params )
+	{
+		$optional = false;
+		foreach( explode(',', $params) as $var )
+		{
+			// \s*(\[?)\s*(?:([-_\pL\d]+)\s)?\s*(\$[-_\pL\d]+|\.{3})\s*\]?
+			if( preg_match('/\\s*(\\[?)\\s*(?:([-_\\pL\d]+)\\s)?\\s*(\\$[-_\\pL\d]+|\\.{3})\\s*\\]?/', $var, $matches) )
+			{
+				if( ! empty($matches[1]) )
+					$optional = true;
+				$this->_params[] = array(
+					'types' => $matches[2]?$matches[2]:false,
+					'var' => $matches[3],
+					'optional' => ($optional)?true:(($matches[3]==='...')?true:false) );
+			}
+		}
+	}
+
+	protected function get_params()
+	{
+		return $this->_params;
 	}
 
 	// }}}
@@ -2090,7 +2183,7 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 	public function descriptable( DstyleDoc_Element $element, $description )
 	{
 		if( $element instanceof DstyleDoc_Element_Function )
-			$element->param->description = $description;
+			$element->function->description = $description;
 	}
 
 	// }}}
@@ -2103,28 +2196,28 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 
 	static public function analyse( $current, $source, $instance, $priority, DstyleDoc $dsd )
 	{
-		// ^(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?(\$[-_\pL\d]+|\.{3})\s*[:=]\s*(.*)$
-		if( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-			and preg_match( '/^(?:[(]?([-_,\\| \\pL\d]+)[)]?\\s+)?(\\$[-_\\pL\d]+|\\.{3})\\s*[:=]\\s*(.*)$/', $source, $matches ) )
+		// ^(?:[-+*]\s+)?(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]\s*(.*)$
+		if( $dsd->dstyledoc and $dsd->method and ($current instanceof DstyleDoc_Analyser_Method or $current instanceof DstyleDoc_Analyser_Element_Function_List)
+			and preg_match( '/^(?:[-+*]\s+)?(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]\s*(.*)$/', $source, $matches ) )
 		{
-			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
+			$instance->value = new self( $matches[1], $matches[2], $matches[3], $matches[4] );
 			$priority->value = self::priority;
 			return true;
 		}
 
-		// ^(?:[-+*]\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?(\$[-_\pL\d]+|\.{3})\s*[:=]?\s*(.*)$
-		elseif( $dsd->dstyledoc and $dsd->params and ($current instanceof DstyleDoc_Analyser_Param or $current instanceof DstyleDoc_Analyser_Element_Param_List)
-			and preg_match( '/^(?:[-+*]\\s+)(?:[(]?([-_,\\| \\pL\d]+)[)]?\\s+)?(\\$[-_\\pL\d]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+		// ^(?:[-+*]\s+)(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]?\s*(.*)$
+		elseif( $dsd->dstyledoc and $dsd->method and ($current instanceof DstyleDoc_Analyser_Method or $current instanceof DstyleDoc_Analyser_Element_Function_List)
+			and preg_match( '/^(?:[-+*]\s+)(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]?\s*(.*)$/', $source, $matches ) )
 		{
-			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
+			$instance->value = new self( $matches[1], $matches[2], $matches[3], $matches[4] );
 			$priority->value = self::priority;
 			return true;
 		}
 
-		// ^(?:@params?\s+)(?:[(]?([-_,\| \pL\d]+)[)]?\s+)?(\$[-_\pL\d]+|\.{3})\s*[:=]?\s*(.*)$
-		elseif( $dsd->javadoc and $dsd->javadoc_params and preg_match( '/^(?:@params?\\s+)(?:[(]?([-_,\\| \\pL\d]+)[)]?\\s+)?(\\$[-_\\pL\d]+|\\.{3})\\s*[:=]?\\s*(.*)$/i', $source, $matches ) )
+		// ^(?:@(?:methods?|functions?)\s+)(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]?\s*(.*)$
+		elseif( $dsd->javadoc and $dsd->javadoc_method and preg_match( '/^(?:@(?:methods?|functions?)\s+)(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]?\s*(.*)$/i', $source, $matches ) )
 		{
-			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
+			$instance->value = new self( $matches[1], $matches[2], $matches[3], $matches[4] );
 			$priority->value = self::priority;
 			return true;
 		}
@@ -2161,11 +2254,11 @@ class DstyleDoc_Analyser_Element_Param_List extends DstyleDoc_Analyser implement
 	// }}}
 	// {{{ __construct()
 
-	public function __construct( $types, $var, $description )
+	public function __construct( $return, $function, $params, $description )
 	{
-		foreach( preg_split('/[,|]/', $types) as $type )
-			$this->type = trim($type);
-		$this->var = $var;
+		$this->return = $return;
+		$this->function = $function;
+		$this->params = $params;
 		$this->description = $description;
 	}
 
