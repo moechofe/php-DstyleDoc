@@ -1309,6 +1309,8 @@ class DstyleDoc_Analyser_Type extends DstyleDoc_Analyser
 
 /**
  * Classe d'analyse d'un élement de type.
+ * Todo:
+ * 	 - ne peux pas etre de plusieurs types ?
  */
 class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements DstyleDoc_Analyser_Descriptable
 {
@@ -2197,7 +2199,7 @@ class DstyleDoc_Analyser_Element_Function_List extends DstyleDoc_Analyser implem
 	static public function analyse( $current, $source, $instance, $priority, DstyleDoc $dsd )
 	{
 		// ^(?:[-+*]\s+)?(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]\s*(.*)$
-		if( $dsd->dstyledoc and $dsd->method and ($current instanceof DstyleDoc_Analyser_Method or $current instanceof DstyleDoc_Analyser_Element_Function_List)
+		if( $dsd->dstyledoc and $dsd->method and ($current instanceof DstyleDoc_Analyser_Function or $current instanceof DstyleDoc_Analyser_Element_Function_List)
 			and preg_match( '/^(?:[-+*]\s+)?(?:((?:[-_\pL\d]+\s*,\s*)*[-_\pL\d]+)\s+)?([-_\pL\d]+)\(\s*((?:\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})\s*\]?\s*,\s*)*\[?\s*(?:[-_\pL\d]+\s+)?(?:\$[-_\pL\d]+|\.{3})[\s\]]*\s*)?\)\s*[:=]\s*(.*)$/', $source, $matches ) )
 		{
 			$instance->value = new self( $matches[1], $matches[2], $matches[3], $matches[4] );
@@ -2231,10 +2233,12 @@ class DstyleDoc_Analyser_Element_Function_List extends DstyleDoc_Analyser implem
 
 	public function apply( DstyleDoc_Custom_Element $element )
 	{
-		if( $element instanceof DstyleDoc_Element_Function )
+		if( $element instanceof DstyleDoc_Element_Class )
 		{
-			$element->param = $this->var;
+			$element->method = $this->function;
 
+
+/*
 			if( $this->var and ! $element->param->var )
 				$element->param->var = $this->var;
 
@@ -2245,8 +2249,8 @@ class DstyleDoc_Analyser_Element_Function_List extends DstyleDoc_Analyser implem
 				// - et, de la doc pour "Params:" ne déclare pas les types pour les même paramètres.
 				if( $type )
 					$element->param->type = $type;
-
-			$element->param->description = $this->description;
+		 */
+			$element->method->description = $this->description;
 		}
 		return $this;
 	}
