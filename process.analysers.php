@@ -863,6 +863,7 @@ class DstyleDoc_Analyser_Element_Return_List extends DstyleDoc_Analyser implemen
 	 * S'assure que le précédent ajout n'étaient pas déjà un nouveau paragraphe.
 	 * Todo:
 	 *	 - ne devrait pas faire de trim() ici.
+	 *	 - faire un preg_split dans set_return()
 	 */
 	public function apply( DstyleDoc_Custom_Element $element )
 	{
