@@ -2244,6 +2244,10 @@ class DstyleDoc_Analyser_Element_Function_List extends DstyleDoc_Analyser implem
 		{
 			$element->method = $this->function;
 
+			$element->method->class = $element;
+			$element->method->file = $element->file;
+			$element->method->line = $element->line;
+
 
 /*
 			if( $this->var and ! $element->param->var )
