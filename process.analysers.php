@@ -79,7 +79,7 @@ class DstyleDoc_Analyser_Description extends DstyleDoc_Analyser
 		{
 			$instance->value = new self( $source );
 			$priority->value = self::priority;
-			$instance->descriptable = $current;
+			$instance->value->descriptable = $current;
 			return true;
 		}
 		elseif( $source )
@@ -678,7 +678,7 @@ class DstyleDoc_Analyser_Element_Param_Sub_List extends DstyleDoc_Analyser_Eleme
 			and preg_match( '/^(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([\\PC]+|\.{3})"\s*[:=]\s*(.*)$/', $source, $matches ) )
 		{
 			$instance->value = new self( $matches[1], '$'.self::get_ref_var($current).'[ '.$matches[2].' ]', $matches[3] );
-			$instance->ref = $current;
+			$instance->value->ref = $current;
 			$priority->value = self::priority;
 			return true;
 		}
@@ -690,7 +690,7 @@ class DstyleDoc_Analyser_Element_Param_Sub_List extends DstyleDoc_Analyser_Eleme
 			and preg_match( '/^(?:[-+*]\s+)(?:[(]?([-_,| \pL\d]+)[)]?\s+)?"([\\PC]+|\.{3})"\s*[:=]?\s*(.*)$/', $source, $matches ) )
 		{
 			$instance->value = new self( $matches[1], $matches[2], $matches[3] );
-			$instance->ref = $current;
+			$instance->value->ref = $current;
 			$priority->value = self::priority;
 			return true;
 		}
@@ -1934,6 +1934,7 @@ class DstyleDoc_Analyser_Licence extends DstyleDoc_Analyser implements DstyleDoc
 	 */
 	public function apply( DstyleDoc_Custom_Element $element )
 	{
+		d($element);
 		return $this;
 	}
 
