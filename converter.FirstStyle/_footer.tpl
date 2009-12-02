@@ -26,9 +26,11 @@ $(function(){
 {if $browse_mode}
 <script language="javascript" src="{$_template_dir}/skins/shCore.js"></script>
 <script language="javascript" src="{$_template_dir}/skins/shBrushPhp.js"></script>
+<script language="javascript" src="{$_template_dir}/skins/shBrushSql.js"></script>
 {else}
 <script language="javascript" src="shCore.js"></script>
 <script language="javascript" src="shBrushPhp.js"></script>
+<script language="javascript" src="shBrushSql.js"></script>
 {/if}
 <script language="javascript">
 	dp.SyntaxHighlighter.HighlightAll('code');
