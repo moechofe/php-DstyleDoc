@@ -310,5 +310,66 @@ class DstyleDoc_Descritable_PHP_Code extends DstyleDoc_Descritable
   // }}}
 }
 
-// vim: set expandtab tabstop=2 shiftwidth=2 softtabstop=2 fileformat=unix foldmethod=marker encoding=latin1 setlocal noendofline binary
-?>
+class DstyleDoc_Descritable_SQL_Code extends DstyleDoc_Descritable implements DstyleDoc_Descritable_Analysable
+{
+  // {{{ $content
+
+  protected function set_content( $content )
+  {
+    if( $content )
+      $this->_content = $content;
+  }
+
+  // }}}
+  // {{{ $append
+
+  protected function set_append( $content )
+  {
+    if( $content )
+      $this->_content .= $content;
+  }
+
+  // }}}
+  // {{{ __toString()
+
+  public function __toString()
+  {
+    return (string)$this->element->converter->convert_sql( $this->content );
+  }
+
+  // }}}
+  // {{{ analyse()
+
+  static public function analyse( $content, DstyleDoc_Custom_Element $element )
+  {
+    // <sql>(.*?)</sql>
+    if( preg_match( '%<sql>(.+?)</sql>%si', $content, $match, PREG_OFFSET_CAPTURE ) )
+      return self::result( $content, $match[0][1], $match[1][0], strlen($match[0][0]), $element );
+
+    return false;
+  }
+
+  // }}}
+  // {{{ result()
+
+  static private function result( $content, $offset, $sql_code, $length, DstyleDoc_Custom_Element $element )
+  {
+    $return = new DstyleDoc_Descritable_Analysable_Replace;
+    $return->element = $element;
+    if( $offset > 1 )
+    {
+      $return->current = new DstyleDoc_Descritable( substr($content, 0, $offset), $element );
+      $return->next = new self($sql_code, $element);
+      $return->next = new DstyleDoc_Descritable( substr($content, $offset+$length), $element );
+    }
+    else
+    {
+      $return->current = new self($sql_code, $element);
+      $return->next = new DstyleDoc_Descritable( substr($content, $length), $element );
+    }
+    return $return;
+  }
+
+  // }}}
+}
+
