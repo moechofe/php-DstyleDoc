@@ -306,7 +306,6 @@ HTML;
 
 	public function convert_with( DstyleDoc_Converter $converter )
 	{
-		//		d( $converter )->d6;
 		$converter->dsd = $this;
 		$this->analyse_all( $converter );
 		if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'hide')!==false )
