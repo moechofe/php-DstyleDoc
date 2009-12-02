@@ -287,7 +287,37 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 	}
 
 	// }}}
-	// {{{ print_packages_index()
+	// {{{ print_members_index()
+
+	/**
+	 * Plug-in Template_Lite pour afficher la listes des membres d'une classe.
+	 * Affiche la liste des membres déclarés dans la classe passée en paramètre en utilisant le template "print_members_index.tpl".
+	 * Cette fonction ne doit pas être appelé directement, elle doit être enregistrée en temps que plug-in Template_Lite grâce à la méthode Template_Lite::register_function().
+	 * Si le paramètre "class" n'est pas renseigné il sera determinté automatiquement.
+	 * Deux variables Template_Lite seront créer et pourront être utilisé dans le template "print_methods_index.tpl" : {$_file} et {$_fonctions}.
+	 * Params:
+	 *	 array $params = Les paramètres envoyés par Template_Lite.
+	 *		 DstyleDoc_Element_Class "class" = L'instance de la classe.
+	 * Returns:
+	 *	 string = Le résultat du template "print_methods_index.tpl".
+	 */
+	static public function print_members_index( $params, Template_Lite $tpl )
+	{
+		if( isset($params['class']) and $params['class'] instanceof DstyleDoc_Element_Class )
+			$tpl->assign( array(
+				'_class' => $params['class'],
+				'_members' => $params['class']->members ) );
+		elseif( isset($tpl->_vars['class']) and $tpl->_vars['class'] instanceof DstyleDoc_Element_Class )
+			$tpl->assign( array(
+				'_class' => $tpl->_vars['class'],
+				'_members' => $tpl->_vars['class']->members ) );
+		else
+			$tpl->trigger_error( 'unexists or non DstyleDoc_Element_Class "class" parameter send to {members_index}' );
+
+		return $tpl->fetch( __CLASS__.':print_members_index.tpl' );
+	}
+
+	// }}}	// {{{ print_packages_index()
 /*
 	static public function print_packages_index( $params, Template_Lite $tpl )
 	{
@@ -385,6 +415,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 		$this->tpl->register_function( 'classes_index', array($this,'print_classes_index') );
 		$this->tpl->register_function( 'methods_index', array($this,'print_methods_index') );
 		$this->tpl->register_function( 'functions_index', array($this,'print_functions_index') );
+		$this->tpl->register_function( 'members_index', array($this,'print_members_index') );
 		//		$this->tpl->register_function( 'packages_index', array($this,'print_packages_index') );
 		$this->tpl->register_function( 'ascent_index', array($this,'print_ascent_index') );
 		$this->tpl->register_function( 'home', array($this,'print_home') );
