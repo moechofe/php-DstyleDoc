@@ -46,12 +46,26 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 	}
 
 	// }}}
-	// {{{
+	// {{{ convert_php
 
 	public function convert_php( $code )
   {
-    return '<pre name="code" class="php:nocontrols:">'.$code.'</pre>';
+    return '<pre name="code" class="php:nocontrols">'.$code.'</pre>';
   }
+
+	// }}}
+	// {{{ convert_id()
+
+	public function convert_id( $id, DstyleDoc_Element $element )
+	{
+		if( $this->_browse_mode )
+			return parent::convert_id( $id, $element );
+
+		if( is_array($id) )
+			$id = implode(',', $id);
+
+		return strtr( (string)$id, array('/'=>',') );
+	}
 
 	// }}}
 
@@ -80,6 +94,28 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 				$this->tpl->assign( 'this', $class );
 				$this->write( 'class.tpl', $tmp = $this->destination_dir.'/'.$class->id );
 			}
+
+			foreach( $this->functions as $function )
+			{
+				$this->tpl->assign( 'function', $function );
+				$this->tpl->assign( 'this', $function );
+				$this->write( 'function.tpl', $tmp = $this->destination_dir.'/'.$function->id );
+			}
+
+			foreach( $this->methods as $method )
+			{
+				$this->tpl->assign( 'method', $method );
+				$this->tpl->assign( 'this', $method );
+				$this->write( 'method.tpl', $tmp = $this->destination_dir.'/'.$method->id );
+			}
+/*
+			foreach( $this->constants as $constant )
+			{
+				$this->tpl->assign( 'constant', $constant );
+				$this->tpl->assign( 'this', $constant );
+				$this->write( 'class.tpl', $tmp = $this->destination_dir.'/'.$constant->id );
+			}
+			*/
 		}
 		elseif( ! empty($_GET['file']) and $found = $this->file_exists($_GET['file']) )
 		{
@@ -124,6 +160,7 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 		if( is_readable((string)$path) and is_dir((string)$path) )
 		{
 			$this->_destination_dir = (string)$path;
+			$this->browse_mode = false;
 		}
 		else
 			throw new InvalidArgumentException('invalid path for 1st parameter send to: '.__FUNCTION__);
