@@ -75,6 +75,14 @@ HTML;
     return highlight_string( "<?php\n{$code}\n?>", true );
   }
 
+	// }}}
+	// {{{ convert_sql( $code )
+
+	public function convert_sql( $code )
+	{
+		return "<code>{$code}</code>";
+	}
+
   // }}}
   // {{{ convert_todo()
 
