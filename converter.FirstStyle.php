@@ -141,6 +141,12 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 			$this->tpl->assign( 'this', $found );
 			$this->tpl->display( 'function.tpl' );
 		}
+		elseif( ! empty($_GET['member']) and @list($file,$class,$member) = explode(',',$_GET['member']) and $found = $this->member_exists($class,$member) )
+		{
+			$this->tpl->assign( 'member', $found );
+			$this->tpl->assign( 'this', $found );
+			$this->tpl->display( 'member.tpl' );
+		}
 		else
 			$this->tpl->display( 'home.tpl' );
 	}
