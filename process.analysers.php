@@ -1327,6 +1327,11 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 				$this->_types[] = $type;
 	}
 
+	protected function set_type( $type )
+	{
+		$this->_types[] = (string)$type;
+	}
+
 	protected function get_types()
 	{
 		return $this->_types;
@@ -1421,7 +1426,7 @@ class DstyleDoc_Analyser_Element_Type_List extends DstyleDoc_Analyser implements
 
 	public function __construct( $type, $description )
 	{
-		$this->type = $type;
+		$this->types = $type;
 		$this->description = $description;
 	}
 
@@ -1934,7 +1939,6 @@ class DstyleDoc_Analyser_Licence extends DstyleDoc_Analyser implements DstyleDoc
 	 */
 	public function apply( DstyleDoc_Custom_Element $element )
 	{
-		d($element);
 		return $this;
 	}
 
