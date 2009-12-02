@@ -13,6 +13,7 @@
 	</div>
   <div class="content-description">{$_class.description}</div>
   <div class="content-index">{methods_index class=$_class}</div>
+	<div class="content-index">{members_index class=$_class}</div>
 {if $_class.todos}
   <div class="content-todos">
     <h2>{if isset(#class_todos#)}{#class_todos#|string_format:$_class.display:$_class.link}{else}#class_todos(class.name,class.link)#{/if}</h2>
