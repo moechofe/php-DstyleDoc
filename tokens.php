@@ -89,7 +89,7 @@ abstract class LightToken extends CustomToken implements WorkToken
 
 /**
  * Interface pour les tokens qui peuvent recevoir des valeures des tokens suivant.
- * Les tokens comme TokenThrow, TokenReturn ou TokenConst on besoin de connaitre le code source des tokens qui les suivent, cette interface déclare 2 fonctions qui permet de traiter ses codes sources.
+ * Les tokens comme TokenThrow, TokenReturn ou TokenConst on besoin de connaître le code source des tokens qui les suivent, cette interface déclare 2 fonctions qui permettent de traiter ces codes sources.
  */
 interface ValueableToken
 {
@@ -163,27 +163,53 @@ interface ElementToken
  */
 abstract class Token extends CustomToken implements WorkToken
 {
-	// {{{
+	// {{{ __construct()
 
 	/**
 	 * Contruit un token utile.
 	 */
-  final protected function __construct()
+  protected function __construct()
   {
 	}
 
 	// }}}
   // {{{ $file
 
+	/**
+	 * Le chemin du fichier d'où proviens le token.
+	 * Utiliser le membre $file pour accéder au chemin du fichier.
+	 * Type:
+	 *   string = Le chemin du fichier.
+	 */
   protected $_file = '';
 
+	/**
+	 * Changer le chemin du fichier d'où proviens le token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $file en écriture à la place.
+	 * ----
+	 * $token->file = __FILE__;
+	 * ----
+	 * Params:
+	 *   string $file = Le chemin du fichier, ne doit pas être vide.
+	 */
   protected function set_file( $file )
-  {
+	{
+		assert('!empty((string)$file)');
     $this->_file = (string)$file;
   }
 
+	/**
+	 * Retourne le chemin du fichier d'où proviens le token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $file en lecture à la place.
+	 * ----
+	 * echo $token->file;
+	 * ----
+	 * Return:
+	 *   string = Le chemin du fichier, ne doit pas être vide.
+	 */
   protected function get_file()
-  {
+	{
+		assert('!empty($this->_file)');
     return $this->_file;
   }
 
@@ -529,5 +555,31 @@ abstract class Token extends CustomToken implements WorkToken
  */
 abstract class StopToken extends Token
 {
+}
+
+require_once( 'dev.documentation.php' );
+require_once( 'dev.unittest.php' );
+require_once( 'converter.php' );
+
+Mock::generatePartial('Token','MockToken',array('hie'));
+
+class TestToken extends UnitTestCase
+{
+	protected $token = null;
+	function setUp() { $this->token = new TestToken; }
+	function tearDown() { unset($this->token); }
+
+	function testFile()
+	{
+		$this->token->file = __FILE__;
+		$this->assertEqual( $this->token->file, __FILE__ );
+	}
+
+	function testLine()
+	{
+		$this->token->line = $l = __LINE__;
+		$this->assertEqual( $this->token->line, $l );
+	}
+
 }
 
