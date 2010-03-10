@@ -39,7 +39,8 @@ class DstyleDocReporter extends SimpleReporter
   }
 
   function colormessage( $message )
-  {
+	{
+		return $message;
     return preg_replace(
       array(
         '/\\[string: (.*?)\\]/i',
