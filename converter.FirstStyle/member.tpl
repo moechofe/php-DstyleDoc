@@ -1,8 +1,8 @@
 <html>
 {include file="_head.tpl"}
-<body id="page-">
+<body id="page-members">
 <div id="page-content">
-<div class="page-annotation"><p>{if isset(#page_#)}{#page_#|string_format:$.display:$.link:$.class.display:$.class.link:$.file.display:$.file.link}{else}#page_(member-name,member-link,class-name,class-link,file-name,file-link)#{/if}</p></div>
+<div class="page-annotation"><p>{if isset(#page_members#)}{#page_members#|string_format:$members.display:$members.link:$members.class.display:$members.class.link:$members.file.display:$members.file.link}{else}#page_members(member-name,member-link,class-name,class-link,file-name,file-link)#{/if}</p></div>
 <div class="page-content">{$member}</div>
 <div id="page-footer">
 {include file="_footer.tpl"}

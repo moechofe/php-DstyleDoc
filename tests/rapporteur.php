@@ -141,12 +141,12 @@ html;
 </html>
 html;
   }
-    
+
   function paintstart($test_name, $size)
   {
     parent::paintstart($test_name, $size);
   }
-    
+
   function paintend($test_name, $size)
   {
     parent::paintend($test_name, $size);
@@ -181,7 +181,7 @@ html;
     if( ! isset($_REQUEST['nopass']) )
       $this->displayresult( 'pass', $message );
   }
-    
+
   function paintfail($message)
   {
     parent::paintfail($message);

@@ -1,6 +1,6 @@
 <html>
 {include file="_head.tpl"}
-<body id="page-home">
+<body id="page-home"{if isset($debug)} class="debug"{/if}>
 <div id="page-content">
 <div class="page-annotation"><p>{if isset(#page_home#)}{#page_home#}{else}#page_home#{/if}</p></div>
 <div class="page-content">

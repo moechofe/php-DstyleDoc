@@ -3,7 +3,7 @@
 chdir('../');
 set_time_limit(0);
 
-require_once( 'xdebug.front.end.php' );
+require_once( 'xdebug-frontend.php' );
 
 require_once( 'DstyleDoc.php' );
 require_once( 'converter.FirstStyle.php' );
@@ -18,7 +18,7 @@ DstyleDoc::hie()
 
 		DstyleDoc_Converter_FirstStyle::hie()
 			->template_dir( 'converter.FirstStyle' )
-			->destination_dir( 'api_doc' )
+			->destination_dir( dirname(__FILE__).'/api_doc' )
 			->config( array(
 
 'skin' => 'rosy',
@@ -64,6 +64,7 @@ DstyleDoc::hie()
 'files_index_list_header' => 'Liste des fichiers',
 'classes_index_list_header' => 'Liste des classes déclarées dans le fichier %2$s',
 'methods_index_list_header' => 'Liste des méthodes de la classe %2$s',
+'members_index_list_header' => 'Liste des membres de la classe %2$s',
 
 'todos' => 'todolist',
 

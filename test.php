@@ -1,47 +1,9 @@
 <?php
-
-require_once( 'xdebug.front.end.php' );
-
-class c
+require_once( 'converter.toString.php' );
+foreach( get_declared_classes() as $class )
 {
+	$reflection = new ReflectionClass($class);
+	var_dump( $reflection->implementsInterface('DstyleDoc_Converter_Convert') );
+	if( $reflection->implementsInterface('DstyleDoc_Converter_Convert') and ! $reflection->isAbstract() )
+		echo basename(__FILE__),':',$class;
 }
-
-class d
-{
-  function __sleep()
-  {
-    return array('a');
-  }
-  function __wakeup()
-  {
-    $this->a = 'bbb';
-    return $this->__sleep();
-  }
-}
-
-class a extends d
-{
-  protected $a = 'aaa';
-  function __construct( c $c )
-  {
-  }
-}
-
-class b extends d
-{
-  protected $a = null;
-  function __construct( a $a )
-  {
-    $this->a = $a;
-  }
-}
-
-$b = new b( new a( new c ) );
-
-d( $b )->lb;
-echo( $s = serialize($b) );
-
-$bb = unserialize($s);
-d( $bb )->lbb;
-
-?>

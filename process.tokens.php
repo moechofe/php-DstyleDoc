@@ -2356,4 +2356,8 @@ class DstyleDoc_Token_Close_Tag extends DstyleDoc_Token
 }
 
 // }}}
+// {{{ Boolean Or
 
+class DstyleDoc_Token_Boolean_Or extends DstyleDoc_Token_Value {}
+
+// }}}

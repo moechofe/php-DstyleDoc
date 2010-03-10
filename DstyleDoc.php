@@ -3,6 +3,11 @@
 /**
  * Script principale de DstyleDoc.
  * Déclare la classe de controle DstyleDoc, l'interface pour les converteurs DstyleDoc_Converter_Convert ainsi que différentes classes d'outils.
+ * Ce script est la porte d'entrée de DstyleDoc et il nécessaire d'écrire un outil par dessus pour pouvoir l'utiliser correctement. Cela peut être un outil générique mais la classe DstyleDoc à été écrite pour être directement utilisé par un script léger. Ci-dessous, un exemple d'un script simple qui génere la documentation du script DstyleDoc.php et l'affiche dans le navigateur.
+ * ----
+ * require_once( 'DstyleDoc.php' );
+ * DstyleDoc::hie()->source( 'DstyleDoc.php' )->convert_with( DstyleDoc_Converter_toString::hie() );
+ * ----
  * Packages: core
  */
 
@@ -105,10 +110,18 @@ require_once 'process.analysers.php';
 require_once 'process.descriptables.php';
 //require_once 'extension.state_saver.php';
 //require_once 'extension.function_return.php';
+//require_once 'extension.memcache.php';
 
 /**
  * Classe de control de DstyleDoc.
- * La classe DstyleDoc permet de configurer et de lancer un processus de génération de documentation.
+ * La classe DstyleDoc permet de configurer et de lancer un processus de génération de documentation, en utilisante un syntaxe fluide.
+ * ----
+ * new DstyleDoc()->source( 'fichier1.php' )->source( 'fichier2.php' );
+ * ----
+ * Members:
+ *  string $source = Fichiers source à analyser.
+ *  Accès en écriture : ajoute un fichier source à analyser.
+ *  Accès en lecture, isset() et unset() : refusé.
  */
 class DstyleDoc extends DstyleDoc_Properties
 {
@@ -122,38 +135,36 @@ class DstyleDoc extends DstyleDoc_Properties
 	/**
 	 * Envoie un message de log sur la sortie standard.
 	 * Params:
-	 *		string,numeric,array ... = Une chaîne de caractère, un nombre ou un tableau de pairs clefs/valeurs a afficher.
+	 *  string,numeric,array ... = Une chaîne de caractère, un nombre ou un tableau de pairs clefs/valeurs a afficher.
 	 * Syntax:
-	 *		... = Un nombre infinie de paramètre a afficher.
+	 *  ... = Un nombre infinie de paramètre a afficher.
 	 */
 	static public function log()
 	{
 		$args = func_get_args();
-		foreach( $args as $arg )
-			if( is_string($arg) or is_numeric($arg) )
-				echo sprintf( '<small>%s</small> %s', date('H:i:s'), $arg );
-			elseif( is_array($arg) )
-				foreach( $arg as $key => $value )
-					echo sprintf( '<small>%s</small> <strong>%s : </strong> %s, ', date('H:i:s'), $key, $value );
-		$last = array_pop($args);
-		if( is_bool($last) and $last )
-			echo "<br />";
-		flush();
+		call_user_func( self::$_logger, $args, false );
 	}
 
 	static public function warning()
 	{
 		$args = func_get_args();
-		foreach( $args as $arg )
-			if( is_string($arg) or is_numeric($arg) )
-				echo '<span style="color:red">',$arg,'</span>';
-			elseif( is_array($arg) )
-				foreach( $arg as $key => $value )
-					echo "<strong>$key: </strong> $value, ";
-		$last = array_pop($args);
-		if( is_bool($last) and $last )
-			echo "<br />";
-		flush();
+		call_user_func( self::$_logger, $args, true );
+	}
+
+	static private $_logger = null;
+
+	static public function logger( $callback )
+	{
+		if( is_callable($callback) )
+			self::$_logger = $callback;
+		else
+			throw new InvalidArgumentException('Invalide callbask for 1st parameter sent to: '.__FUNCTION__);
+	}
+
+	static public function default_logger( $args, $warning = false )
+	{
+		/*if( is_array($args) ) foreach( $args as $arg )
+			echo (string)$arg."\n";*/
 	}
 
 	// }}}
@@ -174,6 +185,10 @@ class DstyleDoc extends DstyleDoc_Properties
 	// }}}
 	// {{{ $sources
 
+	/**
+	 * Liste des fichiers sources à analyser.
+	 * Type: array(string)
+	 */
 	protected $_sources = array();
 
 	protected function set_source( $files )
@@ -218,6 +233,7 @@ class DstyleDoc extends DstyleDoc_Properties
 		$line = 1;
 		$current = new DstyleDoc_Token_Fake;
 		$doc = '';
+		self::log( sprintf("Reading and parsing: %s\n",$file) );
 		foreach( token_get_all(file_get_contents($this->source_dir.$file)) as $token )
 		{
 			if( is_array($token) )
@@ -320,6 +336,7 @@ HTML;
 
 	static public function hie()
 	{
+		self::logger( array('DstyleDoc','default_logger') );
 		return new self;
 	}
 
@@ -598,7 +615,7 @@ interface DstyleDoc_Converter_Convert
 	 * Returns:
 	 *		mixed = Dépends du convertisseur.
 	 */
-	 function convert_display( $name, DstyleDoc_Element $element );
+	 function convert_display( $name, DstyleDoc_Custom_Element $element );
 
 	// }}}
 	// {{{ convert_syntax()
@@ -722,14 +739,29 @@ interface DstyleDoc_Converter_Convert
 
 	/**
 	 * Recherche dans un text des �ventuels mots ou expression correspondant � des �lements existants.
+	 * Fixme: delete me
 	 */
-	function come_accross_elements( $string, DstyleDoc_Custom_Element $element );
+	// function come_accross_elements( $string, DstyleDoc_Custom_Element $element );
 
 	// }}}
+	static function hie();
 }
 
 class DstyleDoc_Element_Container
 {
+	// {{{ $extention
+
+	static protected $extension = false;
+
+	/**
+	 * Todo: passer par Reflexion
+	 */
+	static public function set_extension( $extension )
+	{
+		$this->extension = $extension;
+	}
+
+	// }}}
 	// {{{ $class
 
 	protected $class = '';
@@ -755,8 +787,8 @@ class DstyleDoc_Element_Container
 
 	public function put( $data, DstyleDoc_Converter $converter, $cache = true )
 	{
-		if( $cache and $converter->dsd->use_temporary_sqlite_database and current($this->data) )
-			DstyleDoc_State_Saver::put_element( current($this->data) );
+		if( $cache and self::$extension and current($this->data) )
+			call_user_func( array(self::$extension,'put_element'), current($this->data) );
 
 		$found = false;
 		if( ! empty($data) and $converter->dsd->use_temporary_sqlite_database
@@ -767,7 +799,7 @@ class DstyleDoc_Element_Container
 			reset($this->data);
 			while( true)
 			{
-	$current = current($this->data);
+				$current = current($this->data);
 				if( $found = ( (is_object($data) and $current === $data)
 					or (is_string($data) and strtolower($current->name) === strtolower($data)) ) or false === next($this->data) )
 					break;
@@ -780,8 +812,8 @@ class DstyleDoc_Element_Container
 				$this->data[] = $data;
 			else
 			{
-	$class_name = $this->class;
-	$this->data[] = new $class_name( $converter, $data );
+				$class_name = $this->class;
+				$this->data[] = new $class_name( $converter, $data );
 			}
 			end($this->data);
 		}
@@ -846,10 +878,10 @@ class DstyleDoc_Element_Container
  *   - gérer les membres
  *   - gérer la ligne suivante
  * Members:
- *	 - (out) array(DstyleDoc_Element_Class) $classes = La listes des classes.
+ *	 - array(DstyleDoc_Element_Class) $classes = La listes des classes.
  *	 - DstyleDoc_Element_Class $class = Ajoute une nouvelle classe dans la liste ou retourne la dernière ajoutée.
  */
-abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements ArrayAccess
+abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements ArrayAccess, DstyleDoc_Converter_Convert
 {
 	// {{{ $dsd
 
@@ -1274,11 +1306,12 @@ abstract class DstyleDoc_Converter extends DstyleDoc_Properties implements Array
 	// {{{ member_exists()
 
 	/**
-	 * Renvoie un membre si il existe.
+	 * Renvoie un membre s'il existe.
 	 * Params:
 	 *		string $class = Le nom de la classe ou de l'interface.
 	 *		DstyleDoc_Element_Class, DstyleDoc_Element_Interface $class = L'instance de la classe ou de l'interface.
 	 *		string $member = Le nom du membre.
+	 *		boolean $analyse = Indique si la documentation de la classe doit être analysé afin de trouver le membre.
 	 * Returns:
 	 *		DstyleDoc_Element_Member = L'instance du membre en cas de succès.
 	 *		false = En cas d'échec.

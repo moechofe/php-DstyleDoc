@@ -1478,7 +1478,7 @@ class DstyleDoc_Analyser_Since extends DstyleDoc_Analyser_Version
 	// }}}
 }
 
-class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
+class DstyleDoc_Analyser_PHPEndCode extends DstyleDoc_Analyser
 {
 	// {{{ priority
 
@@ -1505,16 +1505,16 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 	static public function analyse( $current, $source, $instance, $priority, DstyleDoc $dsd )
 	{
 		/* ^(.*)\?>$ */
-		if( $current instanceof DstyleDoc_Analyser_PHPOpenTag and preg_match( '/^(.*)\?>$/', $source, $match ) )
+		if( $current instanceof DstyleDoc_Analyser_PHPCode and preg_match( '/^(.*)\?>$/', $source, $match ) )
 		{
-			$instance->value = new DstyleDoc_Analyser_PHPCode( $match[1] );
+			$instance->value = new DstyleDoc_Analyser_PHPEndCode( $match[1] );
 			$priority->value = self::priority;
 			return true;
 		}
-		elseif( $current instanceof DstyleDoc_Analyser_PHPOpenTag )
+		elseif( $current instanceof DstyleDoc_Analyser_PHPCode )
 		{
-			$instance->value = new DstyleDoc_Analyser_PHPOpenTag( $source );
-			$priority->value = DstyleDoc_Analyser_PHPOpenTag::priority;
+			$instance->value = new DstyleDoc_Analyser_PHPCode( $source );
+			$priority->value = DstyleDoc_Analyser_PHPCode::priority;
 			return true;
 		}
 
@@ -1552,7 +1552,7 @@ class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 /**
  * Classe d'analyse d'une balise de début de code PHP.
  */
-class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
+class DstyleDoc_Analyser_PHPCode extends DstyleDoc_Analyser
 {
 	// {{{ priority
 
@@ -1581,7 +1581,7 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
 		/* ^<\?php(.*)(?<!\?>)$ */
 		if( preg_match( '/^<\?php(.*)(?<!\?>)$/i', $source, $match ) )
 		{
-			$instance->value = new DstyleDoc_Analyser_PHPOpenTag( $match[1] );
+			$instance->value = new DstyleDoc_Analyser_PHPCode( $match[1] );
 			$priority->value = self::priority;
 			return true;
 		}
@@ -1589,8 +1589,23 @@ class DstyleDoc_Analyser_PHPOpenTag extends DstyleDoc_Analyser
 		/* ^<\?php(.*)(?>\?>)$ */
 		elseif( preg_match( '/^<\?php(.*)(?>\?>)$/i', $source, $match ) )
 		{
-			$instance->value = new DstyleDoc_Analyser_PHPCode( $match[1] );
-			$priority->value = DstyleDoc_Analyser_PHPCode::priority;
+			$instance->value = new DstyleDoc_Analyser_PHPEndCode( $match[1] );
+			$priority->value = DstyleDoc_Analyser_PHPEndCode::priority;
+			return true;
+		}
+
+		elseif( preg_match( '/^---+(\w*php$|$)/i', $source, $match ) )
+		{
+			if( $current instanceof DstyleDoc_Analyser_PHPCode )
+			{
+				$instance->value = new DstyleDoc_Analyser_PHPEndCode( '' );
+				$priority->value = DstyleDoc_Analyser_PHPEndCode::priority;
+			}
+			else
+			{
+				$instance->value = new DstyleDoc_Analyser_PHPCode( '' );
+				$priority->value = DstyleDoc_Analyser_PHPCode::priority;
+			}
 			return true;
 		}
 

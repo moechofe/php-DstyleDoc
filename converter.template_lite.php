@@ -430,6 +430,7 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 		{
 			$this->tpl->template_dir = $path;
 			$this->tpl->assign( '_template_dir', dirname(dirname($_SERVER['SCRIPT_NAME'])).'/'.$path );
+			$this->tpl->assign( '_template_dir', dirname($_SERVER['SCRIPT_NAME']).'/'.$path );
 			// substr(realpath($path),strlen($_SERVER['DOCUMENT_ROOT'])) );
 			$this->tpl->compile_dir = $path.'/compiled';
 		}

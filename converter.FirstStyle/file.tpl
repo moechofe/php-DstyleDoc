@@ -1,6 +1,6 @@
 <html>
 {include file="_head.tpl"}
-<body id="page-file">
+<body id="page-file"{if isset($debug)} class="debug"{/if}>
 <div id="page-content">
 <div class="page-annotation"><p>{if isset(#page_file#)}{#page_file#|string_format:$file.display:$file.link}{else}#page_file(file-name,file-link)#{/if}</p></div>
 <div class="page-content">{$file}</div>

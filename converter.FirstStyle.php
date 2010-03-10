@@ -154,31 +154,58 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 	// }}}
 	// {{{ $destination_dir
 
-	protected $_destination_dir = null;
+        /**
+         * Dossier de destination
+         * Si un dossier de destination est défini, les fichiers génerés y seront stocké.
+         * Type: string, false
+         */
+	protected $_destination_dir = false;
 
 	/**
-	 * Todo:
-	 *	 Prévoir de la création de dossier
-	 *	 et de la correction de '/' '\'.
+         * Change le dossier de destination des fichiers génerés
+         * Lorsque un dossier de destination est défini, les fichiers génerés seront stocker dans ce dossier et ne seront plus envoyé au navigateur.
+         * ----
+         * $this->destination_dir( '/output' );
+         * ----
+         * Params:
+         *  - (string,false) $path = Le dossier de destination.
+         * Return: self = Retourne l'objet lui même.
 	 */
 	public function destination_dir( $path )
 	{
-		if( is_readable((string)$path) and is_dir((string)$path) )
-		{
+                if( $path === false )
+                        $this->destination_dir = false;
+                elseif( is_writeable((string)$path) and is_dir((string)$path) )
 			$this->_destination_dir = (string)$path;
-			$this->browse_mode = false;
-		}
-		else
-			throw new InvalidArgumentException('invalid path for 1st parameter send to: '.__FUNCTION__);
+                else
+			throw new InvalidArgumentException("Invalid path or unwriteable dir \"{$path}\" for 1st parameter send to: ".__FUNCTION__);
 
 		return $this;
 	}
 
+        /**
+         * Indique si un dossier de destination a été défini
+         * Ne pas appeler cette fonction directement, utiliser $destination avec l'instruction isset à la place.
+         * ----
+         * isset($this->destination);
+         * ----
+         * Return: boolean = TRUE si un dossier de destination a été défini.
+         */
 	protected function isset_destination_dir()
 	{
 		return $this->_destination_dir;
 	}
 
+        /**
+         * Retourne le dossier de destination défini.
+         * Ne pas appeler cette fonction directement, utiliser $destination en lecture à la place.
+         * ----
+         * echo $this->destination;
+         * ----
+         * Return:
+         *  string = Le dossier de destination.
+         *  false = Pas de dossier de destination defini.
+         */
 	protected function get_destination_dir()
 	{
 		return $this->_destination_dir;
@@ -205,10 +232,10 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 	//$this->tpl->assign( 'href', '%2$s.html' );
 
 	file_put_contents( $to.'.html', $this->tpl->fetch( $template ) );
-	DstyleDoc::log( sprintf( 'Write <strong>%s</strong>', $to.'.html' ), true );
+	DstyleDoc::log( sprintf("Writing: %s\n", $to.'.html'), true );
 			}
 			else
-	DstyleDoc::warning( sprintf( 'Write <strong>%s</strong>', $to.'.html' ), true );
+	DstyleDoc::warning( sprintf("Cannot writing: %s\n", $to.'.html'), true );
 		//}
 	}
 
@@ -219,6 +246,8 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 	{
 		$instance = new self;
 		$instance->browse_mode = true;
+		if( isset($_GET['debug']) )
+			$instance->tpl->assign('debug',$_GET['debug']);
 		return $instance;
 	}
 
