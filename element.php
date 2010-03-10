@@ -1,7 +1,6 @@
 <?php
 
 require_once( 'include.properties.php' );
-require_once( 'converter.php' );
 
 /**
  * Classe de base d'un Element.
@@ -52,23 +51,51 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	// }}}
 	// {{{ $descriptions
 
+	/**
+	 * Liste des lignes de descriptions associées a l'élément.
+	 * Type:
+	 *    array = Un tableau de chaine de caractère ou d'instance de Descritable.
+	 */
 	protected $_descriptions = array();
 
+	/**
+	 * Retourne la liste des descriptions associées a l'élément.
+	 * Ne pas utiliser cette méthode, utiliser le membre $descriptions en lecture à la place.
+	 * ----
+	 * foreach( $element->descriptions as $item );
+	 * ----
+	 * Return:
+	 *    array = Un tableau de chaine de caractère ou d'instance de Descritable.
+	 */
 	protected function get_descriptions()
 	{
 		return $this->_descriptions;
 	}
 
+	/**
+	 * Change la liste des descriptions associées a l'élément.
+	 * Ne pas utiliser cette méthode, utiliser le membre $descriptions en écriture à la place.
+	 * ----
+	 * $element->descriptions = array( 'ligne de description' );
+	 * ----
+	 * Params:
+	 *   array $descriptions = Un tableau de chaine de caractère ou d'instance de Descritable.
+	 */
 	protected function set_descriptions( $descriptions )
 	{
 		$this->_descriptions = (array)$descriptions;
 	}
 
 	/**
-	 * Todo:
-	 *	 apparement on passe toujours des strings.
-	 *	 FAUX
-	 *	 on passe par un DstyleDoc_Descritable
+	 * Ajoute une ligne de description à la documentation de l'élément.
+	 * Contrairement à ce que cette fonction suggère, elle ne change pas la description mais ajoute une description dans le membre $_descriptions.
+	 * Ne pas utiliser cette méthode, utiliser le membre $description en écriture à la place.
+	 * ----
+	 * $element->description = 'ligne de description';
+	 * ----
+	 * Params:
+	 *   string $description = Une ligne de description.
+	 *   Descritable $Descritable = Un object de description.
 	 */
 	protected function set_description( $description )
 	{
@@ -729,6 +756,7 @@ abstract class MethodedElement extends NamedElement
 
 require_once( 'dev.documentation.php' );
 require_once( 'dev.unittest.php' );
+require_once( 'converter.php' );
 
 Mock::generatePartial('CustomElement','MockCustomElement',array('get_display','get_convert'));
 
@@ -747,7 +775,10 @@ class TestCustomElement extends UnitTestCase
 
 	function testDescription()
 	{
-		$this->element->
+		$this->element->description = $b = 'banana';
+		$this->element->description = $c = 'chocolat';
+		$this->assertEqual( $this->element->descriptions[0], $b );
+		$this->assertEqual( $this->element->descriptions[1], $c );
 	}
 }
 
