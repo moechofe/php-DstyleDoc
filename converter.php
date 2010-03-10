@@ -133,7 +133,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = DÃ©pends du convertisseur.
 	 */
-	function convert_description( $description, DstyleDoc_Custom_Element $element );
+	function convert_description( $description, CustomElement $element );
 
 	// }}}
 	// {{{ convert_title()
@@ -187,7 +187,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = DÃ©pends du convertisseur.
 	 */
-	 function convert_display( $name, DstyleDoc_Custom_Element $element );
+	 function convert_display( $name, CustomElement $element );
 
 	// }}}
 	// {{{ convert_syntax()
@@ -313,7 +313,7 @@ interface ConverterInterface
 	 * Recherche dans un text des éventuels mots ou expression correspondant à des élements existants.
 	 * Fixme: delete me
 	 */
-	// function come_accross_elements( $string, DstyleDoc_Custom_Element $element );
+	// function come_accross_elements( $string, CustomElement $element );
 
 	// }}}
 	// {{{ hie()
