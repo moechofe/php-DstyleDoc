@@ -3,6 +3,7 @@
 require_once( 'include.libraries.php' );
 
 require_once 'simpletest/unit_tester.php';
+require_once 'simpletest/mock_objects.php';
 require_once 'simpletest/scorer.php';
 
 register_shutdown_function('unittest_autorun');
@@ -74,16 +75,29 @@ class DstyleDocReporter extends SimpleReporter
 
 	public function paintFooter( $test_name )
 	{
+		$color = ($this->getfailcount() + $this->getexceptioncount() > 0) ? 'fail' : 'pass';
+		$color = '';
 		echo <<<HTML
+	<dt class="{$color} result">
+		<ul>
+		  <li>&nbsp;</li>
+		  <li>pass&eacute;s : <strong>{$this->getpasscount()}</strong></li>
+		  <li>&eacute;chou&eacute;s : <strong>{$this->getfailcount()}</strong></li>
+		  <li>except&eacute;s : <strong>{$this->getexceptioncount()}</strong></li>
+		</ul>
+	</dt>
+	<dd class="{$color} result">{$this->gettestcaseprogress()} test(s) effectu&eacute;(s) sur {$this->gettestcasecount()}</dd>
+
 </dl>
 </div>
 <style type="text/css">
 	#unittest .fail { background:IndianRed; }
+	#unittest dd.fail { color:white; }
 	#unittest ul { list-style:none; margin:0px; padding:0px; }
 	#unittest li { font:11px monospace !important; margin:0px; padding:0px; }
 	#unittest dl { margin:0px; padding:0px; }
 	#unittest dt { margin:0px; padding:5px 20px 0px 20px; }
-	#unittest dd { margin:0px; padding:0px 20px 5px 20px; font:15px sans-serif !important; color:white; }
+	#unittest dd { margin:0px; padding:0px 20px 5px 20px; font:15px sans-serif !important; }
 </style>
 <script  type="text/javascript">
 $(function(){
@@ -124,10 +138,10 @@ HTML;
 		$this->paintAll($message,'fail');
 	}
 
-	public function paintException( $message )
+	public function paintException( $exception )
 	{
-		parent::paintException($message);
-		$this->paintAll($message,'fail');
+		parent::paintException($exception);
+		$this->paintAll("{$exception->getmessage()} at [{$exception->getfile()} line {$exception->getline()}]",'fail');
 	}
 
 	public function paintSkip( $message )
