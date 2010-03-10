@@ -994,6 +994,7 @@ abstract class Converter extends Properties implements ArrayAccess, ConverterInt
 
 require_once( 'dev.documentation.php' );
 require_once( 'dev.unittest.php' );
+require_once( 'element.php' );
 
 Mock::generatePartial('Converter','MockConverter',array(
 	'convert_all', 'convert_file', 'convert_class', 'convert_interface', 'convert_function',
