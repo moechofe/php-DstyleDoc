@@ -992,3 +992,13 @@ abstract class Converter extends Properties implements ArrayAccess, ConverterInt
 	// }}}
 }
 
+require_once( 'dev.documentation.php' );
+require_once( 'dev.unittest.php' );
+
+Mock::generatePartial('Converter','MockConverter',array(
+	'convert_all', 'convert_file', 'convert_class', 'convert_interface', 'convert_function',
+	'convert_method', 'convert_description', 'convert_title', 'convert_link', 'convert_id',
+	'convert_display', 'convert_syntax', 'convert_param', 'convert_return', 'convert_type',
+	'convert_exception', 'convert_member', 'convert_text', 'convert_php', 'convert_todo',
+	'hie' ));
+
