@@ -1,6 +1,7 @@
 <?php
 
 require_once( 'include.properties.php' );
+require_once( 'converter.php' );
 
 /**
  * Classe de base d'un Element.
@@ -19,13 +20,32 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	 */
 	protected $_converter = null;
 
-	protected function set_converter( DstyleDoc_Converter $converter )
+	/**
+	 * Setter pour l'instance du convertisseur.
+	 * Ne pas utiliser cette méthode, utiliser le membre $converter en écriture à la place.
+	 * ----
+	 * $element->converter = new Converter;
+	 * ----
+	 * Params:
+	 *   $converter = L'instance du convertisseur qui sera utilisé pour la génération de la documentation.
+	 */
+	protected function set_converter( Converter $converter )
 	{
 		$this->_converter = $converter;
 	}
 
+	/**
+	 * Getter pour l'instance du convertisseur.
+	 * Ne pas utiliser cette méthode, utiliser le membre $converter en lecture à la place.
+	 * ----
+	 * var_dump( $element->converter );
+	 * ----
+	 * Return:
+	 *   Converter = L'instance du convertisseur utilisé pour la génération de la documentation.
+	 */
 	protected function get_converter()
 	{
+		assert( '$this->_converter instanceof Converter' );
 		return $this->_converter;
 	}
 
@@ -99,7 +119,7 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	// }}}
 	// {{{ __construct()
 
-	public function __construct( DstyleDoc_Converter $converter )
+	public function __construct( Converter $converter )
 	{
 		$this->converter = $converter;
 	}
@@ -152,7 +172,7 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	abstract protected function get_convert();
 
 	// }}}
-	// {{{ offsetExists()
+	// {{{ offsetExists(), offsetGet(), offsetSet(), offsetUnset()
 
 	final public function offsetExists( $offset )
 	{
@@ -166,24 +186,15 @@ abstract class CustomElement extends Properties implements ArrayAccess
 		}
 	}
 
-	// }}}
-	// {{{ offsetGet()
-
 	final public function offsetGet( $offset )
 	{
 		return $this->$offset;
 	}
 
-	// }}}
-	// {{{ offsetSet()
-
 	final public function offsetSet( $offset, $value )
 	{
 		$this->$offset = $value;
 	}
-
-	// }}}
-	// {{{ offsetUnset()
 
 	final public function offsetUnset( $offset )
 	{
@@ -715,4 +726,29 @@ abstract class MethodedElement extends NamedElement
 
 	// }}}
 }
+
+require_once( 'dev.documentation.php' );
+require_once( 'dev.unittest.php' );
+
+Mock::generatePartial('CustomElement','MockCustomElement',array('get_display','get_convert'));
+
+class TestCustomElement extends UnitTestCase
+{
+	protected $element = null;
+	function setUp() { $this->element = new MockCustomElement(); }
+	function tearDown() { unset($this->element); }
+
+	function testConstructAndConverter()
+	{
+		$this->element->converter = new MockConverter();
+		$this->assertIsA( $this->element->converter, 'Converter' );
+		$this->assertIsA( $this->element['converter'], 'Converter' );
+	}
+
+	function testDescription()
+	{
+		$this->element->
+	}
+}
+
 
