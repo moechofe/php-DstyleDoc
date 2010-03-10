@@ -107,6 +107,15 @@ abstract class CustomElement extends Properties implements ArrayAccess
 			$this->_descriptions[] = $description;
 	}
 
+	/**
+	 * Retourne la version convertie de la documentation.
+	 * Utilise l'instance du convertisseur $_converter pour retourner la documentation de l'élément.
+	 * Ne pas utiliser cette méthode, utiliser le membre $description en lecture à la place.
+	 * ----
+	 * echo $element->description;
+	 * ----
+	 *
+	 */
 	protected function get_description()
 	{
 		return $this->converter->convert_description( $this->_descriptions, $this );
@@ -773,12 +782,20 @@ class TestCustomElement extends UnitTestCase
 		$this->assertIsA( $this->element['converter'], 'Converter' );
 	}
 
+	/**
+	 * Ne teste pas la conversion.
+	 */
 	function testDescription()
 	{
 		$this->element->description = $b = 'banana';
 		$this->element->description = $c = 'chocolat';
-		$this->assertEqual( $this->element->descriptions[0], $b );
-		$this->assertEqual( $this->element->descriptions[1], $c );
+		$this->assertEqual( $this->element->descriptions, array($b,$c) );
+		$this->element->descriptions = $a = array('ananas');
+		$this->assertEqual( $this->element->descriptions, $a );
+		$this->assertTrue( isset($this->element->description) );
+		unset($this->element->description);
+		$this->assertFalse( isset($this->element->description) );
+		$this->assertEqual( $this->element->descriptions, array() );
 	}
 }
 
