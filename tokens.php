@@ -176,6 +176,10 @@ interface ElementToken
  *     Accès en écriture : ajoute des lignes ou copie les lignes d'un autre token grâce à set_documentation().
  *     Accès en lecture : retourne les lignes de la documentation grâce à get_documentation().
  *     Accès isset() et unset() : refusé.
+ *   string $name = Le nom associé au token.
+ *     Accès en écriture : change le nom du token grâce à set_name().
+ *     Accès en lecteur : retourne le nom du token grâce à get_name().
+ *     Accès isset() et unset() : refusé.
  */
 abstract class Token extends CustomToken implements WorkToken
 {
@@ -426,14 +430,36 @@ abstract class Token extends CustomToken implements WorkToken
   // }}}
   // {{{ $modifiers
 
+	/**
+	 * Liste des modificateurs de porté et autre attributs.
+	 * Utiliser le membre $modifier pour accéder au modificateurs en lecture et écriture.
+	 * Type:
+	 *   array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
+	 *     boolean "static" = Indique si la méthode est statique.
+	 *     boolean "abstract" = Indique si la classe ou la méthode est abstraite.
+	 *     boolean "final" = Indique si la classe ou la méthode est finale.
+	 *     boolean "public" = Indique si la méthode est publique.
+	 *     boolean "protected" = Indique si la méthode est protégée.
+	 *     boolean "private" = Indique si la méthode est privée.
+	 */
   protected $_modifiers = array(
     'static' => false,
     'abstract' => false,
     'final' => false,
-    'public' => true,
+    'public' => false,
     'protected' => false,
     'private' => false );
 
+	/**
+	 * Setter pour les modificateurs de porté et autre attributs.
+	 * Ajoute un modificateur au token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $modifier en écriture à la place.
+	 * ----
+	 * $token->modifier = 'public'; // Ajoute le modificateur de porté publique.
+	 * ----
+	 * Params:
+	 *   string $modifier = Le nom du modifier à ajouter
+	 */
   protected function set_modifier( $modifier )
 	{
     if( $modifier instanceof CustomToken )
@@ -442,13 +468,46 @@ abstract class Token extends CustomToken implements WorkToken
 			$this->_modifiers[$modifier] = true;
   }
 
+	/**
+	 * Setter pour les modificateurs de porté et autre attributs.
+	 * Change les modificateurs du token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $modifiers en écriture à la place.
+	 * ----
+	 * $token->modifiers = array( 'public', 'static' ); // Indique que le token est publique et statique
+	 * ----
+	 * Params:
+	 *   array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
+	 *     boolean "static" = Indique si la méthode est statique.
+	 *     boolean "abstract" = Indique si la classe ou la méthode est abstraite.
+	 *     boolean "final" = Indique si la classe ou la méthode est finale.
+	 *     boolean "public" = Indique si la méthode est publique.
+	 *     boolean "protected" = Indique si la méthode est protégée.
+	 *     boolean "private" = Indique si la méthode est privée.
+	 */
   protected function set_modifiers( $modifiers )
   {
     foreach( (array)$modifiers as $modifier => $true )
       if( $true and isset($this->_modifiers[$modifier]) )
-        $this->_modifiers[$modifier] = true;
+				$this->_modifiers[$modifier] = true;
+			elseif( isset($this->_modifiers[$modifier]) )
+				$this->_modifiers[$modifier] = false;
   }
 
+	/**
+	 * Getter pour les modificateurs de porté et autre attibuts.
+	 * Ne pas utiliser cette méthode, utiliser le membre $modifiers en lecture à la place.
+	 * ----
+	 * foreach( $token->modifiers as $modifer );
+	 * ----
+	 * Return:
+	 *   array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
+	 *     boolean "static" = Indique si la méthode est statique.
+	 *     boolean "abstract" = Indique si la classe ou la méthode est abstraite.
+	 *     boolean "final" = Indique si la classe ou la méthode est finale.
+	 *     boolean "public" = Indique si la méthode est publique.
+	 *     boolean "protected" = Indique si la méthode est protégée.
+	 *     boolean "private" = Indique si la méthode est privée.
+	 */
   protected function get_modifiers()
   {
     return $this->_modifiers;
@@ -735,6 +794,34 @@ class TestToken extends UnitTestCase
 	{
 		$this->token->name = $f = 'frite';
 		$this->assertEqual( $this->token->name, $f );
+	}
+
+	// }}}
+	// {{{ testModifiersAppend(), testModifiersSet()
+
+	function testModifiersAppend()
+	{
+		$keys = array('static','abstract','final','public','protected','private');
+		$values = array();
+		$this->assertEqual( $this->token->modifiers, array_combine($keys,array_pad($values,count($keys),false)) );
+		foreach( $keys as $key )
+		{
+			$this->token->modifier = $key;
+			array_push($values,true);
+			$this->assertEqual( $this->token->modifiers, array_combine($keys,array_pad($values,count($keys),false)) );
+		}
+	}
+
+	function testModifiersSet()
+	{
+		$ref = array('static','abstract','final','public','protected','private');
+		$keys = array('static','abstract','final','public','protected','private');
+		while( $keys )
+		{
+			$key = array_shift($keys);
+			$this->token->modifiers = array_merge(array_combine($ref,array_pad(array(),count($ref),false)),$tmp=array_combine($ref,array_pad(array_pad(array(),count($ref)-count($keys),false),count($ref),true)));
+			$this->assertEqual( $this->token->modifiers, $tmp );
+		}
 	}
 
 	// }}}
