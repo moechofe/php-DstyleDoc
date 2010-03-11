@@ -4,8 +4,7 @@ require_once( 'include.properties.php' );
 
 /**
  * Les classes des tokens.
- * Contient les classes de correspondance avec les tokens PHP retournés par la fonction http://php.net/token_get_all .
- * Ces classes analysent le code PHP et instancie les classes d'éléments correspondantes.
+ * Contient les classes de correspondance avec les tokens PHP retournés par la fonction http://php.net/token_get_all. Ces classes analysent le code PHP et instancie les classes d'éléments correspondantes dérivées de Element. Ce script déclare des classe abstraites basé des groupes de token. Certain tokens génére automatiquement de la documentation (ex: TokenReturn, TokenThrow), certain ne font rien et d'autre influence les tokens analysée précédament (ex: TokenOr TokenString). Enfin une derrnère gatégorie sont les tokens qui transmettent la documentation (ex: TokenPublic, TokenAbstract).
  */
 
 /**
@@ -159,7 +158,16 @@ interface ElementToken
 
 /**
  * Classe de token utile.
- * Surement étendu par tous les token qui font du travail ou qui influance les tokens courant et suivant.
+ * Surement étendu par tous les tokens qui font du travail ou qui influence les tokens courants et suivant.
+ * Members:
+ *   string $file = Le chemin du fichier d'où proviens le token.
+ *     Accès en écriture : change le chemin du fichier grâce à set_file().
+ *     Accès en lecture : retourne le chemin du fichier grâce à get_file().
+ *     Accès isset() et unset() : refusé.
+ *   integer $line = La ligne a laquelle apparait le token.
+ *     Accès en écriture : change le numéro de ligne grâce à set_line().
+ *     Accès en lecture : retourne le numéro de ligne grâce à get_line().
+ *     Accès isset() et unset() : refusé.
  */
 abstract class Token extends CustomToken implements WorkToken
 {
@@ -177,14 +185,14 @@ abstract class Token extends CustomToken implements WorkToken
 
 	/**
 	 * Le chemin du fichier d'où proviens le token.
-	 * Utiliser le membre $file pour accéder au chemin du fichier.
+	 * Utiliser le membre $file pour accéder au chemin du fichier en lecture et écriture
 	 * Type:
 	 *   string = Le chemin du fichier.
 	 */
   protected $_file = '';
 
 	/**
-	 * Changer le chemin du fichier d'où proviens le token.
+	 * Setter pour le chemin du fichier d'où proviens le token.
 	 * Ne pas utiliser cette méthode, utiliser le membre $file en écriture à la place.
 	 * ----
 	 * $token->file = __FILE__;
@@ -199,7 +207,7 @@ abstract class Token extends CustomToken implements WorkToken
   }
 
 	/**
-	 * Retourne le chemin du fichier d'où proviens le token.
+	 * Getter pour le chemin du fichier d'où proviens le token.
 	 * Ne pas utiliser cette méthode, utiliser le membre $file en lecture à la place.
 	 * ----
 	 * echo $token->file;
@@ -216,15 +224,37 @@ abstract class Token extends CustomToken implements WorkToken
   // }}}
   // {{{ $line
 
+	/**
+	 * Le numéro de la ligne d'où proviens le token.
+	 * Utiliser le membre $line pour accéder au chemin du fichier en lecture et écriture.
+	 * Type:
+	 *   integer = Le numéro de ligne.
+	 */
   protected $_line = 0;
 
+	/**
+	 * Setter pour le numéro de la ligne d'où proviens le token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $line en écriture à la place.
+	 * ----
+	 * $token->line = __LINE__;
+	 * ----
+	 */
   protected function set_line( $line )
-  {
+	{
+		assert('!empty((integer)$line)');
     $this->_line = (integer)$line;
   }
 
+	/**
+	 * Getter pour le numéro de la ligne d'où proviens le token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $line en lecture à la place.
+	 * ----
+	 * echo $token->line;
+	 * ----
+	 */
   protected function get_line()
   {
+		assert('!empty($this->_line)');
     return $this->_line;
   }
 
@@ -569,6 +599,8 @@ class TestToken extends UnitTestCase
 	function setUp() { $this->token = new TestToken; }
 	function tearDown() { unset($this->token); }
 
+	// {{{ $file, $line
+
 	function testFile()
 	{
 		$this->token->file = __FILE__;
@@ -580,6 +612,10 @@ class TestToken extends UnitTestCase
 		$this->token->line = $l = __LINE__;
 		$this->assertEqual( $this->token->line, $l );
 	}
+
+	// }}}
+
+	function testOpenTag
 
 }
 
