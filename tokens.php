@@ -168,6 +168,14 @@ interface ElementToken
  *     Accès en écriture : change le numéro de ligne grâce à set_line().
  *     Accès en lecture : retourne le numéro de ligne grâce à get_line().
  *     Accès isset() et unset() : refusé.
+ *   TokenOpenTag $open_tag = Le token du tag PHP d'ouverture de code (<?php).
+ *     Accès en écriture : change l'instance du token. Récupère l'instance du token du tag PHP à partir du token courrant graĉe à set_open_tag()
+ *     Accès en lecture : retourne l'instance du token du tag PHP grâce à get_open_tag().
+ *     Accès isset() et unset() : refusé.
+ *   Token, string $documentation = Les lignes de la documentation du token.
+ *     Accès en écriture : ajoute des lignes ou copie les lignes d'un autre token grâce à set_documentation().
+ *     Accès en lecture : retourne les lignes de la documentation grâce à get_documentation().
+ *     Accès isset() et unset() : refusé.
  */
 abstract class Token extends CustomToken implements WorkToken
 {
@@ -202,7 +210,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 */
   protected function set_file( $file )
 	{
-		assert('!empty((string)$file)');
+		assert('(string)$file');
     $this->_file = (string)$file;
   }
 
@@ -217,7 +225,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 */
   protected function get_file()
 	{
-		assert('!empty($this->_file)');
+		assert('$this->_file');
     return $this->_file;
   }
 
@@ -241,7 +249,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 */
   protected function set_line( $line )
 	{
-		assert('!empty((integer)$line)');
+		assert('(integer)$line');
     $this->_line = (integer)$line;
   }
 
@@ -254,28 +262,56 @@ abstract class Token extends CustomToken implements WorkToken
 	 */
   protected function get_line()
   {
-		assert('!empty($this->_line)');
+		assert('$this->_line');
     return $this->_line;
   }
 
   // }}}
   // {{{ $open_tag
 
+	/**
+	 * Le tag PHP d'ouverture de code (<?php).
+	 * Utiliser le membre $open_tag pour accéder au chemin du fichier en lecture et écriture.
+	 * Type:
+	 *   TokenOpenTag = Le token du tag PHP d'ouverture de code.
+	 *   null = Ne devrait pas arrivé.
+	 */
   protected $_open_tag = null;
 
+	/**
+	 * Setter pour le tag PHP d'ouverture de code (<?php).
+	 * Ne pas utiliser cette méthode, utiliser le membre $open_tag en écriture à la place.
+	 * ----
+	 * $token = new self;
+	 * $token->open_tag = $current;
+	 * ----
+	 * Params:
+	 *   CustomToken $open_tag = L'instance du token courrant.
+	 *   TokenOpenTag $open_tag = L'instance du token du tag PHP.
+	 */
   protected function set_open_tag( CustomToken $open_tag )
   {
-    if( $open_tag instanceof Token_Open_Tag )
+    if( $open_tag instanceof TokenOpenTag )
       $this->_open_tag = $open_tag;
-    elseif( $open_tag->open_tag instanceof Token_Open_Tag )
+    elseif( $open_tag->open_tag instanceof TokenOpenTag )
       $this->_open_tag = $open_tag->open_tag;
   }
 
+	/**
+	 * Getter pour le tag PHP d'ouverture de code (<?php).
+	 * Ne pas utiliser cette méthode, utiliser le membre $open_tag en lecture à la place.
+	 * ----
+	 * var_dump( $token->open_tag );
+	 * ----
+	 * Return:
+	 *   TokenOpenTag = L'instance du token du tag PHP.
+	 *   FakeToken = Un faux token, si $_open_tag est vide.
+	 */
   protected function get_open_tag()
   {
-    if( $this->_open_tag instanceof Token_Open_Tag )
+    if( $this->_open_tag instanceof TokenOpenTag )
       return $this->_open_tag;
-    elseif( $this instanceof Token_Open_Tag )
+    elseif( $this instanceof TokenOpenTag )
       return $this;
     else
       return new FakeToken;
@@ -284,31 +320,62 @@ abstract class Token extends CustomToken implements WorkToken
   // }}}
   // {{{ $documentation
 
+	/**
+	 * Le documentation capturé pour le token courant.
+	 * Utiliser le membre $documentation pour accéder aux lignes de la documentation en lecture et écriture.
+	 * Type:
+	 *   string = Les lignes de documentation du token.
+	 */
   protected $_documentation = '';
 
+	/**
+	 * Setter pour les lignes de la documentation du token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $documentation en écriture à la place.
+	 * Permet de transmettre la documentation d'un token à un autre qui ne s'en est pas servis.
+	 * ----
+	 * $token = new self;
+	 * $token->documentation = $current;
+	 * ----
+	 * Params:
+	 *   TokenOpenTag, TokenClass = La documenation n'est pas capturé si elle proviens d'un token de tag PHP d'ouverture de code (<?php) ou du token de l'instruction de language (class).
+	 *   TokenDocComment, Token = La documentation de ce token sera transferé vers le nouveau token.
+	 *   string = Une ou plusieurs lignes à ajouter à la documentation du token.
+	 */
   protected function set_documentation( $documentation )
 	{
-		if( $documentation instanceof Token_Open_Tag )
+		if( $documentation instanceof TokenOpenTag )
 			null;
-		elseif( $documentation instanceof Token_Class )
+		elseif( $documentation instanceof TokenClass )
 			null;
     elseif( $documentation instanceof TokenDocComment or $documentation instanceof Token )
 		{
-			//var_dump( get_class($this) );
-			if( $this instanceof Token_Class or $this instanceof Token_Modifier or $this instanceof Token_Variable or $this instanceof Token_Function or $this instanceof Token_Const )
+			if( $this instanceof TokenClass or $this instanceof Token_Modifier or $this instanceof Token_Variable or $this instanceof Token_Function or $this instanceof Token_Const )
 				$this->set_documentation( $documentation->documentation );
 			else
 	      $this->open_tag->set_documentation( $documentation->documentation );
 		}
-    elseif( trim((string)$documentation) )
-    {
-      if( $this->_documentation )
-        $this->_documentation .= "\n".(string)$documentation;
-      else
-        $this->_documentation = (string)$documentation;
-    }
+    else
+		{
+			assert('(string)$documentation');
+			if( trim((string)$documentation) )
+			{
+	      if( $this->_documentation )
+  	      $this->_documentation .= "\n".(string)$documentation;
+    	  else
+					$this->_documentation = (string)$documentation;
+			}
+		}
   }
 
+	/**
+	 * Getter pour les lignes de documentation capturées.
+	 * Ne pas utiliser cette méthode, utiliser le membre $documentation en lecture à la place.
+	 * ----
+	 * foreach( explode("\n",$token->documentation) as $ligne );
+	 * ----
+	 * Return:
+	 *   string = Les lignes de documentation séparées par des retours chariots (\n);
+	 */
   protected function get_documentation()
   {
     return $this->_documentation;
@@ -317,15 +384,42 @@ abstract class Token extends CustomToken implements WorkToken
   // }}}
   // {{{ $name
 
+	/**
+	 * Le nom associé au token.
+	 * Cela peut être un nom de fonction, de classe, de variable...
+	 * Utiliser le membre $name pour accéder au nom en lecture et écriture.
+	 * Type:
+	 *   string = Le nom associé au token.
+	 */
   protected $_name = '';
 
+	/**
+	 * Setter pour le nom du token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $name en écriture à la place.
+	 * ----
+	 * $token->name = 'myFunction';
+	 * ----
+	 * Params:
+	 *   string $name = Le nom à associer au token.
+	 */
   protected function set_name( $name )
-  {
+	{
+		assert('(string)$name');
     $this->_name = (string)$name;
   }
 
+	/**
+	 * Getter pour le nom du token.
+	 * Ne pas utiliser cette méthode, utiliser le membre $name en lecture à la place.
+	 * ----
+	 * echo "function: {$token->name}";
+	 * ----
+	 * Return:
+	 *   string = Le nom associé au token.
+	 */
   protected function get_name()
-  {
+	{
+		assert('$this->_name');
     return $this->_name;
   }
 
@@ -465,13 +559,13 @@ abstract class Token extends CustomToken implements WorkToken
   {
     if( $object instanceof Token_Interface
       or $object instanceof Token_Function
-      or $object instanceof Token_Class
+      or $object instanceof TokenClass
       or $object instanceof Token_Context )
       $this->_object = $object;
 
     elseif( $object->object instanceof Token_Interface
       or $object->object instanceof Token_Function
-      or $object->object instanceof Token_Class
+      or $object->object instanceof TokenClass
       or $object->object instanceof Token_Context )
       $this->_object = $object->object;
   }
@@ -596,10 +690,10 @@ Mock::generatePartial('Token','MockToken',array('hie'));
 class TestToken extends UnitTestCase
 {
 	protected $token = null;
-	function setUp() { $this->token = new TestToken; }
+	function setUp() { $this->token = new MockToken; }
 	function tearDown() { unset($this->token); }
 
-	// {{{ $file, $line
+	// {{{ testFile(), testLine()
 
 	function testFile()
 	{
@@ -614,8 +708,35 @@ class TestToken extends UnitTestCase
 	}
 
 	// }}}
+	// {{{ testOpenTag()
 
-	function testOpenTag
+	function testOpenTag()
+	{
+		$this->assertIsA( $this->token->open_tag, 'FakeToken' );
+		$this->fail( 'Tester avec TokenOpenTag' );
+	}
 
+	// }}}
+	// {{{ testDocumentation()
+
+	function testDocumentation()
+	{
+		$this->assertEqual( $this->token->documentation,'' );
+		$this->token->documentation = $c = 'chocolat';
+		$this->token->documentation = $p = 'petit suisse';
+		$this->assertEqual( $this->token->documentation, "$c\n$p" );
+		$this->fail( 'Tester avec TokenOpenTag, TokenClass, TokenDocComment, Token, TokenClass, TokenModifier, TokenVariable, TokenFunction, TokenConst' );
+	}
+
+	// }}}
+	// {{{ testName()
+
+	function testName()
+	{
+		$this->token->name = $f = 'frite';
+		$this->assertEqual( $this->token->name, $f );
+	}
+
+	// }}}
 }
 
