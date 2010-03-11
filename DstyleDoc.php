@@ -850,7 +850,8 @@ class DstyleDoc_Element_Container
 
 		foreach( $this->data as $value )
 		{
-			if( strtolower($value->name) === strtolower((string)$data) )
+//			if( strtolower($value->name) === strtolower((string)$data) )
+			if( $value->name == (string)$data )
 				return $value;
 		}
 		return false;
