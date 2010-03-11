@@ -894,7 +894,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 			if( $method->protected or $method->public )
 				$methods[] = $method;
 
-		if( $this->parent )
+		if( $this->parent instanceof DstyleDoc_Element_Class )
 			foreach( $this->parent->heritable_methods as $method )
 				if( ! in_array($method, $methods) )
 					$methods[] = $method;
@@ -1040,7 +1040,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 	{
 		$membres = $this->_members;
 
-		if( $this->parent instanceof DstyleDoc_Element )
+		if( $this->parent instanceof DstyleDoc_Element_Class )
 			foreach( $this->parent->heritable_members as $membre )
 				if( ! in_array($membre, $membres) )
 					$membres[] = $membre;
@@ -1062,7 +1062,7 @@ class DstyleDoc_Element_Class extends DstyleDoc_Element_Methoded_Filed_Named
 			if( $membre->protected or $membre->public )
 				$membres[] = $membre;
 
-		if( $this->parent )
+		if( $this->parent instanceof DstyleDoc_Element_Class )
 			foreach( $this->parent->heritable_members as $membre )
 				if( ! in_array($membre, $membres) )
 					$membres[] = $membre;
