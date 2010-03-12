@@ -58,13 +58,13 @@ interface WorkToken
 	/**
 	 * Instancie un token de travail.
 	 * Params:
-	 *	 $converter = Le convertisseur utilisé pour convertir la documentation.
-	 *	 $current = Le token courant.
-	 *	 string $source = Le code source du token.
-	 *	 string $file = Le chemin du fichier source.
-	 *	 integer $line = La ligne qui contient le code source du token.
+	 *   $converter = Le convertisseur utilisé pour convertir la documentation.
+	 *   $current = Le token courant.
+	 *   string $source = Le code source du token.
+	 *   string $file = Le chemin du fichier source.
+	 *   integer $line = La ligne qui contient le code source du token.
 	 * Return:
-	 *	 WorkToken = L'instance du nouveau token courant.	 *
+	 *   WorkToken = L'instance du nouveau token courant.	 *
 	 */
 	static function hie( Converter $converter, CustomToken $current, $source, $file, $line );
 
@@ -151,7 +151,7 @@ interface ElementToken
 	 * Convertion du Token en Element.
 	 * Instancie les Element correspondant au code source analysé et remplis l'object Converter avec.
 	 * Params:
-	 *	 $converter = Le convertisseur qui sera utilisé par les Element durant la conversion.
+	 *   $converter = Le convertisseur qui sera utilisé par les Element durant la conversion.
 	 */
 	function to( Converter $converter );
 
@@ -162,39 +162,39 @@ interface ElementToken
  * Classe de token utile.
  * Surement étendu par tous les tokens qui font du travail ou qui influence les tokens courants et suivant.
  * Members:
- *	 string $file = Le chemin du fichier d'où provient le token.
- *		 Accès en écriture : change le chemin du fichier grâce à set_file().
- *		 Accès en lecture : retourne le chemin du fichier grâce à get_file().
- *		 Accès isset() et unset() : refusé.
- *	 integer $line = La ligne a laquelle apparait le token.
- *		 Accès en écriture : change le numéro de ligne grâce à set_line().
- *		 Accès en lecture : retourne le numéro de ligne grâce à get_line().
- *		 Accès isset() et unset() : refusé.
- *	 TokenOpenTag $open_tag = Le token du tag PHP d'ouverture de code (<?php).
- *		 Accès en écriture : change l'instance du token. Récupère l'instance du token du tag PHP à partir du token courrant graĉe à set_open_tag()
- *		 Accès en lecture : retourne l'instance du token du tag PHP grâce à get_open_tag().
- *		 Accès isset() et unset() : refusé.
- *	 Token, string $documentation = Les lignes de la documentation du token.
- *		 Accès en écriture : ajoute des lignes ou copie les lignes d'un autre token grâce à set_documentation().
- *		 Accès en lecture : retourne les lignes de la documentation grâce à get_documentation().
- *		 Accès isset() et unset() : refusé.
- *	 string $name = Le nom associé au token.
- *		 Accès en écriture : change le nom du token grâce à set_name().
- *		 Accès en lecteur : retourne le nom du token grâce à get_name().
- *		 Accès isset() et unset() : refusé.
- *	 string $modifier = Ajoute un modificateur au token
- *		 Accès en écriture : ajoute un modificateurs de porté ou attribut grâce à set_modifier().
- *		 Accès lecture, isset() et unset() : refusé.
- *	 array $modifiers = Change ou retourne la liste des modificateurs du token.
- *		 boolean "static" = Indique si la méthode est statique.
- *		 boolean "abstract" = Indique si la classe ou la méthode est abstraite.
- *		 boolean "final" = Indique si la classe ou la méthode est finale.
- *		 boolean "public" = Indique si la méthode est publique.
- *		 boolean "protected" = Indique si la méthode est protégée.
- *		 boolean "private" = Indique si la méthode est privée.
- *		 Accès en écriture : change les modificateurs du token grâce à set_modifiers().
- *		 Accès en lecture : retourne les modificateurs du token grâce à get_modifiers().
- *		 Accès isset() et unset() : refusé.
+ *   string $file = Le chemin du fichier d'où provient le token.
+ *  	 Accès en écriture : change le chemin du fichier grâce à set_file().
+ *  	 Accès en lecture : retourne le chemin du fichier grâce à get_file().
+ *  	 Accès isset() et unset() : refusé.
+ *   integer $line = La ligne a laquelle apparait le token.
+ *  	 Accès en écriture : change le numéro de ligne grâce à set_line().
+ *  	 Accès en lecture : retourne le numéro de ligne grâce à get_line().
+ *  	 Accès isset() et unset() : refusé.
+ *   TokenOpenTag $open_tag = Le token du tag PHP d'ouverture de code (<?php).
+ *  	 Accès en écriture : change l'instance du token. Récupère l'instance du token du tag PHP à partir du token courrant graĉe à set_open_tag()
+ *  	 Accès en lecture : retourne l'instance du token du tag PHP grâce à get_open_tag().
+ *  	 Accès isset() et unset() : refusé.
+ *   Token, string $documentation = Les lignes de la documentation du token.
+ *  	 Accès en écriture : ajoute des lignes ou copie les lignes d'un autre token grâce à set_documentation().
+ *  	 Accès en lecture : retourne les lignes de la documentation grâce à get_documentation().
+ *  	 Accès isset() et unset() : refusé.
+ *   string $name = Le nom associé au token.
+ *  	 Accès en écriture : change le nom du token grâce à set_name().
+ *  	 Accès en lecteur : retourne le nom du token grâce à get_name().
+ *  	 Accès isset() et unset() : refusé.
+ *   string $modifier = Ajoute un modificateur au token
+ *  	 Accès en écriture : ajoute un modificateurs de porté ou attribut grâce à set_modifier().
+ *  	 Accès lecture, isset() et unset() : refusé.
+ *   array $modifiers = Change ou retourne la liste des modificateurs du token.
+ *  	 boolean "static" = Indique si la méthode est statique.
+ *  	 boolean "abstract" = Indique si la classe ou la méthode est abstraite.
+ *  	 boolean "final" = Indique si la classe ou la méthode est finale.
+ *  	 boolean "public" = Indique si la méthode est publique.
+ *  	 boolean "protected" = Indique si la méthode est protégée.
+ *  	 boolean "private" = Indique si la méthode est privée.
+ *  	 Accès en écriture : change les modificateurs du token grâce à set_modifiers().
+ *  	 Accès en lecture : retourne les modificateurs du token grâce à get_modifiers().
+ *  	 Accès isset() et unset() : refusé.
  */
 abstract class Token extends CustomToken implements WorkToken
 {
@@ -215,7 +215,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Le chemin du fichier d'où provient le token.
 	 * Utiliser le membre $file pour accéder au chemin du fichier en lecture et écriture
 	 * Type:
-	 *	 string = Le chemin du fichier.
+	 *   string = Le chemin du fichier.
 	 */
 	protected $_file = '';
 
@@ -227,7 +227,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->file = __FILE__;
 	 * ----
 	 * Params:
-	 *	 string $file = Le chemin du fichier, ne doit pas être vide.
+	 *   string $file = Le chemin du fichier, ne doit pas être vide.
 	 */
 	protected function set_file( $file )
 	{
@@ -257,7 +257,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Le numéro de la ligne d'où provient le token.
 	 * Utiliser le membre $line pour accéder au chemin du fichier en lecture et écriture.
 	 * Type:
-	 *	 integer = Le numéro de ligne.
+	 *   integer = Le numéro de ligne.
 	 */
 	protected $_line = 0;
 
@@ -297,8 +297,8 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Le tag PHP d'ouverture de code (<?php).
 	 * Utiliser le membre $open_tag pour accéder au chemin du fichier en lecture et écriture.
 	 * Type:
-	 *	 TokenOpenTag = Le token du tag PHP d'ouverture de code.
-	 *	 null = Ne devrait pas arrivé.
+	 *   TokenOpenTag = Le token du tag PHP d'ouverture de code.
+	 *   null = Ne devrait pas arrivé.
 	 */
 	protected $_open_tag = null;
 
@@ -311,8 +311,8 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->open_tag = $current;
 	 * ----
 	 * Params:
-	 *	 CustomToken $open_tag = L'instance du token courrant.
-	 *	 TokenOpenTag $open_tag = L'instance du token du tag PHP.
+	 *   CustomToken $open_tag = L'instance du token courrant.
+	 *   TokenOpenTag $open_tag = L'instance du token du tag PHP.
 	 */
 	protected function set_open_tag( CustomToken $open_tag )
 	{
@@ -330,8 +330,8 @@ abstract class Token extends CustomToken implements WorkToken
 	 * var_dump( $token->open_tag );
 	 * ----
 	 * Return:
-	 *	 TokenOpenTag = L'instance du token du tag PHP.
-	 *	 FakeToken = Un faux token, si $_open_tag est vide.
+	 *   TokenOpenTag = L'instance du token du tag PHP.
+	 *   FakeToken = Un faux token, si $_open_tag est vide.
 	 */
 	protected function get_open_tag()
 	{
@@ -351,7 +351,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Le documentation capturé pour le token courant.
 	 * Utiliser le membre $documentation pour accéder aux lignes de la documentation en lecture et écriture.
 	 * Type:
-	 *	 string = Les lignes de documentation du token.
+	 *   string = Les lignes de documentation du token.
 	 */
 	protected $_documentation = '';
 
@@ -365,9 +365,9 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->documentation = $current;
 	 * ----
 	 * Params:
-	 *	 TokenOpenTag, TokenClass $documentation = La documenation n'est pas capturé si elle provient d'un token de tag PHP d'ouverture de code (<?php) ou du token de l'instruction de language (class).
-	 *	 TokenDocComment, Token $documentation = La documentation de ce token sera transferé vers le nouveau token.
-	 *	 string $documentation = Une ou plusieurs lignes à ajouter à la documentation du token.
+	 *   TokenOpenTag, TokenClass $documentation = La documenation n'est pas capturé si elle provient d'un token de tag PHP d'ouverture de code (<?php) ou du token de l'instruction de language (class).
+	 *   TokenDocComment, Token $documentation = La documentation de ce token sera transferé vers le nouveau token.
+	 *   string $documentation = Une ou plusieurs lignes à ajouter à la documentation du token.
 	 */
 	protected function set_documentation( $documentation )
 	{
@@ -403,7 +403,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * foreach( explode("\n",$token->documentation) as $ligne );
 	 * ----
 	 * Return:
-	 *	 string = Les lignes de documentation séparées par des retours chariots (\n);
+	 *   string = Les lignes de documentation séparées par des retours chariots (\n);
 	 */
 	protected function get_documentation()
 	{
@@ -419,7 +419,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Cela peut être un nom de fonction, de classe, de variable...
 	 * Utiliser le membre $name pour accéder au nom en lecture et écriture.
 	 * Type:
-	 *	 string = Le nom associé au token.
+	 *   string = Le nom associé au token.
 	 */
 	protected $_name = '';
 
@@ -431,7 +431,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->name = 'myFunction';
 	 * ----
 	 * Params:
-	 *	 string $name = Le nom à associer au token.
+	 *   string $name = Le nom à associer au token.
 	 */
 	protected function set_name( $name )
 	{
@@ -461,13 +461,13 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Liste des modificateurs de porté et autre attributs.
 	 * Utiliser le membre $modifier pour accéder au modificateurs en lecture et écriture.
 	 * Type:
-	 *	 array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
-	 *		 boolean "static" = Indique si la méthode est statique.
-	 *		 boolean "abstract" = Indique si la classe ou la méthode est abstraite.
-	 *		 boolean "final" = Indique si la classe ou la méthode est finale.
-	 *		 boolean "public" = Indique si la méthode est publique.
-	 *		 boolean "protected" = Indique si la méthode est protégée.
-	 *		 boolean "private" = Indique si la méthode est privée.
+	 *   array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
+	 *  	 boolean "static" = Indique si la méthode est statique.
+	 *  	 boolean "abstract" = Indique si la classe ou la méthode est abstraite.
+	 *  	 boolean "final" = Indique si la classe ou la méthode est finale.
+	 *  	 boolean "public" = Indique si la méthode est publique.
+	 *  	 boolean "protected" = Indique si la méthode est protégée.
+	 *  	 boolean "private" = Indique si la méthode est privée.
 	 */
 	protected $_modifiers = array(
 		'static' => false,
@@ -486,7 +486,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->modifier = 'public'; // Ajoute le modificateur de porté publique.
 	 * ----
 	 * Params:
-	 *	 string $modifier = Le nom du modifier à ajouter
+	 *   string $modifier = Le nom du modifier à ajouter
 	 */
 	protected function set_modifier( $modifier )
 	{
@@ -505,13 +505,13 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->modifiers = array( 'public', 'static' ); // Indique que le token est publique et statique
 	 * ----
 	 * Params:
-	 *	 array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
-	 *		 boolean "static" = Indique si la méthode est statique.
-	 *		 boolean "abstract" = Indique si la classe ou la méthode est abstraite.
-	 *		 boolean "final" = Indique si la classe ou la méthode est finale.
-	 *		 boolean "public" = Indique si la méthode est publique.
-	 *		 boolean "protected" = Indique si la méthode est protégée.
-	 *		 boolean "private" = Indique si la méthode est privée.
+	 *   array = La liste des modificateurs autorisés tous tokens concernés confondus (TokenClass, TokenFunction)
+	 *  	 boolean "static" = Indique si la méthode est statique.
+	 *  	 boolean "abstract" = Indique si la classe ou la méthode est abstraite.
+	 *  	 boolean "final" = Indique si la classe ou la méthode est finale.
+	 *  	 boolean "public" = Indique si la méthode est publique.
+	 *  	 boolean "protected" = Indique si la méthode est protégée.
+	 *  	 boolean "private" = Indique si la méthode est privée.
 	 */
 	protected function set_modifiers( $modifiers )
 	{
@@ -543,7 +543,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * La liste des tokens de fonctions du token de classe.
 	 * Utiliser les membres $method et $methodes pour accéder au modificateurs en lecture et écriture.
 	 * Type:
-	 *	 array(TokenFunction) = La liste des tokens de fonction.
+	 *   array(TokenFunction) = La liste des tokens de fonction.
 	 */
 	protected $_methods = array();
 
@@ -555,8 +555,8 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->method = TokenFunction::hie( ... );
 	 * ----
 	 * Params:
-	 *	 TokenFunction $method = Ajout du token de fonction dans la liste.
-	 *	 CustomToken $method = Pas d'ajout.
+	 *   TokenFunction $method = Ajout du token de fonction dans la liste.
+	 *   CustomToken $method = Pas d'ajout.
 	 */
 	protected function set_method( CustomToken $method )
 	{
@@ -585,7 +585,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Liste des tokens de variable.
 	 * Utiliser le membre $vars pour accéder à la liste des variable en lecture et écriture.
 	 * Type:
-	 *	 array(TokenVariable) = La liste des variables.
+	 *   array(TokenVariable) = La liste des variables.
 	 */
 	protected $_vars = array();
 
@@ -597,8 +597,8 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->var = TokenVariable::hie( ... )
 	 * ----
 	 * Params:
-	 *	 TokenVariable $var = Ajoute le token de variable dans la liste.
-	 *	 CustomToken $var = Ne fait rien.
+	 *   TokenVariable $var = Ajoute le token de variable dans la liste.
+	 *   CustomToken $var = Ne fait rien.
 	 */
 	protected function set_var( CustomToken $var )
 	{
@@ -627,7 +627,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Liste des types de variable.
 	 * Utiliser les membres $type et $types pour accéder à la liste des types de variable en lecture et écriture.
 	 * Type:
-	 *	 array(string) = La liste des types de variable.
+	 *   array(string) = La liste des types de variable.
 	 */
 	protected $_types = array();
 
@@ -640,7 +640,7 @@ abstract class Token extends CustomToken implements WorkToken
 	 * $token->type = 'string'; // Ajoute le type "string" dans la liste.
 	 * ----
 	 * Params:
-	 *	 string $type = Ajoute un type à la liste.
+	 *   string $type = Ajoute un type à la liste.
 	 */
 	protected function set_type( $type )
 	{
@@ -665,25 +665,75 @@ abstract class Token extends CustomToken implements WorkToken
 	// }}}
 	// {{{ $returns
 
+	/**
+	 * Valeur de retour
+	 * Liste des valeurs de retour d'une fonction.
+	 * Utiliser les membres $return et $returns pour accéder à la liste des types de variable en lecture et écriture.
+	 * Type:
+	 *   array(string) = La liste des valeurs de retour.
+	 */
 	protected $_returns = array();
 
-	protected function set_return( $return)
+	/**
+	 * Setter pour les valeurs de retour
+	 * Setter pour la liste des valeurs de retour de fonction $_returns.
+	 * Ne pas utiliser cette méthode, utiliser le membre $return en écriture à la place.
+	 * Utiliser avec une chaine de caractère : modifie le type de la valeur de retour.
+	 * Utiliser avec TRUE : ajoute un nouveau type de valeur de retour.
+	 * ----
+	 * $token->return = 'integer'; // Ajoute le type de valeur de retour "integer"
+	 * $token->return = 'string'; // Change le type "integer" en "string"
+	 * $token->return = true; // Ajoute un nouveau type vide
+	 * $token->return = 'array'; // Change le type vide en "array"
+	 * echo $token->returns[0]; // Affichera "string"
+	 * ehoc $token->returns[1]; // Affichera "array"
+	 * ----
+	 * Params:
+	 *   string $return = Le type de valeur à ajouter à la liste ou en remplacement du précédent type de valeur.
+	 *   true $return = Ajoute un nouveau type de valeur vide à la liste.
+	 */
+	protected function set_return( $return )
 	{
 		if( $return === true )
 		{
-			$this->_returns = array_values(array_unique($this->_returns));
 			if( $this->get_return() !== '' )
 				$this->_returns[] = '';
 		}
 		else
-			$this->_returns[ count($this->_returns)-1 ] = (string)$return;
+		{
+			assert('(string)$return');
+			$this->_returns[ max(0,count($this->_returns)-1) ] = (string)$return;
+		}
 	}
 
+	/**
+	 * Getter pour les valeurs de retour
+	 * Getter pour la liste des valeurs de retour de fonction $_returns.
+	 * Retourne le dernier type de valeur de retour ajouté.
+	 * Ne pas utiliser cette méthode, utiliser le membre $return en lecture à la place.
+	 * ----
+	 * $token->return = 'resource';
+	 * echo $token->return; // Affichera "resource"
+	 * ----
+	 * Return:
+	 *   string = Le dernier type de valeur de retour ajouté.
+	 *   false = Aucun type de valeur de retour ajouté.
+	 */
 	protected function get_return()
 	{
 		return end($this->_returns);
 	}
 
+	/**
+	 * Getter pour les valeurs de retour
+	 * Getter pour la liste des valeurs de retour de fonction $_returns.
+	 * Ne pas utiliser cette méthode, utiliser le membre $returns en lecture à la place.
+	 * ----
+	 * foreach( $token->returns as $return );
+	 * ----
+	 * Return:
+	 *   	array(string) = La liste des types de valeur de retour de fonction.
+	 */
 	protected function get_returns()
 	{
 		if( $this->get_return() === '' )
@@ -692,10 +742,21 @@ abstract class Token extends CustomToken implements WorkToken
 		return array_unique($this->_returns);
 	}
 
+	/**
+	 * Setter pour les valeurs de retour
+	 * Setter pour la liste des valeurs de retour de fonction $_returns.
+	 * Ne pas utiliser cette méthode, utiliser le membre $returns en lecture à la place.
+	 * ----
+	 * $token->returns = array('string','integer');
+	 * ----
+	 * Fixme: Cette méthode est plus restrictive que les autres : set_returns() interdit les array( $object->toString() )
+	 */
 	protected function set_returns( $returns )
 	{
-		$this->_returns = (array)$returns;
+		assert('(array)$returns');
+		$this->_returns = array_filter( (array)$returns, 'is_string' );
 	}
+
 	// }}}
 	// {{{ $default
 
@@ -878,7 +939,7 @@ class TestToken extends UnitTestCase
 	}
 
 	// }}}
-	// {{{ testDocumentation(), testTypes()
+	// {{{ testDocumentation(), testTypes(), testReturns()
 
 	function testDocumentation()
 	{
@@ -895,6 +956,21 @@ class TestToken extends UnitTestCase
 		$this->token->type = $t = 'tako yaki';
 		$this->token->type = $c = 'côte de boeuf';
 		$this->assertEqual( $this->token->types, array($t,$c) );
+	}
+
+	function testReturns()
+	{
+		$this->assertEqual( $this->token->returns, array() );
+		$this->assertFalse( $this->token->return );
+		$this->token->return = 'choux fleur';
+		$this->token->return = $b = 'brocoli';
+		$this->assertEqual( $this->token->return, $b );
+		$this->token->return = true;
+		$this->token->return = $c = 'carote';
+		$this->assertEqual( $this->token->return, $c );
+		$this->assertEqual( $this->token->returns, array($b,$c) );
+		$this->token->returns = $e = array('épinards');
+		$this->assertEqual( $this->token->returns, $e );
 	}
 
 	// }}}
