@@ -760,13 +760,39 @@ abstract class Token extends CustomToken implements WorkToken
 	// }}}
 	// {{{ $default
 
+	/**
+	 * Valeur par défaut
+	 * Valeur par défaut pour un paramètre de fonction.
+	 * Utiliser le membre $default pour accéder à la liste des variable en lecture et écriture.
+	 * Type:
+	 *   string = La valeur par défault définie dans le code source.
+	 */
 	protected $_default = '';
 
+	/**
+	 * Setter pour la valeur par défaut
+	 * Setter pour la valeur par défaut d'un paramètre de fonction $_default.
+	 * Ne pas utiliser cette méthode, utiliser le membre $default en écriture à la place.
+	 * ----
+	 * $token->default = 'null';
+	 * ----
+	 * Params:
+	 *   string = La valeur par défault du paramètre de fonction.
+	 */
 	protected function set_default( $default )
 	{
-		$this->_default = $default;
+		assert('(string)$default');
+		$this->_default = (string)$default;
 	}
 
+	/**
+	 * Getter pour la valeur par défaut
+	 * Getter pour la valeur par défaut d'un paramètre de fonction $_default.
+	 * Ne pas utiliser cette méthode, utiliser le membre $default en lecture à la place.
+	 * ----
+	 * echo $token->default;
+	 * ----
+	 */
 	protected function get_default()
 	{
 		return $this->_default;
@@ -974,12 +1000,18 @@ class TestToken extends UnitTestCase
 	}
 
 	// }}}
-	// {{{ testName()
+	// {{{ testName(), testDefault()
 
 	function testName()
 	{
 		$this->token->name = $f = 'frite';
 		$this->assertEqual( $this->token->name, $f );
+	}
+
+	function testDefault()
+	{
+		$this->token->default = $c = 'crabe';
+		$this->assertEqual( $thos->token->default, $c );
 	}
 
 	// }}}
