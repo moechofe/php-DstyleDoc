@@ -12,7 +12,8 @@ require_once( 'converter.FirstStyle.php' );
 error_reporting( E_ALL | E_STRICT );
 
 DstyleDoc::hie()
-	->source( 'DstyleDoc.php' )
+	->source( 'converter.php' )
+	->source( 'element.php' )
 //	->source( 'process.tokens.php' )
 	->convert_with(
 

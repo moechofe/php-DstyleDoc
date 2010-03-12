@@ -131,6 +131,7 @@ class DstyleDoc_Converter_FirstStyle extends DstyleDoc_Converter_TemplateLite
 		}
 		elseif( ! empty($_GET['method']) and @list($file,$class,$method) = explode(',',$_GET['method']) and $found = $this->method_exists($class,$method) )
 		{
+			d($found->returns);
 			$this->tpl->assign( 'method', $found );
 			$this->tpl->assign( 'this', $found );
 			$this->tpl->display( 'method.tpl' );

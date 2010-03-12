@@ -26,7 +26,7 @@ div.content-display h1 { font-weight: normal; }
  */
 span.display span.member-part { white-space: nowrap; }
 
-span.display-method { background-repeat: no-repeat; background-position: left; padding-left: 20px; line-height: 18px; }
+span.display-method { background-repeat: no-repeat; background-position: 3px; padding-left: 20px; line-height: 18px; }
 span.display-method.method-public { background-image: url("Icon_method_public.png"); }
 span.display-method.method-protected { background-image: url("Icon_method_protected.png"); }
 span.display-method.method-private { background-image: url("Icon_method_private.png"); }
@@ -37,12 +37,12 @@ span.display-method.method-public-final { background-image: url("Icon_method_pub
 span.display-method.method-protected-final { background-image: url("Icon_method_protected_final.png"); }
 span.display-method.method-private-final { background-image: url("Icon_method_private_final.png"); }
 
-span.display-class { background-repeat: no-repeat; background-position: left; padding-left: 20px; line-height: 18px; }
+span.display-class { background-repeat: no-repeat; background-position: 3px; padding-left: 20px; line-height: 18px; }
 span.display-class.class { background-image: url("Icon_class.png"); }
 span.display-class.class-abstract { background-image: url("Icon_class_abstract.png"); }
 span.display-class.class-final { background-image: url("Icon_class_final.png"); }
 
-span.display-member { background-repeat: no-repeat; background-position: left; padding-left: 20px; line-height: 18px; }
+span.display-member { background-repeat: no-repeat; background-position: 3px; padding-left: 20px; line-height: 18px; }
 span.display-member.member-public { background-image: url("Icon_member_public.png"); }
 span.display-member.member-protected { background-image: url("Icon_member_protected.png"); }
 span.display-member.member-private { background-image: url("Icon_member_private.png"); }
@@ -50,9 +50,9 @@ span.display-member.member-public-static { background-image: url("Icon_static_me
 span.display-member.member-protected-static { background-image: url("Icon_static_member_protected.png"); }
 span.display-member.member-private-static { background-image: url("Icon_static_member_private.png"); }
 
-span.display-function { background: url("Icon_function.png") no-repeat left; padding-left: 20px; line-height: 18px; }
+span.display-function { background: url("Icon_function.png") no-repeat 3px; padding-left: 20px; line-height: 18px; }
 
-span.display-file { background: url("Icon_file.png") no-repeat left; padding-left: 20px; line-height: 18px; }
+span.display-file { background: url("Icon_file.png") no-repeat 3px; padding-left: 20px; line-height: 18px; }
 
 h1 span.display { background: inherit !important; padding-left: 0px !important; }
 
@@ -95,7 +95,7 @@ a { color: mediumblue; }
 #page-content div.content-syntax h2 { margin-top: 0px; margin-bottom: 10px; }
 #page-content div.content-syntax ul { margin-bottom: 0px; list-style: none; padding-left: 0px; margin-top: 10px; }
 #page-content div.syntax-code { display: table-cell; border: solid 1px black; background: white; padding: 8px 10px; }
-#page-content div.content-params { background-color: palegoldenrod; padding: 8px 10px; margin-top: 10px; }
+#page-content div.content-params { background-color: palegoldenrod; padding: 8px 10px; margin: 10px 0px; }
 #page-content div.content-params h2 { margin-top: 0px; margin-bottom: 10px; }
 #page-content div.content-params dl { margin-bottom: 0px; margin-top: 10px; }
 #page-content div.content-params dd + dt { margin-top: 20px; }
