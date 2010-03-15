@@ -337,38 +337,39 @@ interface ConverterInterface
  */
 abstract class Converter extends Properties implements ArrayAccess, ConverterInterface
 {
-	// {{{ $dsd
+	// {{{ $control
 
 	/**
 	 * L'instance de DstyleDoc associé au converteur.
 	 * Type: DstyleDoc
 	 * Members:
-	 *   (set,get) DstyleDoc $dsd = L'instance de DstyleDoc associé au converteur.
+	 *   (set,get) DstyleDoc $control = L'instance de DstyleDoc associé au converteur.
 	 */
-	protected $_dsd = null;
+	protected $_control = null;
 
 	/**
-	 * Setter pour $_dsd
+	 * Setter pour $_control
 	 * Met à jour l'instance de DstyleDoc associé au converteur.
-	 * Il est préferable d'accèder au membre $_dsd en écriture plutôt que d'appelé cette méthode.
+	 * Il est préferable d'accèder au membre $_control en écriture plutôt que d'appelé cette méthode.
 	 * Params:
 	 *   DstyleDoc = L'instance de DstyleDoc à associer au converteur.
 	 */
-	protected function set_dsd( DstyleDoc $dsd )
+	protected function set_control( Control $control )
 	{
-		$this->_dsd = $dsd;
+		$this->_control = $control;
 	}
 
 	/**
-	 * Getter pour $_dsd
+	 * Getter pour $_control
 	 * Retourne l'instance de DstyleDoc associé au converteur.
-	 * Il est préferable d'accèder au membre $_dsd en lecture plutôt que d'appelé cette méthode.
+	 * Il est préferable d'accèder au membre $_control en lecture plutôt que d'appelé cette méthode.
 	 * Returns:
 	 *   DstyleDoc = L'instance de DstyleDoc associé au converteur.
 	 */
-	protected function get_dsd()
+	protected function get_control()
 	{
-		return $this->_dsd;
+		assert('$this->_control instanceof Control');
+		return $this->_control;
 	}
 
 	// }}}
@@ -994,7 +995,7 @@ abstract class Converter extends Properties implements ArrayAccess, ConverterInt
 
 require_once( 'dev.documentation.php' );
 require_once( 'dev.unittest.php' );
-require_once( 'element.php' );
+require_once( 'control.php' );
 
 Mock::generatePartial('Converter','MockConverter',array(
 	'convert_all', 'convert_file', 'convert_class', 'convert_interface', 'convert_function',
@@ -1002,4 +1003,19 @@ Mock::generatePartial('Converter','MockConverter',array(
 	'convert_display', 'convert_syntax', 'convert_param', 'convert_return', 'convert_type',
 	'convert_exception', 'convert_member', 'convert_text', 'convert_php', 'convert_todo',
 	'hie' ));
+
+class TestConverter extends UnitTestCase
+{
+	protected $converter = null;
+	function setUp() { $this->converter = new MockConverter; }
+	function  tearDown() { unset($this->converter); }
+
+	function testControl()
+	{
+		$this->assertNull( $this->converter->control );
+		$this->converter->control = Control::hie();
+		$this->assertIsA( $this->converter->control, 'Control' );
+	}
+
+}
 

@@ -43,6 +43,11 @@ DstyleDoc::hie()->source($script_name)->convert_with(
 'method_returns' => 'valeurs de retour',
 'method_exceptions' => 'exceptions lancés',
 
+'member_title' => '%s',
+'member_display' => 'Le membre <strong>%s</strong>',
+'member_package' => 'Paquetages : ',
+'member_types' => 'Types de valeur',
+
 'return_from' => 'Retourné depuis %2$s',
 // fixme: très foireux
 'return_from_free' => 'Retourné depuis %1$s',
