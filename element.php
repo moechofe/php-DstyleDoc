@@ -255,6 +255,7 @@ abstract class CustomElement extends Properties implements ArrayAccess
 
 	final public function offsetUnset( $offset )
 	{
+		assert('false','Forbidden');
 	}
 
 	// }}}
@@ -847,11 +848,15 @@ class TestCustomElement extends UnitTestCase
 		$this->assertEqual( $this->element->descriptions, array() );
 	}
 
-	function test__serialize()
+	function testSerialize()
 	{
 		$this->element->description = $s = 'saussice';
 		$this->element = unserialize(serialize($this->element));
 		$this->assertEqual( $this->element->descriptions, array($s) );
+	}
+
+	function testArrayAcces()
+	{
 	}
 }
 
