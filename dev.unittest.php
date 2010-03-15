@@ -10,18 +10,18 @@ register_shutdown_function('unittest_autorun');
 
 function unittest_autorun()
 {
+	$testclass = array();
 	foreach( get_declared_classes() as $class )
 		if( is_subclass_of($class,'UnitTestCase') )
 		{
 			$reflection = new ReflectionClass($class);
-			if( $_SERVER['SCRIPT_FILENAME'] == $reflection->getFileName() )
-			{
-				$loader = new SimpleFileLoader();
-				$suite = $loader->createSuiteFromClasses(basename($reflection->getFileName()),array($class));
-				$result = $suite->run( new DstyleDocReporter() );
-				if( SimpleReporter::inCli() ) exit( $result ? 0 : 1 );
-			}
+			if( $_SERVER['SCRIPT_FILENAME'] == $reflection->getFileName() and ! $reflection->isAbstract() )
+				$testclass[] = $class;
 		}
+	$loader = new SimpleFileLoader();
+	$suite = $loader->createSuiteFromClasses(basename($reflection->getFileName()),$testclass);
+	$result = $suite->run( new DstyleDocReporter() );
+	if( SimpleReporter::inCli() ) exit( $result ? 0 : 1 );
 }
 
 class DstyleDocReporter extends SimpleReporter

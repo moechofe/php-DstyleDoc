@@ -96,6 +96,12 @@ class BadPropertyException extends LogicException
 	public function __construct( $class, $member )
 	{
 		parent::__construct( sprintf('Access denied for %s::$%s.', get_class($class), $member) );
+		$trace = $this->getTrace();
+		if( isset($trace[0]) and isset($trace[0]['line']) and isset($trace[0]['file']) )
+		{
+			$this->line = $trace[0]['line'];
+			$this->file = $trace[0]['file'];
+		}
 	}
 }
 }

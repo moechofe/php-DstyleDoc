@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'include.properties.php' );
+require_once 'include.properties.php';
 
 /**
  * Classe de base d'un Element.
@@ -12,15 +12,17 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	// {{{ $converter
 
 	/**
+	 * Convertisseur
 	 * L'instance du convertisseur.
 	 * Utilisez les setter et getter du membre $converter pour accéder a l'instance du convertisseur.
 	 * Type:
-	 *   Converter
+	 *   Converter = L'instance du convertisseur utilisé pour la génération de la documentation.
 	 */
 	protected $_converter = null;
 
 	/**
-	 * Setter pour l'instance du convertisseur.
+	 * Setter pour convertisseur
+	 * Setter pour l'instance du convertisseur $_converter.
 	 * Ne pas utiliser cette méthode, utiliser le membre $converter en écriture à la place.
 	 * ----
 	 * $element->converter = new Converter;
@@ -34,13 +36,12 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	}
 
 	/**
-	 * Getter pour l'instance du convertisseur.
+	 * Getter pour convertisseur
+	 * Getter pour l'instance du convertisseur $_converter.
 	 * Ne pas utiliser cette méthode, utiliser le membre $converter en lecture à la place.
 	 * ----
 	 * var_dump( $element->converter );
 	 * ----
-	 * Return:
-	 *   Converter = L'instance du convertisseur utilisé pour la génération de la documentation.
 	 */
 	protected function get_converter()
 	{
@@ -52,6 +53,7 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	// {{{ $descriptions
 
 	/**
+	 * Description
 	 * Liste des lignes de descriptions associées a l'élément.
 	 * Type:
 	 *    array = Un tableau de chaine de caractère ou d'instance de Descritable.
@@ -59,21 +61,22 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	protected $_descriptions = array();
 
 	/**
-	 * Retourne la liste des descriptions associées a l'élément.
+	 * Getter pour description
+	 * Getter pour la liste des descriptions associées a l'élément $_descriptions.
 	 * Ne pas utiliser cette méthode, utiliser le membre $descriptions en lecture à la place.
 	 * ----
 	 * foreach( $element->descriptions as $item );
 	 * ----
-	 * Return:
-	 *    array = Un tableau de chaine de caractère ou d'instance de Descritable.
 	 */
 	protected function get_descriptions()
 	{
+		assert('is_array((array)$this->_descriptions)');
 		return $this->_descriptions;
 	}
 
 	/**
-	 * Change la liste des descriptions associées a l'élément.
+	 * Setter pour description
+	 * Setter pour la liste des descriptions associées a l'élément $_descriptions.
 	 * Ne pas utiliser cette méthode, utiliser le membre $descriptions en écriture à la place.
 	 * ----
 	 * $element->descriptions = array( 'ligne de description' );
@@ -83,10 +86,15 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	 */
 	protected function set_descriptions( $descriptions )
 	{
-		$this->_descriptions = (array)$descriptions;
+		assert('is_array((array)$descriptions)');
+		unset($this->description);
+		foreach( (array)$descriptions as $description )
+			$this->description = $description;
 	}
 
 	/**
+	 * Setter pour description
+	 * Setter pour la liste des descriptions associées a l'élément $_descriptions.
 	 * Ajoute une ligne de description à la documentation de l'élément.
 	 * Contrairement à ce que cette fonction suggère, elle ne change pas la description mais ajoute une description dans le membre $_descriptions.
 	 * Ne pas utiliser cette méthode, utiliser le membre $description en écriture à la place.
@@ -99,33 +107,46 @@ abstract class CustomElement extends Properties implements ArrayAccess
 	 */
 	protected function set_description( $description )
 	{
-		//d( gettype( $description ) );
-		/*if( $description instanceof DstyleDoc_Descritable )
-			$this->_descriptions = array_merge( $this->_descriptions, $description->descriptions );
-		else*/
-//			$this->_descriptions[] = (string)$description;
-			$this->_descriptions[] = $description;
+		assert('is_string((string)$description) or $description instanceof Descritable');
+		$this->_descriptions[] = $description;
 	}
 
 	/**
+	 * Getter pour description
+	 * Getter pour la liste des descriptions associées a l'élément $_descriptions.
 	 * Retourne la version convertie de la documentation.
 	 * Utilise l'instance du convertisseur $_converter pour retourner la documentation de l'élément.
 	 * Ne pas utiliser cette méthode, utiliser le membre $description en lecture à la place.
 	 * ----
 	 * echo $element->description;
 	 * ----
-	 *
 	 */
 	protected function get_description()
 	{
 		return $this->converter->convert_description( $this->_descriptions, $this );
 	}
 
+	/**
+	 * Isseter pour description
+	 * Isseted pour la liste des descriptions associées a l'élément $_descriptions.
+	 * Ne pas utiliser cette méthode, utiliser le membre $description avec l'instruction isset() à la place.
+	 * ----
+	 * if( isset($element->description) );
+	 * ----
+	 */
 	protected function isset_description()
 	{
 		return (boolean)$this->_descriptions;
 	}
 
+	/**
+	 * Unseter pour description
+	 * Unseter pour la liste des descriptions associées a l'élément $_descriptions.
+	 * Ne pas utiliser cette méthode, utiliser le membre $description avec l'instruction unset() à la place.
+	 * ----
+	 * unset($element->description);
+	 * ----
+	 */
 	protected function unset_description()
 	{
 		$this->_descriptions = array();
@@ -256,15 +277,42 @@ abstract class AnalyseableElement extends CustomElement
 {
 	// {{{ $analysed
 
+	/**
+	 * Documentation analysée
+	 * Indique si la documentation associé $_analysed à été analysée.
+	 * Utiliser le membre $analyse pour accéder l'information de documentation analysée en lecture et écriture.
+	 * Type:
+	 *   boolean = Indique si la documentation à été analyée.
+	 */
 	protected $_analysed = false;
 
+	/**
+	 * Setter pour documentation analysée
+	 * Setter pour l'information de documentation analysée.
+	 * Ne pas utiliser cette méthode, utiliser le membre $analysed en écriture à la place.
+	 * ----
+	 * $element->analysed = true;
+	 * ----
+	 * Params:
+	 *   boolean $analysed = L'état analysée de la documentation.
+	 */
 	protected function set_analysed( $analysed )
 	{
+		assert('is_bool((boolean)$analysed)');
 		$this->_analysed = (boolean)$analysed;
 	}
 
+	/**
+	 * Getter pour documentation analysée
+	 * Getter pour l'information de documentation analysée.
+	 * Ne pas utiliser cette méthode, utiliser le membre $analysed en lecture à la place.
+	 * ----
+	 * if( $element->analysed );
+	 * ----
+	 */
 	protected function get_analysed()
 	{
+		assert('is_bool((boolean)$this->_analysed)');
 		return $this->_analysed;
 	}
 
@@ -274,6 +322,7 @@ abstract class AnalyseableElement extends CustomElement
 	protected function get_description()
 	{
 		$this->analyse();
+		assert('(array)$this->_descriptions');
 		return $this->converter->convert_description( $this->_descriptions, $this );
 	}
 
@@ -763,16 +812,19 @@ abstract class MethodedElement extends NamedElement
 	// }}}
 }
 
-require_once( 'dev.documentation.php' );
-require_once( 'dev.unittest.php' );
-require_once( 'converter.php' );
+require_once 'dev.documentation.php';
+require_once 'dev.unittest.php';
+require_once 'converter.php';
 
 Mock::generatePartial('CustomElement','MockCustomElement',array('get_display','get_convert'));
+Mock::generatePartial('AnalyseableElement','MockAnalyseableElement',array('get_display','get_convert','get_analyseable'));
+Mock::generatePartial('Element','MockElement',array('get_display','get_convert','get_id'));
+Mock::generatePartial('TitledElement','MockTitledElement',array('get_display','get_convert','get_id'));
 
 class TestCustomElement extends UnitTestCase
 {
 	protected $element = null;
-	function setUp() { $this->element = new MockCustomElement(); }
+	function setUp() { $this->element = new MockCustomElement; }
 	function tearDown() { unset($this->element); }
 
 	function testConstructAndConverter()
@@ -782,9 +834,6 @@ class TestCustomElement extends UnitTestCase
 		$this->assertIsA( $this->element['converter'], 'Converter' );
 	}
 
-	/**
-	 * Ne teste pas la conversion.
-	 */
 	function testDescription()
 	{
 		$this->element->description = $b = 'banana';
@@ -797,6 +846,40 @@ class TestCustomElement extends UnitTestCase
 		$this->assertFalse( isset($this->element->description) );
 		$this->assertEqual( $this->element->descriptions, array() );
 	}
+
+	function test__serialize()
+	{
+		$this->element->description = $s = 'saussice';
+		$this->element = unserialize(serialize($this->element));
+		$this->assertEqual( $this->element->descriptions, array($s) );
+	}
 }
 
+class TestAnalyseableElement extends TestCustomElement
+{
+	function setUp() { $this->element = new MockAnalyseableElement; }
+	function tearDown() { unset($this->element); }
+
+	function testAnalysed()
+	{
+		$this->assertFalse( $this->element->analysed );
+		$this->element->analysed = true;
+		$this->assertTrue( $this->element->analysed );
+		$this->element->analysed = false;
+		$this->assertFalse( $this->element->analysed );
+	}
+}
+
+class TestElement extends TestAnalyseableElement
+{
+	function setUp() { $this->element = new MockElement; }
+	function tearDown() { unset($this->element); }
+}
+
+class TestTitledElement extends UnitTestCase
+{
+	protected $element = null;
+	function setUp() { $this->element = new MockTitledElement(); }
+	function tearDown() { unset($this->element); }
+}
 

@@ -993,9 +993,10 @@ abstract class Converter extends Properties implements ArrayAccess, ConverterInt
 	// }}}
 }
 
-require_once( 'dev.documentation.php' );
-require_once( 'dev.unittest.php' );
-require_once( 'control.php' );
+require_once 'dev.documentation.php';
+require_once 'dev.unittest.php';
+require_once 'element.php';
+require_once 'control.php';
 
 Mock::generatePartial('Converter','MockConverter',array(
 	'convert_all', 'convert_file', 'convert_class', 'convert_interface', 'convert_function',
@@ -1008,11 +1009,10 @@ class TestConverter extends UnitTestCase
 {
 	protected $converter = null;
 	function setUp() { $this->converter = new MockConverter; }
-	function  tearDown() { unset($this->converter); }
+	function tearDown() { unset($this->converter); }
 
 	function testControl()
 	{
-		$this->assertNull( $this->converter->control );
 		$this->converter->control = Control::hie();
 		$this->assertIsA( $this->converter->control, 'Control' );
 	}
