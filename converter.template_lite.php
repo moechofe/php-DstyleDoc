@@ -126,6 +126,8 @@ abstract class DstyleDoc_Converter_TemplateLite extends DstyleDoc_Converter_HTML
 
 	public function convert_member( DstyleDoc_Element_Member $member )
 	{
+		$this->tpl->assign( '_member', $member );
+		return $this->tpl->fetch( __CLASS__.':convert_member.tpl' );
 	}
 
 	// }}}
