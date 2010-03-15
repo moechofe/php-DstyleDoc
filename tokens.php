@@ -161,11 +161,6 @@ interface ElementToken
 /**
  * Classe de token utile.
  * Surement étendu par tous les tokens qui font du travail ou qui influence les tokens courants et suivant.
- * Members:
- *   string $file = Le chemin du fichier d'où provient le token.
- *  	 Accès en écriture : change le chemin du fichier grâce à set_file().
- *  	 Accès en lecture : retourne le chemin du fichier grâce à get_file().
- *  	 Accès isset() et unset() : refusé.
  *   integer $line = La ligne a laquelle apparait le token.
  *  	 Accès en écriture : change le numéro de ligne grâce à set_line().
  *  	 Accès en lecture : retourne le numéro de ligne grâce à get_line().
@@ -216,6 +211,11 @@ abstract class Token extends CustomToken implements WorkToken
 	 * Utiliser le membre $file pour accéder au chemin du fichier en lecture et écriture
 	 * Type:
 	 *   string = Le chemin du fichier.
+	 * Members:
+	 *   string $file = Le chemin du fichier d'où provient le token.
+	 *  	 Accès en écriture : change le chemin du fichier grâce à set_file().
+	 *  	 Accès en lecture : retourne le chemin du fichier grâce à get_file().
+	 *  	 Accès isset() et unset() : refusé.
 	 */
 	protected $_file = '';
 
@@ -801,20 +801,39 @@ abstract class Token extends CustomToken implements WorkToken
 	// }}}
 	// {{{ $object
 
+	/**
+	 * Objet parent
+	 * L'instance du token de référence.
+	 * Utiliser le membre $object pour accéder à la liste des variable en lecture et écriture.
+	 * Type:
+	 *   CustomToken = L'instance du token de référence.
+	 *   null = Ne devrait pas arrivé.
+	 */
 	protected $_object = null;
 
+	/**
+	 * Setter pour l'objet parent.
+	 * Setter pour l'instance du token de référence.
+	 * Ne pas utiliser cette méthode, utiliser le membre $object en écriture à la place.
+	 * ----
+	 * $token->object = TokenClass::hie( ... );
+	 * ----
+	 * Params:
+	 *   TokenInterface, TokenFunction, TokenClass, TokenContext $object = Ce token deviens le référent.
+	 *   CustomToken $object = Aucun changement.
+	 */
 	protected function set_object( CustomToken $object )
 	{
-		if( $object instanceof Token_Interface
-			or $object instanceof Token_Function
+		if( $object instanceof TokenInterface
+			or $object instanceof TokenFunction
 			or $object instanceof TokenClass
-			or $object instanceof Token_Context )
+			or $object instanceof TokenContext )
 			$this->_object = $object;
 
-		elseif( $object->object instanceof Token_Interface
-			or $object->object instanceof Token_Function
+		elseif( $object->object instanceof TokenInterface
+			or $object->object instanceof TokenFunction
 			or $object->object instanceof TokenClass
-			or $object->object instanceof Token_Context )
+			or $object->object instanceof TokenContext )
 			$this->_object = $object->object;
 	}
 
@@ -1011,7 +1030,7 @@ class TestToken extends UnitTestCase
 	function testDefault()
 	{
 		$this->token->default = $c = 'crabe';
-		$this->assertEqual( $thos->token->default, $c );
+		$this->assertEqual( $this->token->default, $c );
 	}
 
 	// }}}
