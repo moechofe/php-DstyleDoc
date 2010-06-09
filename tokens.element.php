@@ -1,7 +1,5 @@
 <?php
 
-require_once 'xdebug-frontend.php';
-require_once 'include.properties.php';
 require_once 'tokens.php';
 
 /**
@@ -9,7 +7,7 @@ require_once 'tokens.php';
  * Contient les classes des tokens qui instancie des instances des classes Element.
  */
 
-// {{{ Interface
+// {{{ TokenInterface
 
 class TokenInterface extends Token implements ValueableToken, ElementToken
 {
@@ -72,7 +70,7 @@ class TokenInterface extends Token implements ValueableToken, ElementToken
 }
 
 // }}}
-// {{{ Function
+// {{{ TokenFunction
 
 class TokenFunction extends Token implements ValueableToken, ElementToken
 {
@@ -137,7 +135,31 @@ class TokenFunction extends Token implements ValueableToken, ElementToken
 }
 
 // }}}
-// {{{ Class
+// {{{ TokenFunction
+
+/**
+ * Todo: test this
+ */
+class TokenOldFunction extends TokenFunction {}
+
+// }}}
+// {{{ TokenOpenTagWithEcho
+
+/**
+ * Todo: test this
+ */
+class TokenOpenTagWithEcho extends TokenFunction {}
+
+// }}}
+// {{{ Paamayim Nekudotayim
+
+/**
+ * Todo: TokenPaamayimNekudotayim
+ */
+class TokenPaamayimNekudotayim extends TokenFunction {}
+
+// }}}
+// {{{ TokenClass
 
 class TokenClass extends Token implements ValueableToken, ElementToken
 {
@@ -228,13 +250,3 @@ class TokenClass extends Token implements ValueableToken, ElementToken
 }
 
 // }}}
-
-require_once( 'dev.documentation.php' );
-require_once( 'dev.unittest.php' );
-require_once( 'converter.php' );
-
-class TestTokenInterface extends UnitTestCase
-{
-	protected $token = null;
-}
-

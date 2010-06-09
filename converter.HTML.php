@@ -1,8 +1,8 @@
 <?php
 
-require_once( 'DstyleDoc.php' );
+require_once 'converter.php';
 
-abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
+abstract class ConverterHTML extends Converter
 {
   // {{{ convert_title()
 
@@ -14,13 +14,13 @@ abstract class DstyleDoc_Converter_HTML extends DstyleDoc_Converter
   // }}}
   // {{{ convert_description()
 
-  public function convert_description( $description, DstyleDoc_Custom_Element $element )
+  public function convert_description( $description, CustomElement $element )
   {
     return implode('<br />',$description);
   }
 
   // }}}
-  // {{{ convert_description()
+  // {{{ convert_licence()
 
   public function convert_licence( $licence, DstyleDoc_Custom_Element $element )
   {
@@ -51,7 +51,7 @@ HTML;
   // }}}
   // {{{ convert_display()
 
-  public function convert_display( $name, DstyleDoc_Custom_Element $element )
+  public function convert_display( $name, CustomElement $element )
   {
     return (string)htmlspecialchars( $name );
   }
@@ -108,5 +108,3 @@ HTML;
 
   // }}}
 }
-
-?>

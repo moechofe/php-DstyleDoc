@@ -8,15 +8,20 @@ ul { margin: 0px; padding: 0px 0px 0px 18px; }
  */
 
 // un dumper/frontend pour xdebug
-require_once( 'xdebug-frontend.php' );
+require_once 'xdebug-frontend.php';
 
 // LE script DstylDoc
-require_once( 'DstyleDoc.php' );
+require_once 'control.php';
 // LE converteur WEB 1.0
-require_once( 'converter.toString.php' );
+require_once( 'converter.simple.php' );
 
 set_time_limit( 90 );
 
+$d = Control::hie()->source(__FILE__);
+
+$d->convert_with( $c = new ConverterSimple );
+
+/*
 // Configure et lance l'analyse et la conversion
 $d =
 DstyleDoc::hie()
@@ -29,7 +34,7 @@ DstyleDoc::hie()
 //  ->source( 'DstyleDoc.php' )
   ->source( basename(__FILE__) )
   ->convert_with( $c = new DstyleDoc_Converter_toString() );
-
+*/
 /**
  * DOC pour le fichier
  * DOC pour le fichier

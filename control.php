@@ -1,12 +1,13 @@
 <?php
 
 require_once 'include.properties.php';
+require_once 'tokens.all.php';
 
 /**
  * Classe de control de DstyleDoc.
  * La classe Control permet de configurer et de lancer un processus de génération de documentation, en utilisante un syntaxe fluide.
  * ----
- * new Control()->source( 'fichier1.php' )->source( 'fichier2.php' );
+ * Control::hie()->source( 'fichier1.php' )->source( 'fichier2.php' );
  * ----
  * Members:
  *  string $source = Fichiers source à analyser.
@@ -18,44 +19,6 @@ class Control extends Properties
 	// {{{ version
 
 	const version = 'DstyleDoc v0.2 2k8-2k10 Martin Mauchauffée';
-
-	// }}}
-	// {{{ log()
-
-	/**
-	 * Envoie un message de log sur la sortie standard.
-	 * Params:
-	 *  string,numeric,array ... = Une chaîne de caractère, un nombre ou un tableau de pairs clefs/valeurs a afficher.
-	 * Syntax:
-	 *  ... = Un nombre infinie de paramètre a afficher.
-	 */
-	static public function log()
-	{
-		$args = func_get_args();
-		call_user_func( self::$_logger, $args, false );
-	}
-
-	static public function warning()
-	{
-		$args = func_get_args();
-		call_user_func( self::$_logger, $args, true );
-	}
-
-	static private $_logger = null;
-
-	static public function logger( $callback )
-	{
-		if( is_callable($callback) )
-			self::$_logger = $callback;
-		else
-			throw new InvalidArgumentException('Invalide callbask for 1st parameter sent to: '.__FUNCTION__);
-	}
-
-	static public function default_logger( $args, $warning = false )
-	{
-		/*if( is_array($args) ) foreach( $args as $arg )
-			echo (string)$arg."\n";*/
-	}
 
 	// }}}
 	// {{{ $source_dir
@@ -100,7 +63,7 @@ class Control extends Properties
 	// }}}
 	// {{{ analyse_all()
 
-	protected function analyse_all( DstyleDoc_Converter $converter )
+	protected function analyse_all( Converter $converter )
 	{
 		if( $this->use_temporary_sqlite_database )
 		{
@@ -118,25 +81,24 @@ class Control extends Properties
 	// }}}
 	// {{{ analyse_file()
 
-	protected function analyse_file( DstyleDoc_Converter $converter, $file )
+	protected function analyse_file( Converter $converter, $file )
 	{
 		$line = 1;
-		$current = new DstyleDoc_Token_Fake;
+		$current = new FakeToken;
 		$doc = '';
-		self::log( sprintf("Reading and parsing: %s\n",$file) );
 		foreach( token_get_all(file_get_contents($this->source_dir.$file)) as $token )
 		{
 			if( is_array($token) )
 				list( $token, $source, $line ) = $token;
 			else
-				list( $token, $source, $line ) = array( 0, $token, $line );
+				list( $call, $token, $source, $line ) = array( 'UnknowToken', null, $token, $line );
 
 			// skip T_WHITESPACE for speed up
 			if( $token === T_WHITESPACE )
 				continue;
 
-			$call = token_name($token);
-			if( substr($call,0,2)==='T_' ) $call = substr($call,2);
+			if( substr(token_name($token),0,2)=='T_' )
+				$call = 'Token'.implode('',array_map('ucfirst',explode('_',strtolower(substr(token_name($token),2)))));
 
 			if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'tokens')!==false )
 			{
@@ -155,22 +117,22 @@ HTML;
 
 			$save = $current;
 			// processing token
-			$current = call_user_func( array('DstyleDoc_Token_'.$call,'hie'), $converter, $current, $source, $file, $line );
+			$current = call_user_func( array($call,'hie'), $converter, $current, $source, $file, $line );
 
 			if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'tokens')!==false and ( strpos($_REQUEST['debug'],'current')!==false or strpos($_REQUEST['debug'],get_class($current))!==false ) )
 				var_dump( $current );
 
-			if( $current instanceof DstyleDoc_Token_Stop )
+			if( $current instanceof StopToken )
 				break;
 
 			if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'open_tag')!==false )
 			{
 				$o = $d = '';
 				$c = get_class($current);
-				if( ! $current instanceof DstyleDoc_Token_Stop )
+				if( ! $current instanceof StopToken )
 				{
 					$o = get_class($current->open_tag);
-					if( $current->open_tag instanceof DstyleDoc_Token_Open_Tag )
+					if( $current->open_tag instanceof TokenOpenTag )
 						$d = strlen($current->open_tag->documentation)." ".substr($current->open_tag->documentation,0,30);
 				}
 				if(!trim($d))$d='&nbsp;';
@@ -182,12 +144,12 @@ HTML;
 HTML;
 			}
 
-			if( ! $current instanceof DstyleDoc_Token_Custom )
+			if( ! $current instanceof CustomToken )
 				throw new UnexpectedValueException;
 		}
 
-		if( $current instanceof DstyleDoc_Token_Open_Tag or $current instanceof DstyleDoc_Token_Halt_Compiler )
-			DstyleDoc_Token_Close_Tag::hie( $converter, $current, $source, $file, $line );
+		if( $current instanceof TokenOpenTag or $current instanceof TokenHaltCompiler )
+			TokenCloseTag::hie( $converter, $current, $source, $file, $line );
 	}
 
 	// }}}
@@ -210,9 +172,9 @@ HTML;
 	// }}}
 	// {{{ convert_with()
 
-	public function convert_with( DstyleDoc_Converter $converter )
+	public function convert_with( Converter $converter )
 	{
-		$converter->dsd = $this;
+		$converter->control = $this;
 		$this->analyse_all( $converter );
 		if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'hide')!==false )
 			null;
@@ -226,7 +188,6 @@ HTML;
 
 	static public function hie()
 	{
-		self::logger( array('DstyleDoc','default_logger') );
 		return new self;
 	}
 
@@ -319,14 +280,3 @@ HTML;
 
 	// }}}
 }
-
-require_once( 'dev.documentation.php' );
-require_once( 'dev.unittest.php' );
-
-class TestControl extends UnitTestCase
-{
-	protected $control = null;
-	function setUp() { $this->control = Control::hie; }
-	function tearDown() { unset($this->control); }
-}
-

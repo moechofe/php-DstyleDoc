@@ -263,6 +263,7 @@ abstract class CustomElement extends Properties implements ArrayAccess
 
 	final static public function put( DstyleDoc_Custom_Element $element )
 	{
+		assert('false','cest quoi ca');
 		if( $element->converter->dsd->use_temporary_sqlite_database )
 		{
 			return $element->converter->dsd->put_element( $element );
@@ -332,6 +333,10 @@ abstract class AnalyseableElement extends CustomElement
 
 	abstract protected function get_analyseable();
 
+	/**
+	 * Analyse la documentation
+	 * Analyse la documentation à la recherche des possibles Element à instancier.
+	 */
 	public function analyse()
 	{
 		if( $this->analysed ) return;
@@ -438,6 +443,13 @@ abstract class Element extends AnalyseableElement
 	// }}}
 	// {{{ $version
 
+	/**
+	 * Version
+	 * La version de l'élément.
+	 * Utiliser le membre $version pour accéder à la version en lecture et écriture.
+	 * Type:
+	 *   string = La version de l'élément.
+	 */
 	protected $_version = '';
 
 	protected function set_version( $version )
@@ -857,6 +869,8 @@ class TestCustomElement extends UnitTestCase
 
 	function testArrayAcces()
 	{
+		$this->element['description'] = $t = 'tajine';
+		$this->assertEqual( $this->element['descriptions'], array($t) );
 	}
 }
 
@@ -879,6 +893,13 @@ class TestElement extends TestAnalyseableElement
 {
 	function setUp() { $this->element = new MockElement; }
 	function tearDown() { unset($this->element); }
+
+	function testSerialize()
+	{
+		$this->element->description = $s = 'saussice';
+		$this->element = unserialize(serialize($this->element));
+		$this->assertEqual( $this->element->descriptions, array($s) );
+	}
 }
 
 class TestTitledElement extends UnitTestCase

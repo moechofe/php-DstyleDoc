@@ -1,7 +1,7 @@
 <?php
 
-require_once( 'xdebug-frontend.php' );
-require_once( 'include.properties.php' );
+require_once 'xdebug-frontend.php';
+require_once 'include.properties.php';
 
 /**
  * Les classes des tokens.
@@ -383,7 +383,6 @@ abstract class Token extends CustomToken implements WorkToken
 		}
 		else
 		{
-			assert('(string)$documentation');
 			if( trim((string)$documentation) )
 			{
 				if( $this->_documentation )
@@ -699,10 +698,7 @@ abstract class Token extends CustomToken implements WorkToken
 				$this->_returns[] = '';
 		}
 		else
-		{
-			assert('(string)$return');
 			$this->_returns[ max(0,count($this->_returns)-1) ] = (string)$return;
-		}
 	}
 
 	/**
@@ -928,7 +924,7 @@ abstract class Token extends CustomToken implements WorkToken
 	protected function set_expression( $expression )
 	{
 		if( $expression )
-			$this->_expression = new Token_Expression;
+			$this->_expression = new ExpressionToken;
 	}
 
 	protected function get_expression()
@@ -943,132 +939,383 @@ abstract class Token extends CustomToken implements WorkToken
  * Classe de token qui stope l'analyse.
  * Si ce token est instancié, l'analyse du code s'arrète. Normalement, cela survient avec la fonction http://php.net/halt-compiler ou le tag de fermeture de PHP "?>"
  */
-abstract class StopToken extends Token
+abstract class StopToken extends Token {}
+
+interface ExpressionableToken
 {
+  // {{{ Rollback()
+
+  function rollback( Token $current );
+
+  // }}}
 }
 
-require_once( 'dev.documentation.php' );
-require_once( 'dev.unittest.php' );
-require_once( 'converter.php' );
+// }}}
+// {{{ ExpressionToken
 
-Mock::generatePartial('Token','MockToken',array('hie'));
-
-class TestToken extends UnitTestCase
+class ExpressionToken extends CustomToken
 {
-	protected $token = null;
-	function setUp() { $this->token = new MockToken; }
-	function tearDown() { unset($this->token); }
+  private $types = array(
+    'string', 'number', 'integer', 'float', 'double', 'real', 'boolean', 'array', 'object', 'null', 'binary', 'resource' );
 
-	// {{{ testFile(), testLine()
+  private $brackets = 0;
 
-	function testFile()
-	{
-		$this->token->file = __FILE__;
-		$this->assertEqual( $this->token->file, __FILE__ );
-	}
+  protected $_rollback = false;
 
-	function testLine()
-	{
-		$this->token->line = $l = __LINE__;
-		$this->assertEqual( $this->token->line, $l );
-	}
+  protected function set_rollback( $rollback )
+  {
+    $this->_rollback = (boolean)$rollback;
+  }
 
-	// }}}
-	// {{{ testOpenTag()
+  protected function get_rollback()
+  {
+    return $this->_rollback;
+  }
 
-	function testOpenTag()
-	{
-		$this->assertIsA( $this->token->open_tag, 'FakeToken' );
-		$this->fail( 'Tester avec TokenOpenTag' );
-	}
+  public function analyse( ExpressionableToken $token, Token $current, $value )
+  {
+    if( $current instanceof TokenClass )
+      $class = $current;
+    elseif( $current->object instanceof TokenClass )
+      $class = $current->object;
+    else
+      $class = false;
 
-	// }}}
-	// {{{ testDocumentation(), testTypes(), testReturns()
+    if( $current instanceof TokenFunction )
+      $function = $current;
+    else
+      $function = false;
 
-	function testDocumentation()
-	{
-		$this->assertEqual( $this->token->documentation, '' );
-		$this->token->documentation = $c = 'chocolat';
-		$this->token->documentation = $p = 'petit suisse';
-		$this->assertEqual( $this->token->documentation, "$c\n$p" );
-		$this->fail( 'Tester avec TokenOpenTag, TokenClass, TokenDocComment, Token, TokenClass, TokenModifier, TokenVariable, TokenFunction, TokenConst' );
-	}
+    if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false )
+    {
+      if( ! $r = $token->expression_value ) $r = '&nbsp;';
+      if( ! $c = (@get_class($current)).' '.(@$current->name) ) $c = '&nbsp;';
+      if( ! $cl = (@get_class($class)).' '.(@$class->name) ) $cl = '&nbsp;';
+      if( ! $fu = (@get_class($function)).' '.(@$function->name) ) $fu = '&nbsp;';
+      echo <<<HTML
+<div style='clear:left;float:left;color:white;background:MediumVioletRed;padding:1px 3px'><b>current: </b>{$c}</div>
+<div style='float:left;color:white;background:DarkMagenta;padding:1px 3px'><b>class: </b>{$cl}</div>
+<div style='float:left;color:white;background:BlueViolet;padding:1px 3px'><b>function: </b>{$fu}</div>
+<div style='float:left;color:white;background:PaleVioletRed;padding:1px 3px'><b>analysed value: </b>{$value}</div>
+<div style='float:left;color:white;background:LightPink;color:black;padding:1px 3px'><b>cumulate expression: </b>{$r}</div>
+<div style='background:IndianRed;padding:1px 3px;'><b>brackets: </b>{$this->brackets}</div>
+<div style='clear:both'></div>
+HTML;
+    }
 
-	function testTypes()
-	{
-		$this->assertEqual( $this->token->types, array() );
-		$this->token->type = $t = 'tako yaki';
-		$this->token->type = $c = 'côte de boeuf';
-		$this->assertEqual( $this->token->types, array($t,$c) );
-	}
+    $r = false;
 
-	function testReturns()
-	{
-		$this->assertEqual( $this->token->returns, array() );
-		$this->assertFalse( $this->token->return );
-		$this->token->return = 'choux fleur';
-		$this->token->return = $b = 'brocoli';
-		$this->assertEqual( $this->token->return, $b );
-		$this->token->return = true;
-		$this->token->return = $c = 'carote';
-		$this->assertEqual( $this->token->return, $c );
-		$this->assertEqual( $this->token->returns, array($b,$c) );
-		$this->token->returns = $e = array('épinards');
-		$this->assertEqual( $this->token->returns, $e );
-	}
+    // si une parenthèse à été ouverte et que l'on trouver une parenthèse fermante :
+    if( $this->brackets and $value === ')' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      // alors on ferme la parenthèse.
+      $this->brackets--;
+    }
 
-	// }}}
-	// {{{ testName(), testDefault()
+    // si une parenthèses à été ouverte :
+    elseif( $this->brackets )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      // alors on ne parse pas sont contenu.
+      null;
+    }
 
-	function testName()
-	{
-		$this->token->name = $f = 'frite';
-		$this->assertEqual( $this->token->name, $f );
-	}
+    // si on trouve "self" ou "this" :
+    elseif( in_array(strtolower($value), array('self','$this')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      // alors on retourne le nom de la classe.
+      if( ! $token->expression_value and $class)
+        $token->expression_value = $token->expression_value . $class->name;
+    }
 
-	function testDefault()
-	{
-		$this->token->default = $c = 'crabe';
-		$this->assertEqual( $this->token->default, $c );
-	}
+    elseif( substr($token->expression_value,-1) === '(' and $value !== ')' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      null;
+    }
 
-	// }}}
-	// {{{ testModifiersAppend(), testModifiersSet()
+    elseif( in_array(substr($value,0,1), array('\'','"')) or in_array(strtolower($value), array('(string)','__file__','__function__','__class__','__dir__','__method__','__namespace__')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('string','')) )
+        $token->expression_value = 'string';
+    }
 
-	function testModifiersAppend()
-	{
-		$keys = array('static','abstract','final','public','protected','private');
-		$values = array();
-		$this->assertEqual( $this->token->modifiers, array_combine($keys,array_pad($values,count($keys),false)) );
-		foreach( $keys as $key )
-		{
-			$this->token->modifier = $key;
-			array_push($values,true);
-			$this->assertEqual( $this->token->modifiers, array_combine($keys,array_pad($values,count($keys),false)) );
-		}
-	}
+    elseif( $value === '::' or $value === '->' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( $token->expression_value and ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = $token->expression_value . $value;
+    }
 
-	function testModifiersSet()
-	{
-		$ref = array('static','abstract','final','public','protected','private');
-		$keys = array('static','abstract','final','public','protected','private');
-		while( $keys )
-		{
-			$key = array_shift($keys);
-			$this->token->modifiers = array_merge(array_combine($ref,array_pad(array(),count($ref),false)),$tmp=array_combine($ref,array_pad(array_pad(array(),count($ref)-count($keys),false),count($ref),true)));
-			$this->assertEqual( $this->token->modifiers, $tmp );
-		}
-	}
+    elseif( $value === '(' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! in_array($token->expression_value,$this->types) and $token->expression_value )
+        $token->expression_value = $token->expression_value . '()';
+      else
+         $this->brackets++;
+    }
 
-	// }}}
-	// {{{ testVars()
+    elseif( in_array($value, array('.','.=')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('string','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = 'string';
+      else
+        return $token->rollback($current);
+    }
 
-	function testVars()
-	{
-		$this->assertEqual( $this->token->vars, array() );
-		$this->fail( 'Tester avec TokenVariable' );
-	}
+    elseif( in_array(strtolower($value), array('(int)','(integer)','(float)','(double)','(real)')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('number','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = ($value=='(int)')?'integer':substr($value,1,-1);
+      else
+        return $token->rollback($current);
+    }
 
-	// }}}
+    elseif( in_array(strtolower($value), array('+','-','*','/','*','%','++','--','>>','<<','&','^','|','+=','-=','*=','/=','%=','__line__','<<=','>>=')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('number','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = 'number';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( in_array(strtolower($value), array('array','(array)')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('array','')) )
+        $token->expression_value = 'array';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( strtolower($value) === '(object)' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('object','')) )
+        $token->expression_value = 'object';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( strtolower($value) === '(binary)' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('binary','')) )
+        $token->expression_value = 'binary';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( preg_match('/^\d/', $value) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('number','')) )
+        $token->expression_value = 'number';
+    }
+
+    elseif( $token->expression_value and in_array(strtolower($value), array('null','true','false')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      null;
+    }
+
+    elseif( in_array(strtolower($value), array('null','true','false')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      $token->expression_value = strtolower($value);
+    }
+
+    elseif( strtolower($value) === 'null' or strtolower($value) === '(unset)' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      $token->expression_value = 'null';
+    }
+
+    elseif( in_array(strtolower($value), array('&&','||','!','and','or','xor','(bool)','(boolean)','instanceof','===','==','<=','>=','>','<','!=','!==','<>')) )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( in_array($token->expression_value,array('boolean','')) or ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = 'boolean';
+      else
+        return $token->rollback($current);
+    }
+
+    elseif( substr($token->expression_value,-2) === '::' or substr($token->expression_value,-2) === '->' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( $function instanceof DstyleDoc_Token_Function and $function->name == $value )
+	return $token->rollback($current);
+      else
+        $token->expression_value = $token->expression_value . $value;
+    }
+
+    elseif( substr($token->expression_value,-1) === ')' )
+      null;
+
+    elseif( substr($value,0,1) === '$' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! in_array($token->expression_value,$this->types) and $token->expression_value == '$this' /*substr($token->expression_value,0,1) !== '$'*/ )
+        $token->expression_value .= $value;
+			else
+				$token->rollback($current);
+    }
+
+    elseif( substr($token->expression_value,0,1) !== '$' )
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      if( ! in_array($token->expression_value,$this->types) )
+        $token->expression_value = $value;
+    }
+
+    else
+    {
+      if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'returns')!==false ) var_dump( __LINE__ );
+      $r = true;
+    }
+
+    if( $r )
+    {
+      $token->rollback( $current );
+    }
+  }
+
 }
 
+// }}}
+// {{{ UnknowToken
+
+class UnknowToken extends LightToken
+{
+  static function hie( Converter $converter, CustomToken $current, $source, $file, $line )
+  {
+    switch( $source )
+    {
+    case '{' :
+      if( $current instanceof TokenTuple
+        or $current instanceof TokenContext )
+        return TokenContext::hie( $converter, $current, $source, $file, $line );
+      elseif( $current instanceof TokenImplements )
+        return $current->object;
+      else
+        return $current;
+      break;
+
+    case '(' :
+      if( $current instanceof TokenFunction )
+        return TokenTuple::hie( $converter, $current, $source, $file, $line );
+      elseif( $current instanceof TokenReturn )
+      {
+        $current->value = $source;
+        return $current->value;
+      }
+      else
+        return $current;
+      break;
+
+    case ',' :
+      if( $current instanceof TokenVariable )
+        return TokenTuple::hie( $converter, $current, $source, $file, $line );
+      else
+        return $current;
+      break;
+
+    case '=' :
+      return $current;
+      break;
+
+    case ')' :
+      if( $current instanceof TokenVariable )
+        return TokenTuple::hie( $converter, $current->object, $source, $file, $line );
+      elseif( $current instanceof TokenReturn )
+      {
+        $current->value = $source;
+        return $current->value;
+      }
+      else
+        return $current;
+      break;
+
+    case ';' :
+      if( $current instanceof TokenTuple )
+      {
+        if( $current->object instanceof TokenFunction and ! $current->object->object instanceof FakeToken )
+          return $current->object->object;
+        elseif( ! $current->object instanceof FakeToken )
+          return $current->object;
+        else
+          return $current->open_tag;
+      }
+      elseif( $current instanceof TokenFunction
+        or $current instanceof TokenContext )
+        return $current;
+      elseif( $current instanceof TokenConst
+        or $current instanceof TokenVariable
+        or $current instanceof TokenReturn )
+        return $current->exit;
+      elseif( $current instanceof TokenOpenTag )
+        return $current;
+      elseif( $current instanceof TokenThrow )
+      {
+        return $current->object;
+      }
+      break;
+
+    case '}' :
+      if( $current instanceof ElementableToken )
+        $current->to( $converter );
+      if( $current instanceof TokenInterface or $current instanceof TokenClass )
+        return $current->open_tag;
+      elseif( $current instanceof TokenContext )
+      {
+        $save = $current->object;
+        $return = $current->down;
+        if( $return !== $save and $save instanceof ElementableToken )
+          $save->to( $converter );
+        return $return;
+      }
+      elseif( $current instanceof TokenOpenTag )
+        return $current;
+      break;
+
+    case '!' :
+    case '@' :
+    case '?' :
+    case ':' :
+    case '[' :
+    case ']' :
+    case '"' :
+      return $current;
+      break;
+
+    case '.' :
+    case '+' :
+    case '-' :
+    case '*' :
+    case '/' :
+    case '%' :
+    case '>' :
+    case '<' :
+    case '&' :
+    case '|' :
+    case '^' :
+		case '~' :
+      if( $current instanceof TokenReturn )
+      {
+        $current->value = $source;
+        return $current->value;
+      }
+      else
+        return $current;
+    }
+  }
+}
+
+// }}}
