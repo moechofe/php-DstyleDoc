@@ -1,6 +1,5 @@
 <?php
 
-require_once 'xdebug-frontend.php';
 require_once 'element.php';
 
 /**
@@ -151,34 +150,3 @@ class FileElement extends TitledElement
 	// }}}
 }
 
-require_once 'dev.documentation.php';
-require_once 'dev.unittest.php';
-require_once 'converter.php';
-
-class TestFileElement extends TestTitledElement
-{
-	protected $element = null;
-	protected $file = 'figue';
-	function setUp() { $this->element = new FileElement( $this->converter = new MockConverter, $this->file ); }
-	function tearDown() { unset($this->element); }
-
-	function test__get()
-	{
-		$this->assertTrue( $this->isFileElement );
-	}
-
-	function testFile()
-	{
-		$this->assertEqual( $this->element->file, $this->file );
-		$this->element->file = $f = 'framboise';
-		$this->assertEqual( $this->element->file, $f );
-	}
-
-	function testName()
-	{
-		$this->assertEqual( $this->element->file, $this->file );
-		$this->element->file = $f = 'fraise';
-		$this->assertEqual( $this->element->name, $f );
-	}
-
-}

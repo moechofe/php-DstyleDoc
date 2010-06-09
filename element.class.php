@@ -1,6 +1,6 @@
 <?php
 
-require_once( 'element.php' );
+require_once 'element.php';
 
 /**
  * Classe d'un element de type classe.
@@ -266,12 +266,4 @@ class ClassElement extends MethodedElement
 
 	// }}}
 }
-
-require_once( 'dev.documentation.php' );
-require_once( 'dev.unittest.php' );
-
-class ClassElementTest extends UnitTestCase
-{
-}
-
 
