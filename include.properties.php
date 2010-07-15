@@ -1,4 +1,6 @@
 <?php
+namespace dstyledoc
+{
 
 /**
  * Classe de prise en charge de surcharges des membres.
@@ -26,7 +28,7 @@ abstract class Properties
 			return get_class( $this );
 
 		elseif( ! method_exists($this,'get_'.(string)$property) or ! is_callable( array($this,'get_'.(string)$property) ) )
-			throw new BadPropertyException($this, (string)$property);
+			throw new \BadPropertyException($this, (string)$property);
 
 		return call_user_func( array($this,'get_'.(string)$property) );
 	}
@@ -45,7 +47,7 @@ abstract class Properties
 	public function __set( $property, $value )
 	{
 		if( ! method_exists($this,'set_'.(string)$property) or ! is_callable( array($this,'set_'.(string)$property) ) )
-			throw new BadPropertyException($this, (string)$property);
+			throw new \BadPropertyException($this, (string)$property);
 
 		call_user_func( array($this,'set_'.(string)$property), $value );
 	}
@@ -64,7 +66,7 @@ abstract class Properties
 	public function __isset( $property )
 	{
 		if( ! method_exists($this,'isset_'.(string)$property) or ! is_callable( array($this,'isset_'.(string)$property) ) )
-			throw new BadPropertyException($this, (string)$property);
+			throw new \BadPropertyException($this, (string)$property);
 
 		return call_user_func( array($this,'isset_'.(string)$property) );
 	}
@@ -83,11 +85,15 @@ abstract class Properties
 	public function __unset( $property )
 	{
 		if( ! method_exists($this,'unset_'.(string)$property) or ! is_callable( array($this,'unset_'.(string)$property) ) )
-			throw new BadPropertyException($this, (string)$property);
+			throw new \BadPropertyException($this, (string)$property);
 
 		call_user_func( array($this,'unset_'.(string)$property) );
 	}
 }
+
+}
+namespace
+{
 
 if( ! class_exists('BadPropertyException') )
 {
@@ -106,3 +112,4 @@ class BadPropertyException extends LogicException
 }
 }
 
+}
