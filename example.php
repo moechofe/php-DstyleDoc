@@ -1,3 +1,7 @@
+<?php
+require_once 'dstyledoc.phar';
+require_once 'dstyledoc.tokyotyrant.phar';
+?>
 <style type="text/css">
 ul { margin: 0px; padding: 0px 0px 0px 18px; }
 </style>
@@ -11,17 +15,15 @@ ul { margin: 0px; padding: 0px 0px 0px 18px; }
 require_once 'xdebug-frontend.php';
 
 // LE script DstylDoc
-require_once 'dstyledoc.phar';
-require_once 'dstyledoc.tokyotyrant.phar';
 
 // LE converteur WEB 1.0
 //require_once 'converter.simple.php';
 
 set_time_limit( 90 );
 
-$d = Control::hie()->source(__FILE__);
+$d = dstyledoc\auto(__FILE__);
 
-$d->convert_with( $c = new ConverterSimple );
+//$d->convert_with( $c = new ConverterSimple );
 
 /*
 // Configure et lance l'analyse et la conversion
