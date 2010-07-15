@@ -1,4 +1,5 @@
 <?php
+namespace dstyledoc;
 
 require_once 'tokens.php';
 require_once 'tokens.none.php';
