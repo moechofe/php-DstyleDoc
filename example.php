@@ -11,9 +11,11 @@ ul { margin: 0px; padding: 0px 0px 0px 18px; }
 require_once 'xdebug-frontend.php';
 
 // LE script DstylDoc
-require_once 'control.php';
+require_once 'dstyledoc.phar';
+require_once 'dstyledoc.tokyotyrant.phar';
+
 // LE converteur WEB 1.0
-require_once( 'converter.simple.php' );
+//require_once 'converter.simple.php';
 
 set_time_limit( 90 );
 

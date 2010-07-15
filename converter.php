@@ -382,14 +382,18 @@ abstract class Converter extends Properties implements ArrayAccess, ConverterInt
 
 	/**
 	 * La liste des fichiers analysés.
-	 * Type: DstyleDoc_Element_Container
+	 * Type: Container
 	 */
 	protected $_files = null;
+	protected $_file = null;
 
-	protected function init_file()
+	protected function ini_files()
 	{
-		if( ! $this->_files instanceof DstyleDoc_Element_Container )
-			$this->_files = new DstyleDoc_Element_Container( 'DstyleDoc_Element_File' );
+		if( ! $this->_files instanceof Container )
+		{
+			$class = $this->control->container;
+			$this->_files = $class::hie('FileElement',$this);
+		}
 	}
 
 	/**
@@ -397,20 +401,20 @@ abstract class Converter extends Properties implements ArrayAccess, ConverterInt
 	 */
 	protected function set_file( $file )
 	{
-		$this->init_file();
-		$this->_files->put( $file, $this );
+		$this->ini_files();
+		$this->_files[$file] = $this->_file = $file;
 	}
 
 	protected function get_file()
 	{
-		$this->init_file();
-		return $this->_files->get( $this );
+		$this->ini_files();
+		return $this->_files[$this->_file];
 	}
 
 	protected function get_files()
 	{
-		$this->init_file();
-		return $this->_files->get_all( $this );
+		$this->ini_files();
+		return $this->_files;
 	}
 
 	// }}}

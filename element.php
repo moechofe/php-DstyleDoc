@@ -7,7 +7,7 @@ require_once 'include.properties.php';
  * Déclare les informations communes à chaque type d"élements tel que la description et le liens vers le convertisseur.
  * Chaque type d'élement contient des données propre qui utilise le convertisseur pour déterminé comment la documentation doit être génerée.
  */
-abstract class CustomElement extends Properties implements ArrayAccess
+abstract class CustomElement extends Properties implements ArrayAccess, Serializable
 {
 	// {{{ $converter
 
