@@ -1,6 +1,6 @@
 <?php
+namespace dstyledoc;
 
-require_once 'xdebug-frontend.php';
 require_once 'include.properties.php';
 
 /**
