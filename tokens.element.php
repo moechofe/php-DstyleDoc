@@ -1,4 +1,5 @@
 <?php
+namespace dstyledoc;
 
 require_once 'tokens.php';
 
@@ -135,7 +136,7 @@ class TokenFunction extends Token implements ValueableToken, ElementToken
 }
 
 // }}}
-// {{{ TokenFunction
+// {{{ TokenOldFunction
 
 /**
  * Todo: test this
@@ -151,11 +152,8 @@ class TokenOldFunction extends TokenFunction {}
 class TokenOpenTagWithEcho extends TokenFunction {}
 
 // }}}
-// {{{ Paamayim Nekudotayim
+// {{{ PaamayimNekudotayim
 
-/**
- * Todo: TokenPaamayimNekudotayim
- */
 class TokenPaamayimNekudotayim extends TokenFunction {}
 
 // }}}
