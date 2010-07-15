@@ -1,7 +1,9 @@
 <?php
+namespace dstyledoc;
 
 require_once 'include.properties.php';
 require_once 'tokens.all.php';
+require_once 'container.tokyo-tyrant.php';
 
 /**
  * Classe de control de DstyleDoc.
@@ -65,11 +67,6 @@ class Control extends Properties
 
 	protected function analyse_all( Converter $converter )
 	{
-		if( $this->use_temporary_sqlite_database )
-		{
-			DstyleDoc_State_Saver::start( $this );
-		}
-
 		foreach( $this->sources as $file )
 		{
 			if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
@@ -196,12 +193,8 @@ HTML;
 
 	protected $_config = array(
 
-		'use_temporary_sqlite_database' => false,
-
-		'database_host' => 'localhost',
-		'database_user' => 'root',
-		'database_pass' => '',
-		'database_base' => 'dstyledoc_saved_state',
+		'container' => 'TokyoTyrantContainer',
+		'tokyotyrant_uri' => 'localhost:1978',
 
 		'dstyledoc' => true,
 		'version' => true,
