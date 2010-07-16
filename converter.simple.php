@@ -1,4 +1,5 @@
 <?php
+namespace dstyledoc\converter;
 
 require_once 'converter.HTML.php';
 
