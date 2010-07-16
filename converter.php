@@ -2,6 +2,9 @@
 namespace dstyledoc;
 
 require_once 'include.properties.php';
+require_once 'element.php';
+
+use ArrayAccess;
 
 /**
  * Interface de base pour les converteurs.
@@ -147,7 +150,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = DÈpends du convertisseur.
 	 */
-	function convert_title( $title, DstyleDoc_Element $element );
+	function convert_title( $title, Element $element );
 
 	// }}}
 	// {{{ convert_link()
@@ -161,7 +164,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = DÈpends du convertisseur.
 	 */
-	function convert_link( $id, $name, DstyleDoc_Element $element );
+	function convert_link( $id, $name, Element $element );
 
 	// }}}
 	// {{{ convert_id()
@@ -175,7 +178,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		string = L'identifiant convertie de l'√©l√©ment.
 	 */
-	function convert_id( $id, DstyleDoc_Element $element );
+	function convert_id( $id, Element $element );
 
 	// }}}
 	// {{{ convert_display()
