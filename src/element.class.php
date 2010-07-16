@@ -1,4 +1,5 @@
 <?php
+namespace dstyledoc;
 
 require_once 'element.php';
 
