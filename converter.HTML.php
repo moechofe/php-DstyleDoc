@@ -1,6 +1,9 @@
 <?php
+namespace dstyledoc\converter;
 
 require_once 'converter.php';
+
+use dstyledoc\Converter;
 
 abstract class ConverterHTML extends Converter
 {
