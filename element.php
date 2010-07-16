@@ -1,6 +1,9 @@
 <?php
+namespace dstyledoc;
 
 require_once 'include.properties.php';
+
+use ArrayAccess, Serializable;
 
 /**
  * Classe de base d'un Element.
