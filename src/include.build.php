@@ -1,6 +1,7 @@
 <?php
+if( $exe = shell_exec('which php') ) $exe = '#!'.$exe;
 chdir(__DIR__);
-$phar = new Phar(__DIR__.'/../dstyledoc.phar');
+$phar = new Phar($file=__DIR__.'/../dstyledoc.phar');
 $phar->addFile('control.php');
 $phar->addFile('converter.php');
 $phar->addFile('element.all.php');
@@ -14,14 +15,15 @@ $phar->addFile('tokens.none.php');
 $phar->addFile('tokens.element.php');
 $phar->addFile('tokens.value.php');
 $phar->addFile('tokens.valueable.php');
-var_dump( $phar->getStub() );
 $phar->setStub(<<<HTML
-<?php
+$exe<?php
 Phar::mapPhar('dstyledoc.phar');
 set_include_path('phar://dstyledoc.phar'.PATH_SEPARATOR.get_include_path());require_once 'phar://dstyledoc.phar/include.frontend.php';
 __HALT_COMPILER();
 HTML
 );
+unset($phar);
+if( $exe ) chmod($file,0744); else chmod($file,0644);
 
 $phar = new Phar(__DIR__.'/../dstyledoc.tokyotyrant.phar');
 $phar->addFile('container.tokyo-tyrant.php');
