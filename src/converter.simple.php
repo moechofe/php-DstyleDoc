@@ -10,7 +10,7 @@ class ConverterSimple extends ConverterHTML
 {
 	// {{{ convert_file()
 
-	public function convert_file( DstyleDoc_Element_File $file )
+	public function convert_file( ElementFile $file )
 	{
 		if( isset($_REQUEST['debug']) and strpos($_REQUEST['debug'],'log')!==false )
 			DstyleDoc::log( "<span style=\"color: RoyalBlue\">Convert file: <strong>{$file->display}</strong></span>", true );
@@ -283,10 +283,10 @@ HTML;*/
 	// }}}
 	// {{{ convert_link()
 
-	public function convert_link( $id, $display, DstyleDoc_Element $element )
+	public function convert_link( $id, $name, Element $element )
 	{
 		return <<<HTML
-<a href="#{$id}">{$display}</a>
+<a href="#{$id}">{$name}</a>
 HTML;
 	}
 

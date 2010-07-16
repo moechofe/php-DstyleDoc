@@ -2,6 +2,10 @@
 require_once 'dstyledoc.phar';
 require_once 'dstyledoc.tokyotyrant.phar';
 require_once 'dstyledoc.converters.phar';
+
+
+dstyledoc\auto(__FILE__)->convert_with(new ConverterSimple);
+
 ?>
 <style type="text/css">
 ul { margin: 0px; padding: 0px 0px 0px 18px; }
@@ -22,7 +26,7 @@ require_once 'xdebug-frontend.php';
 
 set_time_limit( 90 );
 
-dstyledoc\auto(__FILE__)->convert_with(new ConverterSimple);
+
 
 /*
 // Configure et lance l'analyse et la conversion

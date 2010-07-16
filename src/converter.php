@@ -2,7 +2,7 @@
 namespace dstyledoc;
 
 require_once 'include.properties.php';
-require_once 'element.php';
+require_once 'element.all.php';
 
 use ArrayAccess;
 
@@ -76,7 +76,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation du fichier ou pas.
 	 */
-	function convert_file( DstyleDoc_Element_File $file );
+	function convert_file( ElementFile $file );
 
 	// }}}
 	// {{{ convert_class()
@@ -88,7 +88,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de la classe ou pas.
 	 */
-	function convert_class( DstyleDoc_Element_Class $class );
+	function convert_class( ElementClass $class );
 
 	// }}}
 	// {{{ convert_interface()
@@ -100,7 +100,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de l'interface ou pas.
 	 */
-	function convert_interface( DstyleDoc_Element_Interface $interface );
+	function convert_interface( ElementInterface $interface );
 
 	// }}}
 	// {{{ convert_function()
@@ -112,7 +112,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de la fonction ou pas.
 	 */
-	function convert_function( DstyleDoc_Element_Function $function );
+	function convert_function( ElementFunction $function );
 
 	// }}}
 	// {{{ convert_method()
@@ -124,7 +124,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de la fonction ou pas.
 	 */
-	function convert_method( DstyleDoc_Element_Method $method );
+	function convert_method( ElementMethod $method );
 
 	// }}}
 	// {{{ convert_description()
@@ -203,7 +203,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de la syntaxe ou pas.
 	 */
-	function convert_syntax( DstyleDoc_Element_Syntax $syntax );
+	function convert_syntax( ElementSyntax $syntax );
 
 	// }}}
 	// {{{ convert_param()
@@ -215,7 +215,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de la syntaxe ou pas.
 	 */
-	function convert_param( DstyleDoc_Element_Param $param );
+	function convert_param( ElementParam $param );
 
 	// }}}
 	// {{{ convert_return()
@@ -227,7 +227,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de la valeur de retour ou pas.
 	 */
-	function convert_return( DstyleDoc_Element_Return $param );
+	function convert_return( ElementReturn $param );
 
 	// }}}
 	// {{{ convert_type()
@@ -239,7 +239,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation du type.
 	 */
-	function convert_type( DstyleDoc_Element_Type $type );
+	function convert_type( ElementType $type );
 
 	// }}}
 	// {{{ convert_exception()
@@ -251,7 +251,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation de l'exception lancé par l'exception ou pas.
 	 */
-	function convert_exception( DstyleDoc_Element_Exception $exception );
+	function convert_exception( ElementException $exception );
 
 	// }}}
 	// {{{ convert_member()
@@ -263,7 +263,7 @@ interface ConverterInterface
 	 * Returns:
 	 *		mixed = La documentation du membre de la classe ou pas.
 	 */
-	function convert_member( DstyleDoc_Element_Member $member );
+	function convert_member( ElementMember $member );
 
 	// }}}
 	// {{{ convert_text()

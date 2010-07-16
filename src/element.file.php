@@ -8,7 +8,7 @@ require_once 'element.php';
  */
 class FileElement extends TitledElement
 {
-	// {{{ __sleep()
+	// {{{ serialize(), unserialize(), __sleep()
 
 	public function __sleep()
 	{
@@ -150,4 +150,3 @@ class FileElement extends TitledElement
 
 	// }}}
 }
-

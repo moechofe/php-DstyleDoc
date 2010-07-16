@@ -3,7 +3,8 @@ namespace dstyledoc\converters;
 
 require_once 'converter.php';
 
-use \dstyledoc\Converter;
+use dstyledoc\Converter;
+use dstyledoc\Element;
 
 abstract class ConverterHTML extends Converter
 {

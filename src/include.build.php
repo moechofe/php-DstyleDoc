@@ -3,7 +3,9 @@ chdir(__DIR__);
 $phar = new Phar(__DIR__.'/../dstyledoc.phar');
 $phar->addFile('control.php');
 $phar->addFile('converter.php');
+$phar->addFile('element.all.php');
 $phar->addFile('element.php');
+$phar->addFile('element.file.php');
 $phar->addFile('include.properties.php');
 $phar->addFile('include.frontend.php');
 $phar->addFile('tokens.all.php');
@@ -16,7 +18,7 @@ var_dump( $phar->getStub() );
 $phar->setStub(<<<HTML
 <?php
 Phar::mapPhar('dstyledoc.phar');
-require_once 'phar://dstyledoc.phar/include.frontend.php';
+set_include_path('phar://dstyledoc.phar'.PATH_SEPARATOR.get_include_path());require_once 'phar://dstyledoc.phar/include.frontend.php';
 __HALT_COMPILER();
 HTML
 );
@@ -31,6 +33,7 @@ $phar->addFile('converter.simple.php');
 $phar->setStub(<<<HTML
 <?php
 Phar::mapPhar('dstyledoc.converters.phar');
+set_include_path('phar://dstyledoc.converters.phar'.PATH_SEPARATOR.get_include_path());
 spl_autoload_register( function(\$name)
 {
 	switch(strtolower(\$name))
