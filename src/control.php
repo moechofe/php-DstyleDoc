@@ -180,14 +180,6 @@ HTML;
 	}
 
 	// }}}
-	// {{{ hie()
-
-	static public function hie()
-	{
-		return new self;
-	}
-
-	// }}}
 	// {{{ $config
 
 	protected $_config = array(

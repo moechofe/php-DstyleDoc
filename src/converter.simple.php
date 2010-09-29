@@ -448,13 +448,4 @@ HTML;
 	}
 
 	// }}}
-
-	// {{{ hie()
-
-	static function hie()
-	{
-		return new self;
-	}
-
-	// }}}
 }

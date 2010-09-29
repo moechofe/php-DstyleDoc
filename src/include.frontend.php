@@ -29,27 +29,41 @@ case cli:
 		}
 	}
 
-	if( ! $src ) err("No SRC parameter found. \nRead the manual, type: « $exe --help »");
-
 	switch( $action )
 	{
 	case help:
 		echo <<<HELP
 DstyleDoc Front-end: documentation generator for PHP
-Usage: $exe [OPTION]... SRC...
+Usage: $exe [OPTION]... SRC... CONVERTER
 
 SRC can be one or more files, folders or PCRE compatible regular expressions.
 When using expressions, ensure quoted it with a slash (/), a pipe (|)...
 
+CONVERTER should be a valid converter script or package
+
 OPTION:
-	-h, --help      Display this help page
+  -h --help      Display this help page
 
 
 HELP;
+		exit;
 	default:
-		$instance = Control::hie();
-		$instance->source( $src );
-		var_dump($instance);
+		$converter = array_pop($src);
+
+		if( ! $src ) err("No SRC parameter found. \nRead the manual, type: « $exe --help »");
+		if( ! $converter ) err("No CONVERTER parameter found. \nRead the manual, type: « $exe --help »");
+
+		$controller = new Control;
+		$controller->source( $src );
+
+		preg_match('/^dstyledoc\.(.*?)\.ph(?:p|ar)$/',$converter,$match);
+		include $converter;
+		$converter = $match[1];
+
+		$converter = "\\dstyledoc\\converters\\$converter\\get";
+		$converter = $converter();
+		$converter = new $converter;
+
 	}
 	exit(0);
 
@@ -59,7 +73,7 @@ case web:
 	break;
 
 default:
-	$instance = Control::hie();
+	$instance = new Control;
 	function auto()
 	{
 		global $instance;
